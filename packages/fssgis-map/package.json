@@ -1,0 +1,26 @@
+{
+  "name": "@fssgis/map",
+  "version": "0.0.0",
+  "description": "🎉【@fssgis/map】基础地图库🎉",
+  "main": "dist/index.js",
+  "scripts": {
+    "build:dev": "tsc -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fssgis/fssgis-map.git"
+  },
+  "keywords": [],
+  "author": "ngheizit",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fssgis/fssgis-map/issues"
+  },
+  "homepage": "https://github.com/fssgis/fssgis-map#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.28.3",
+    "@typescript-eslint/parser": "^4.28.3",
+    "eslint": "^7.30.0",
+    "typescript": "^4.3.5"
+  }
+}

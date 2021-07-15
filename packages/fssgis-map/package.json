@@ -1,6 +1,6 @@
 {
   "name": "@fssgis/map",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "🎉【@fssgis/map】基础地图库🎉",
   "main": "dist/index.js",
   "scripts": {

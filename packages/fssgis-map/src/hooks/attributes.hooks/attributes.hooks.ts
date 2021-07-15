@@ -2,12 +2,12 @@ import { App, inject, InjectionKey } from 'vue'
 
 interface IAttribute {
   layerName: string
-  fields: {
+  fields?: {
     name: string
     alias: string
     type?: string
   }[]
-  exclude: string[]
+  exclude?: string[]
 }
 
 type IAttributes = IAttribute[]

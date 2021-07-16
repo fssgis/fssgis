@@ -14,7 +14,7 @@ type IAttributesConfig = IAttributesConfigItem[]
 
 const SYMBOL_KEY: InjectionKey<IAttributesConfig> = Symbol()
 
-export function createAttributes (attributes: IAttributesConfig) : { install (app: App) : void } {
+export function createAttributesConfig (attributes: IAttributesConfig) : { install (app: App) : void } {
 
   return {
     install (app) {
@@ -23,6 +23,6 @@ export function createAttributes (attributes: IAttributesConfig) : { install (ap
   }
 }
 
-export function useAttributes () : IAttributesConfig {
+export function useAttributesConfig () : IAttributesConfig {
   return inject(SYMBOL_KEY) as IAttributesConfig
 }

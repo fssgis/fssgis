@@ -9,8 +9,8 @@ interface IAttributesConfigItem {
     exclude?: string[];
 }
 declare type IAttributesConfig = IAttributesConfigItem[];
-export declare function createAttributes(attributes: IAttributesConfig): {
+export declare function createAttributesConfig(attributes: IAttributesConfig): {
     install(app: App): void;
 };
-export declare function useAttributes(): IAttributesConfig;
+export declare function useAttributesConfig(): IAttributesConfig;
 export {};

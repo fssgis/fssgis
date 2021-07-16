@@ -4,6 +4,7 @@
   "description": "🎉【@fssgis/map】基础地图库🎉",
   "main": "dist/index.js",
   "scripts": {
+    "build": "tsc",
     "build:dev": "tsc -w"
   },
   "repository": {

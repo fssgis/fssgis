@@ -1,6 +1,6 @@
 import { App, inject, InjectionKey } from 'vue'
 
-interface IAttributesConfigItem {
+export interface IAttributesConfigItem {
   layerName: string
   fields?: {
     name: string
@@ -10,7 +10,7 @@ interface IAttributesConfigItem {
   exclude?: string[]
 }
 
-type IAttributesConfig = IAttributesConfigItem[]
+export type IAttributesConfig = IAttributesConfigItem[]
 
 const SYMBOL_KEY: InjectionKey<IAttributesConfig> = Symbol()
 

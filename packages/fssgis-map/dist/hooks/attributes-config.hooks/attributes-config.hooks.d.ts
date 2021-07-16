@@ -1,5 +1,5 @@
 import { App } from 'vue';
-interface IAttributesConfigItem {
+export interface IAttributesConfigItem {
     layerName: string;
     fields?: {
         name: string;
@@ -8,9 +8,8 @@ interface IAttributesConfigItem {
     }[];
     exclude?: string[];
 }
-declare type IAttributesConfig = IAttributesConfigItem[];
+export declare type IAttributesConfig = IAttributesConfigItem[];
 export declare function createAttributesConfig(attributes: IAttributesConfig): {
     install(app: App): void;
 };
 export declare function useAttributesConfig(): IAttributesConfig;
-export {};

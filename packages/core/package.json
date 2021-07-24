@@ -1,6 +1,6 @@
 {
   "name": "@fssgis/core",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "✨【@fssgis/core】JavaScript核心库✨",
   "main": "dist/index.js",
   "module": "es/index.js",

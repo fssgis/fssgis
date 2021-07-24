@@ -1,6 +1,6 @@
 {
   "name": "@fssgis/core",
-  "version": "0.1.5",
+  "version": "0.1.4",
   "description": "✨【@fssgis/core】JavaScript核心库✨",
   "main": "dist/index.js",
   "module": "es/index.js",
@@ -8,6 +8,10 @@
     "build:dev": "tsc -w",
     "build": "tsc && tsc --outDir ./dist --module CommonJS",
     "test": "nodemon --exec npx jest"
+  },
+  "repository": {
+    "type": "npm",
+    "url": "https://www.npmjs.com/package/@fssgis/core"
   },
   "keywords": [],
   "author": "ngheizit",

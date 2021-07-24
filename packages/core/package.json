@@ -9,10 +9,6 @@
     "build": "tsc && tsc --outDir ./dist --module CommonJS",
     "test": "nodemon --exec npx jest"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fssgis/fssgis-core.git"
-  },
   "keywords": [],
   "author": "ngheizit",
   "license": "ISC",

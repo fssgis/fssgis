@@ -1,0 +1,25 @@
+{  
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "module": "ESNext",
+    "target": "ESNext",
+    "sourceMap": false,
+    "rootDir": "./src",
+    "outDir": "./es",
+    "watch": false,
+    "esModuleInterop":true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "allowJs": true,
+    "strictNullChecks": true,
+    "noImplicitOverride": true,
+  },
+  "include": [
+    "./src/**/*.ts",
+    "./src/**/*.js",
+  ],
+  "exclude": [
+    "./src/**/*.test.ts",
+  ],
+}

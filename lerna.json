@@ -4,7 +4,7 @@
     "publish": {
       "ignoreChanges": ["ignored-file"],
       "message": "chore(release): publish",
-      "registry": "https://registry.npmjs.org"
+      "registry": "https://www.npmjs.com/package"
     },
     "bootstrap": {
       "ignore": "component-*",

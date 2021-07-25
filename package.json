@@ -1,11 +1,13 @@
 {
   "name": "fssgis",
-  "private": false,
+  "private": true,
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "build": "npx rollup --config"
+    "build": "npx rollup --config",
+    "dev:docs": "npx vitepress dev ./packages/fssgis-docs/docs",
+    "build:docs": "npx vitepress build ./packages/fssgis-docs/docs"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^19.0.1",
@@ -25,7 +27,8 @@
     "sass": "^1.36.0",
     "sass-loader": "^12.1.0",
     "ts-jest": "^27.0.4",
-    "typescript": "^4.3.4"
+    "typescript": "^4.3.4",
+    "vitepress": "^0.15.6"
   },
   "dependencies": {
     "axios": "^0.21.1",

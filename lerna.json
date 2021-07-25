@@ -2,7 +2,7 @@
   "npmClient": "npm",
   "command": {
     "publish": {
-      "ignoreChanges": ["ignored-file"],
+      "ignoreChanges": ["ignored-file", "*.md", ".gitignore"],
       "message": "chore: publish",
       "registry": "https://registry.npmjs.org"
     },

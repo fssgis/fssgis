@@ -1,0 +1,14 @@
+{
+  "name": "@fssgis/observable",
+  "version": "0.0.0",
+  "description": "🎉JavaScript观测者模式，主动观测",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "keywords": [
+    "javascript",
+    "typescript",
+    "observable",
+    "core"
+  ]
+}

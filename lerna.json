@@ -1,0 +1,18 @@
+{
+  "npmClient": "npm",
+  "command": {
+    "publish": {
+      "ignoreChanges": ["ignored-file"],
+      "message": "chore: publish",
+      "registry": "https://registry.npmjs.org"
+    },
+    "bootstrap": {
+      "useWorkspaces": true,
+      "ignoreScripts": true
+    }
+  },
+  "packages": [
+    "packages/*"
+  ],
+  "version": "0.1.0"
+}

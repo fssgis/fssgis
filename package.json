@@ -1,0 +1,35 @@
+{
+  "name": "fssgis",
+  "private": false,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npx rollup --config"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^19.0.1",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.0.4",
+    "@types/jest": "^26.0.24",
+    "@typescript-eslint/eslint-plugin": "^4.28.4",
+    "@typescript-eslint/parser": "^4.28.4",
+    "eslint": "^7.31.0",
+    "eslint-plugin-vue": "^7.14.0",
+    "nodemon": "^2.0.12",
+    "rollup": "^2.54.0",
+    "rollup-jest": "^1.1.2",
+    "rollup-plugin-dts": "^3.0.2",
+    "rollup-plugin-scss": "^3.0.0",
+    "rollup-plugin-vue": "^6.0.0",
+    "sass": "^1.36.0",
+    "sass-loader": "^12.1.0",
+    "ts-jest": "^27.0.4",
+    "typescript": "^4.3.4"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "vue": "^3.1.5"
+  }
+}

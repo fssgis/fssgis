@@ -55,12 +55,12 @@ export function toValue (value?: string | number | null, initValue = '---') : st
     : value as string
 }
 
-// import Icon from '../icon/Icon.vue'
+import FssgIcon from '@fssgis/icon'
 import GridContainer from '@fssgis/grid'
 
 export default defineComponent({
   components: {
-    // Icon,
+    FssgIcon,
     GridContainer,
   },
   props: {
@@ -92,7 +92,7 @@ export default defineComponent({
   >
     <template #item1>
       <div class="top-content">
-        <div
+        <FssgIcon
           v-if="iconUrl"
           :url="iconUrl"
           :style="iconStyle"

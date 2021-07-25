@@ -69,4 +69,5 @@ export default [
   ...createCore('fssgis-map', ['@fssgis/utils', '@fssgis/observable']),
   ...createCore('fssgis-attributes', ['vue']),
   ...createVueComponent('fssgis-grid', ['@fssgis/utils']),
+  ...createVueComponent('fssgis-icon'),
 ]

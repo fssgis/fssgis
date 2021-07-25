@@ -1,0 +1,9 @@
+.fssg-icon {
+  display: inline-block;
+  width: var(--c79f4a06-widthStyle);
+  height: var(--c79f4a06-heightStyle);
+  background-image: var(--c79f4a06-iconUrl);
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}

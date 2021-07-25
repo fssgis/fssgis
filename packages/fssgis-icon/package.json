@@ -1,0 +1,6 @@
+{
+  "name": "@fssgis/icon",
+  "version": "0.0.0",
+  "description": "✨vue icon 图标组件✨",
+  "main": "src/index.ts"
+}

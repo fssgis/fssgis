@@ -4,6 +4,9 @@ import { nodeResolve } from '@rollup/plugin-node-resolve'
 import path from 'path'
 import dts from 'rollup-plugin-dts'
 import json from '@rollup/plugin-json'
+import vue from 'rollup-plugin-vue'
+import scss from 'rollup-plugin-scss'
+
 
 const pathResolve = (...args) => path.resolve(...args)
 
@@ -33,6 +36,30 @@ function createCore (dirName, external = []) {
   ]
 }
 
+function createVueComponent (dirName, external = []) {
+  return [
+    {
+      input: pathResolve('packages', dirName, 'src/index.ts'),
+      output: [
+        { format: 'esm', file: pathResolve('packages', dirName, 'dist/index.js') },
+      ],
+      external:['vue', ...external],
+      plugins: [
+        typescript({
+          'module': 'esnext',
+        }),
+        vue({
+          css: true,
+          compileTemplate: true,
+        }),
+        commonjs(),
+        nodeResolve(),
+        scss(),
+      ]
+    },
+  ]
+}
+
 export default [
   ...createCore('fssgis-observable'),
   ...createCore('fssgis-utils'),
@@ -41,4 +68,5 @@ export default [
   ...createCore('fssgis-axios', ['axios']),
   ...createCore('fssgis-map', ['@fssgis/utils', '@fssgis/observable']),
   ...createCore('fssgis-attributes', ['vue']),
+  ...createVueComponent('fssgis-grid', ['@fssgis/utils']),
 ]

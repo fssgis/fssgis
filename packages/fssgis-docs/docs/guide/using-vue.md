@@ -4,6 +4,9 @@ sidebarDepth: 3
 
 # Using Vue in Markdown
 
+<ComponentInHeader />
+<StatisticsBox name="你好" value="100" unit="遍" />
+
 In VitePress, each markdown file is compiled into HTML and then processed as a Vue Single-File Component. This means you can use any Vue features inside the markdown, including dynamic templating, using Vue components, or arbitrary in-page Vue component logic by adding a `<script>` tag.
 
 It is also important to know that VitePress leverages Vue 3's compiler to automatically detect and optimize the purely static parts of the markdown. Static contents are optimized into single placeholder nodes and eliminated from the page's JavaScript payload. They are also skipped during client-side hydration. In short, you only pay for the dynamic parts on any given page.
@@ -40,7 +43,7 @@ Directives also work:
 
 ### Access to Site & Page Data
 
-You can use the [`useData` helper](/guide/api.html#usedata) in a `<script>` block and expose the data to the page.
+You can use the [`useData` helper] in a `<script>` block and expose the data to the page.
 
 **Input**
 
@@ -107,7 +110,7 @@ This is a .md using a custom component
 
 ### Registering global components in the theme
 
-If the components are going to be used across several pages in the docs, they can be registered globally in the theme (or as part of extending the default VitePress theme). Check out the [Theming Guide](./theming.md) for more information.
+If the components are going to be used across several pages in the docs, they can be registered globally in the theme (or as part of extending the default VitePress theme). Check out the [Theming Guide] for more information.
 
 In `.vitepress/theme/index.js`, the `enhanceApp` function receives the Vue `app` instance so you can [register components](https://v3.vuejs.org/guide/component-registration.html#component-registration) as you would do in a regular Vue application.
 
@@ -200,7 +203,7 @@ export default {
 
 ## Built-In Components
 
-VitePress provides Built-In Vue Components like `ClientOnly` and `OutboundLink`, check out the [Global Component Guide](./global-component.md) for more information.
+VitePress provides Built-In Vue Components like `ClientOnly` and `OutboundLink`, check out the [Global Component Guide] for more information.
 
 **Also see:**
 

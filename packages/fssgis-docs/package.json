@@ -2,5 +2,9 @@
   "name": "@fssgis/docs",
   "version": "1.0.0-alpha.0",
   "private": true,
-  "description": "🎉fssgis文档"
+  "description": "🎉fssgis文档",
+  "dependencies": {
+    "@fssgis/grid": "^0.3.11",
+    "vue": "^3.1.5"
+  }
 }

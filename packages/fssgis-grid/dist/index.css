@@ -1,0 +1,5 @@
+.fssg-grid {
+  display: grid;
+  width: fit-content;
+  height: fit-content;
+}

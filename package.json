@@ -5,6 +5,7 @@
     "packages/*"
   ],
   "scripts": {
+    "publish": "lerna publish --no-push",
     "build": "npx rollup --config",
     "dev:docs": "npx vitepress dev ./packages/fssgis-docs/docs",
     "build:docs": "npx vitepress build ./packages/fssgis-docs/docs"

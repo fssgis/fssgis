@@ -1,6 +1,6 @@
 {
   "name": "@fssgis/observable",
-  "version": "0.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "🎉JavaScript观测者模式，主动观测",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",

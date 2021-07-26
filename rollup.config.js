@@ -92,6 +92,6 @@ export default [
   ...createCore('fssgis-axios', ['axios']),
   ...createMap('fssgis-map', ['@fssgis/utils', '@fssgis/observable']),
   ...createCore('fssgis-attributes', ['vue']),
-  ...createVueComponent('fssgis-grid', ['@fssgis/utils']),
   ...createVueComponent('fssgis-icon'),
+  ...createVueComponent('fssgis-grid', ['@fssgis/utils', '@fssgis/icon']),
 ]

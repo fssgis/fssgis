@@ -1,6 +1,4 @@
-import FssgGrid from './FssgGrid.vue'
-export * from './FssgGrid.vue'
+import FssgGrid from './fssg-grid'
+export default FssgGrid
 
 export * from './boxes'
-
-export default FssgGrid

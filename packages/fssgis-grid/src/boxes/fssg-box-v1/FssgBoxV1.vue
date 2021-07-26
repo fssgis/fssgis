@@ -1,18 +1,23 @@
 <script lang="ts">
-import { defineComponent } from 'vue'
-
+import { defineComponent, PropType } from 'vue'
 import FssgIcon from '@fssgis/icon'
-import FssgGrid from '../../FssgGrid.vue'
-import { statisticsProps, statisticsStyleProps, toValue } from '..'
+import FssgGrid from '../../fssg-grid'
+import { IStatistics, statisticsProps, statisticsStyleProps, toValue } from '..'
+import FssgBoxV4 from '../fssg-box-v4'
 
 export default defineComponent({
   components: {
     FssgIcon,
     FssgGrid,
+    FssgBoxV4,
   },
   props: {
     ...statisticsProps(),
     ...statisticsStyleProps(),
+    values: {
+      type: Array as PropType<IStatistics[]>,
+      default: () => null
+    },
   },
   setup () {
 
@@ -43,18 +48,29 @@ export default defineComponent({
           v-if="iconUrl"
           :url="iconUrl"
           :style="iconStyle"
-          width="40px"
-          height="40px"
         />
 
         <span
-          class="name"
-          :style="nameStyle"
-        >{{ name }}</span>
+          class="title"
+          :style="titleStyle"
+        >{{ title }}</span>
       </div>
     </template>
     <template #item2>
-      <div class="bottom-content">
+      <div
+        v-if="values"
+        class="bottom-content small"
+      >
+        <FssgBoxV4
+          v-for="(item, index) in values"
+          :key="index"
+          :="item"
+        />
+      </div>
+      <div
+        v-else
+        class="bottom-content"
+      >
         <span
           class="value"
           :style="valueStyle"
@@ -69,18 +85,12 @@ export default defineComponent({
 </template>
 
 <style lang="scss" scoped>
-.fssg-box--v1 {
-  font-size: 20px;
-  padding: 8px;
-}
 .top-content,
 .bottom-content {
   text-align: center;
 }
 .value {
   margin-right: 4px;
-  font-size: 24px;
-  font-weight: bold;
   text-align: right;
 }
 </style>

@@ -16,14 +16,14 @@ export {
 }
 
 export interface IStatistics {
-  name: string
+  title: string
   value?: string | number
   unit: string
 }
 
 export function statisticsProps () {
   return {
-    name: {
+    title: {
       type: String,
       default: '',
     },
@@ -46,19 +46,19 @@ export function statisticsStyleProps () {
     },
     iconStyle: {
       type: Object as PropType<CSSProperties>,
-      default: {}
+      default: () => ({})
     },
-    nameStyle: {
+    titleStyle: {
       type: Object as PropType<CSSProperties>,
-      default: {}
+      default: () => ({})
     },
     valueStyle: {
       type: Object as PropType<CSSProperties>,
-      default: {}
+      default: () => ({})
     },
     unitStyle: {
       type: Object as PropType<CSSProperties>,
-      default: {}
+      default: () => ({})
     },
   }
 }

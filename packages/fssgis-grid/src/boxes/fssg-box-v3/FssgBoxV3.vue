@@ -2,7 +2,7 @@
 import { defineComponent } from 'vue'
 
 import FssgIcon from '@fssgis/icon'
-import FssgGrid from '../../FssgGrid.vue'
+import FssgGrid from '../../fssg-grid'
 import { statisticsProps, statisticsStyleProps, toValue } from '..'
 
 export default defineComponent({
@@ -43,14 +43,12 @@ export default defineComponent({
           v-if="iconUrl"
           :url="iconUrl"
           :style="iconStyle"
-          width="40px"
-          height="40px"
         />
 
         <span
-          class="name"
-          :style="nameStyle"
-        >{{ name }}</span>
+          class="title"
+          :style="titleStyle"
+        >{{ title }}</span>
       </div>
     </template>
     <template #item2>
@@ -70,16 +68,8 @@ export default defineComponent({
 </template>
 
 <style lang="scss" scoped>
-.fssg-box--v3 {
-  font-size: 20px;
-  padding: 8px;
-}
 .top-content,
 .bottom-content {
   text-align: center;
-}
-.value {
-  font-size: 24px;
-  font-weight: bold;
 }
 </style>

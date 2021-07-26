@@ -29,7 +29,7 @@ export default defineComponent({
     inline: Boolean,
     margin: {
       type: String,
-      default: () => '0',
+      default: () => '',
     },
   },
   setup (props) {
@@ -44,7 +44,9 @@ export default defineComponent({
           return
         }
         d.style.gridArea = className
-        d.style.margin = props.margin
+        if (props.margin) {
+          d.style.margin = props.margin
+        }
       })
     })
 

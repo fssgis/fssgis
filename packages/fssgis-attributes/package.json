@@ -1,6 +1,6 @@
 {
   "name": "@fssgis/attributes",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-alpha.3",
   "description": "🎉地理要素属性信息解析器",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",

@@ -1,6 +1,6 @@
 {
   "name": "@fssgis/storage",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-alpha.3",
   "description": "🎉JavaScript缓存工具集",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",

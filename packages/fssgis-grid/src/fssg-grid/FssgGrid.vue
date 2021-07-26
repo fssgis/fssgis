@@ -47,6 +47,7 @@ export default defineComponent({
         templateRows: Array.from({ length: _options.gridAreas.length }, () => 'auto').join(' '),
         templateColumns: Array.from({ length: _options.gridAreas[0]?.length }, () => 'auto').join(' '),
         gap: '0 0',
+        margin: '8px'
       }, _options)
     })
 
@@ -60,6 +61,9 @@ export default defineComponent({
         gridTemplateRows: options.value.templateRows,
         gridTemplateColumns: options.value.templateColumns,
         gap: options.value.gap,
+        height: options.value.height,
+        width: options.value.width,
+        margin: options.value.margin,
       }
     })
 
@@ -122,6 +126,7 @@ export interface IGridContainerOptions {
   gap?: string
   width?: string
   height?: string
+  margin?: string
 }
 </script>
 

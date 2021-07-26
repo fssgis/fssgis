@@ -1,10 +1,10 @@
 {
   "name": "@fssgis/docs",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.7",
   "private": true,
   "description": "🎉fssgis文档",
   "dependencies": {
-    "@fssgis/grid": "^1.0.0-alpha.6",
+    "@fssgis/grid": "^1.0.0-alpha.7",
     "@fssgis/icon": "^1.0.0-alpha.3",
     "vue": "^3.1.5"
   }

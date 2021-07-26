@@ -1,5 +1,5 @@
 import { $extend, isNullOrUndefined } from '@fssgis/utils';
-import { defineComponent, computed, reactive, toRefs, openBlock, createBlock, Fragment, renderList, renderSlot, pushScopeId, popScopeId, resolveComponent, createVNode, createCommentVNode, toDisplayString, withScopeId, mergeProps } from 'vue';
+import { defineComponent, ref, onMounted, nextTick, computed, reactive, toRefs, openBlock, createBlock, Fragment, renderList, renderSlot, pushScopeId, popScopeId, resolveComponent, createVNode, createCommentVNode, toDisplayString, withScopeId, mergeProps } from 'vue';
 import FssgIcon from '@fssgis/icon';
 
 var script$4 = defineComponent({
@@ -8,9 +8,28 @@ var script$4 = defineComponent({
             type: Object,
             default: () => null,
         },
-        inline: Boolean
+        inline: Boolean,
+        margin: {
+            type: String,
+            default: () => '',
+        },
     },
     setup(props) {
+        const fssgGrid = ref();
+        onMounted(async () => {
+            await nextTick();
+            const dom = fssgGrid.value;
+            state.gridAreaItems.areaItems.forEach((className, index) => {
+                const d = dom.children.item(index);
+                if (!d) {
+                    return;
+                }
+                d.style.gridArea = className;
+                if (props.margin) {
+                    d.style.margin = props.margin;
+                }
+            });
+        });
         const options = computed(() => {
             const _options = props.options;
             return $extend(true, {
@@ -29,11 +48,14 @@ var script$4 = defineComponent({
                 gridTemplateRows: options.value.templateRows,
                 gridTemplateColumns: options.value.templateColumns,
                 gap: options.value.gap,
+                height: options.value.height,
+                width: options.value.width,
             };
         });
         return {
             gridStyle,
             ...toRefs(state),
+            fssgGrid,
         };
     },
 });
@@ -65,6 +87,7 @@ function _createGridTemplateAreas(gridAreas) {
 
 function render$4(_ctx, _cache, $props, $setup, $data, $options) {
   return (openBlock(), createBlock("div", {
+    ref: "fssgGrid",
     class: "fssg-grid",
     style: {
       ..._ctx.gridStyle,
@@ -72,13 +95,10 @@ function render$4(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, [
     (openBlock(true), createBlock(Fragment, null, renderList(_ctx.gridAreaItems.areaItems, (item, index) => {
-      return (openBlock(), createBlock("div", {
+      return renderSlot(_ctx.$slots, item, {
         key: index,
-        class: item,
         style: { gridArea: item }
-      }, [
-        renderSlot(_ctx.$slots, item)
-      ], 6 /* CLASS, STYLE */))
+      })
     }), 128 /* KEYED_FRAGMENT */))
   ], 4 /* STYLE */))
 }

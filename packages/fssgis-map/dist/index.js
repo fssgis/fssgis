@@ -43,7 +43,10 @@ class BaseClass extends Observable {
                 resolve();
             }
             else {
-                this.once('loaded', () => resolve());
+                this.once('loaded', () => {
+                    callback?.();
+                    resolve();
+                });
             }
         });
     }

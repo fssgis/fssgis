@@ -35,6 +35,30 @@ function createCore (dirName, external = []) {
     }
   ]
 }
+function createMap (dirName, external = []) {
+  return [
+    {
+      input: pathResolve('packages', dirName, 'src/index.ts'),
+      output: [
+        { format: 'esm', file: pathResolve('packages', dirName, 'dist/index.js') },
+      ],
+      external:[...external],
+      plugins: [
+        typescript(),
+        commonjs(),
+        nodeResolve(),
+        json(),
+      ]
+    },
+    {
+      input: pathResolve('packages', dirName, 'src/index.ts'),
+      output: [
+        { format: 'esm', file: pathResolve('packages', dirName, 'dist/index.d.ts') },
+      ],
+      plugins: [dts()]
+    }
+  ]
+}
 
 function createVueComponent (dirName, external = []) {
   return [
@@ -66,7 +90,7 @@ export default [
   ...createCore('fssgis-ext'),
   ...createCore('fssgis-storage'),
   ...createCore('fssgis-axios', ['axios']),
-  ...createCore('fssgis-map', ['@fssgis/utils', '@fssgis/observable']),
+  ...createMap('fssgis-map', ['@fssgis/utils', '@fssgis/observable']),
   ...createCore('fssgis-attributes', ['vue']),
   ...createVueComponent('fssgis-grid', ['@fssgis/utils']),
   ...createVueComponent('fssgis-icon'),

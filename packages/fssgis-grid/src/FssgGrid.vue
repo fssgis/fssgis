@@ -1,7 +1,10 @@
 <template>
   <div
     class="fssg-grid"
-    :style="gridStyle"
+    :style="{
+      ...gridStyle,
+      display: inline ? 'inline-grid' : 'grid'
+    }"
   >
     <div
       v-for="(item, index) in gridAreaItems.areaItems"
@@ -24,14 +27,15 @@ export default defineComponent({
       type: Object as PropType<IGridContainerOptions>,
       default: () => null,
     },
+    inline: Boolean
   },
   setup (props) {
     const options = computed<IGridContainerOptions>(() => {
       const _options = props.options
       return $extend(true, {
         gridAreas: [],
-        templateRows: Array.from({ length: _options.gridAreas.length }, () => '1fr').join(' '),
-        templateColumns: Array.from({ length: _options.gridAreas[0]?.length }, () => '1fr').join(' '),
+        templateRows: Array.from({ length: _options.gridAreas.length }, () => 'auto').join(' '),
+        templateColumns: Array.from({ length: _options.gridAreas[0]?.length }, () => 'auto').join(' '),
         gap: '0 0',
       }, _options)
     })
@@ -112,7 +116,6 @@ export interface IGridContainerOptions {
 
 <style lang="scss">
 .fssg-grid {
-  display: inline-grid;
   width: fit-content;
   height: fit-content;
 }

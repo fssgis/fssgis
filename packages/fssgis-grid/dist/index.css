@@ -1,5 +1,76 @@
 .fssg-grid {
-  display: inline-grid;
   width: fit-content;
   height: fit-content;
+}
+
+.fssg-box--v1[data-v-1e11ebba] {
+  font-size: 20px;
+  padding: 8px;
+}
+
+.top-content[data-v-1e11ebba],
+.bottom-content[data-v-1e11ebba] {
+  text-align: center;
+}
+
+.value[data-v-1e11ebba] {
+  margin-right: 4px;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.fssg-box--v2[data-v-4ae08be5] {
+  font-size: 20px;
+  padding: 8px;
+}
+
+.top-content[data-v-4ae08be5],
+.bottom-content[data-v-4ae08be5] {
+  text-align: center;
+}
+
+.value[data-v-4ae08be5] {
+  margin-right: 4px;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.fssg-box--v3[data-v-b66be4b2] {
+  font-size: 20px;
+  padding: 8px;
+}
+
+.top-content[data-v-b66be4b2],
+.bottom-content[data-v-b66be4b2] {
+  text-align: center;
+}
+
+.value[data-v-b66be4b2] {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.fssg-box--v4[data-v-0298e12e] {
+  font-size: 20px;
+  padding: 8px;
+  text-align: center;
+}
+
+.icon-container[data-v-0298e12e] {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fssg-icon {
+  display: inline-block;
+  width: var(--c79f4a06-widthStyle);
+  height: var(--c79f4a06-heightStyle);
+  background-image: var(--c79f4a06-iconUrl);
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
 }

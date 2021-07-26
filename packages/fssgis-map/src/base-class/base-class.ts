@@ -60,7 +60,10 @@ export abstract class BaseClass<T_OPTIONS, T_EVENTS extends IBaseClassEvents = I
         callback?.()
         resolve()
       } else {
-        this.once('loaded', () => resolve())
+        this.once('loaded', () => {
+          callback?.()
+          resolve()
+        })
       }
     })
   }

@@ -1,25 +1,24 @@
 <template>
   <div
+    ref="fssgGrid"
     class="fssg-grid"
     :style="{
       ...gridStyle,
       display: inline ? 'inline-grid' : 'grid'
     }"
   >
-    <div
+    <slot
       v-for="(item, index) in gridAreaItems.areaItems"
       :key="index"
-      :class="item"
       :style="{ gridArea: item }"
-    >
-      <slot :name="item" />
-    </div>
+      :name="item"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { $extend } from '@fssgis/utils'
-import { computed, ComputedRef, CSSProperties, defineComponent, PropType, reactive, toRefs } from 'vue'
+import { computed, ComputedRef, CSSProperties, defineComponent, nextTick, onMounted, PropType, reactive, ref, toRefs } from 'vue'
 
 export default defineComponent({
   props: {
@@ -29,7 +28,18 @@ export default defineComponent({
     },
     inline: Boolean
   },
-  setup (props) {
+  setup (props, { slots }) {
+    const fssgGrid = ref()
+
+    onMounted(async () => {
+      await nextTick()
+      const dom = fssgGrid.value as HTMLDivElement
+      state.gridAreaItems.areaItems.forEach((className, index) => {
+        const d = dom.children.item(index) as HTMLDivElement
+        d && (d.style.gridArea = className)
+      })
+    })
+
     const options = computed<IGridContainerOptions>(() => {
       const _options = props.options
       return $extend(true, {
@@ -56,6 +66,7 @@ export default defineComponent({
     return {
       gridStyle,
       ...toRefs(state),
+      fssgGrid,
     }
   },
 })

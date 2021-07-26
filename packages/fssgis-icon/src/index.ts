@@ -1,3 +1,3 @@
-import FssgIcon from './FssgIcon.vue'
+import FssgIcon from './FssgIcon.tsx'
 
 export default FssgIcon

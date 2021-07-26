@@ -1,9 +1,4 @@
-<template>
-  <div class="fssg-icon" />
-</template>
-
-<script lang="ts">
-import { computed, defineComponent } from 'vue'
+import { computed, CSSProperties, defineComponent } from "vue";
 
 export default defineComponent({
   props: {
@@ -21,30 +16,18 @@ export default defineComponent({
     },
   },
   setup (props) {
-
-
     const iconUrl = computed(() => `url(${props.url})`)
     const widthStyle = computed(() => !isNaN(props.width as number) ? `${props.width}px` : props.width)
     const heightStyle = computed(() => !isNaN(props.height as number) ? `${props.height}px` : props.height)
 
-    return {
-      iconUrl,
-      widthStyle,
-      heightStyle,
-    }
+    const style = computed<CSSProperties>(() => ({
+      display: 'inline-block',
+      backgroundSize: '100% 100%',
+      width: widthStyle.value,
+      height: heightStyle.value,
+      backgroundImage: iconUrl.value,
+    }))
+
+    return () => <div class="fssg-icon" style={ style.value } />
   }
 })
-
-</script>
-
-<style lang="scss">
-.fssg-icon {
-  display: inline-block;
-  width: v-bind(widthStyle);
-  height: v-bind(heightStyle);
-  background-image: v-bind(iconUrl);
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-</style>

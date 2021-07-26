@@ -6,6 +6,7 @@ import dts from 'rollup-plugin-dts'
 import json from '@rollup/plugin-json'
 import vue from 'rollup-plugin-vue'
 import scss from 'rollup-plugin-scss'
+import babel from '@rollup/plugin-babel'
 
 
 const pathResolve = (...args) => path.resolve(...args)
@@ -83,15 +84,42 @@ function createVueComponent (dirName, external = []) {
     },
   ]
 }
+function createVueTsxComponent (dirName, external = []) {
+  return [
+    {
+      input: pathResolve('packages', dirName, 'src/index.ts'),
+      output: [
+        { format: 'esm', file: pathResolve('packages', dirName, 'dist/index.js') },
+      ],
+      external:['vue', ...external],
+      plugins: [
+        typescript({
+          'module': 'esnext',
+        }),
+        commonjs(),
+        babel({ babelHelpers: 'bundled', extensions: ['.ts', '.js', '.tsx'], plugins: [['@vue/babel-plugin-jsx']] }),
+        nodeResolve(),
+        scss(),
+      ]
+    },
+    {
+      input: pathResolve('packages', dirName, 'src/index.ts'),
+      output: [
+        { format: 'esm', file: pathResolve('packages', dirName, 'dist/index.d.ts') },
+      ],
+      plugins: [dts()]
+    }
+  ]
+}
 
 export default [
-  ...createCore('fssgis-observable'),
-  ...createCore('fssgis-utils'),
-  ...createCore('fssgis-ext'),
-  ...createCore('fssgis-storage'),
-  ...createCore('fssgis-axios', ['axios']),
-  ...createMap('fssgis-map', ['@fssgis/utils', '@fssgis/observable']),
-  ...createCore('fssgis-attributes', ['vue']),
-  ...createVueComponent('fssgis-icon'),
-  ...createVueComponent('fssgis-grid', ['@fssgis/utils', '@fssgis/icon']),
+  // ...createCore('fssgis-observable'),
+  // ...createCore('fssgis-utils'),
+  // ...createCore('fssgis-ext'),
+  // ...createCore('fssgis-storage'),
+  // ...createCore('fssgis-axios', ['axios']),
+  // ...createMap('fssgis-map', ['@fssgis/utils', '@fssgis/observable']),
+  // ...createCore('fssgis-attributes', ['vue']),
+  ...createVueTsxComponent('fssgis-icon'),
+  // ...createVueComponent('fssgis-grid', ['@fssgis/utils', '@fssgis/icon']),
 ]

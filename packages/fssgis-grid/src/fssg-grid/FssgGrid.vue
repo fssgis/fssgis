@@ -26,9 +26,13 @@ export default defineComponent({
       type: Object as PropType<IGridContainerOptions>,
       default: () => null,
     },
-    inline: Boolean
+    inline: Boolean,
+    margin: {
+      type: String,
+      default: () => '0',
+    },
   },
-  setup (props, { slots }) {
+  setup (props) {
     const fssgGrid = ref()
 
     onMounted(async () => {
@@ -36,7 +40,11 @@ export default defineComponent({
       const dom = fssgGrid.value as HTMLDivElement
       state.gridAreaItems.areaItems.forEach((className, index) => {
         const d = dom.children.item(index) as HTMLDivElement
-        d && (d.style.gridArea = className)
+        if (!d) {
+          return
+        }
+        d.style.gridArea = className
+        d.style.margin = props.margin
       })
     })
 
@@ -47,7 +55,6 @@ export default defineComponent({
         templateRows: Array.from({ length: _options.gridAreas.length }, () => 'auto').join(' '),
         templateColumns: Array.from({ length: _options.gridAreas[0]?.length }, () => 'auto').join(' '),
         gap: '0 0',
-        margin: '8px'
       }, _options)
     })
 
@@ -63,7 +70,6 @@ export default defineComponent({
         gap: options.value.gap,
         height: options.value.height,
         width: options.value.width,
-        margin: options.value.margin,
       }
     })
 
@@ -126,7 +132,6 @@ export interface IGridContainerOptions {
   gap?: string
   width?: string
   height?: string
-  margin?: string
 }
 </script>
 

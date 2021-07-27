@@ -3,17 +3,12 @@
 import { CSSProperties, PropType } from 'vue'
 import { isNullOrUndefined } from '@fssgis/utils'
 
-import FssgBoxV1 from './fssg-box-v1'
-import FssgBoxV2 from './fssg-box-v2'
-import FssgBoxV3 from './fssg-box-v3'
-import FssgBoxV4 from './fssg-box-v4'
+export * from './fssg-box-v4'
+export * from './fssg-box-v3'
+export * from './fssg-box-v2'
+export * from './fssg-box-v1'
 
-export {
-  FssgBoxV1,
-  FssgBoxV2,
-  FssgBoxV3,
-  FssgBoxV4,
-}
+import './fssg-box.scss'
 
 export interface IStatistics {
   title: string

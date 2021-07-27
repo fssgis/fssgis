@@ -1,39 +1,38 @@
-<template>
-  <div
-    ref="fssgGrid"
-    class="fssg-grid"
-    :style="{
-      ...gridStyle,
-      display: inline ? 'inline-grid' : 'grid'
-    }"
-  >
-    <slot
-      v-for="(item, index) in gridAreaItems.areaItems"
-      :key="index"
-      :style="{ gridArea: item }"
-      :name="item"
-    />
-  </div>
-</template>
-
-<script lang="ts">
+import { computed, ComputedRef, CSSProperties, defineComponent, nextTick, onMounted, PropType, reactive, ref } from 'vue'
 import { $extend } from '@fssgis/utils'
-import { computed, ComputedRef, CSSProperties, defineComponent, nextTick, onMounted, PropType, reactive, ref, toRefs } from 'vue'
 
-export default defineComponent({
+import './fssg-grid.scss'
+
+export type GridAreas = number[][]
+
+export interface IGridTemplateArea {
+  gridTemplateArea: string
+  areaItems: string[]
+}
+
+export interface IFssgGridOptions {
+  gridAreas: GridAreas
+  templateRows?: string
+  templateColumns?: string
+  gap?: string
+  width?: string
+  height?: string
+}
+
+export const FssgGrid = defineComponent({
   props: {
     options: {
-      type: Object as PropType<IGridContainerOptions>,
-      default: () => null,
+      type: Object as PropType<IFssgGridOptions>,
+      default: () => ({})
     },
     inline: Boolean,
     margin: {
       type: String,
-      default: () => '',
-    },
+      default: () => ''
+    }
   },
-  setup (props) {
-    const fssgGrid = ref()
+  setup (props, { slots }) {
+    const fssgGrid = ref<InstanceType<typeof HTMLDivElement>>()
 
     onMounted(async () => {
       await nextTick()
@@ -50,7 +49,7 @@ export default defineComponent({
       })
     })
 
-    const options = computed<IGridContainerOptions>(() => {
+    const options = computed<IFssgGridOptions>(() => {
       const _options = props.options
       return $extend(true, {
         gridAreas: [],
@@ -75,29 +74,22 @@ export default defineComponent({
       }
     })
 
-    return {
-      gridStyle,
-      ...toRefs(state),
-      fssgGrid,
-    }
-  },
+    return () =>
+    <div
+      ref={ fssgGrid }
+      class="fssg-grid"
+      style={{
+        ...gridStyle.value,
+        display: props.inline ? 'inline-grid' : 'grid'
+      }}
+    >
+      {
+        state.gridAreaItems.areaItems.map((item, index) => slots[item]?.() ?? '')
+      }
+    </div>
+  }
 })
-
-
-export type GridAreas = number[][] // number is 0 or 1, and the row and columns count need to be same
-
-/*
-[
-  [1, 2, 1],
-  [1, 0, 1], => ' "item-0-0 item-0-1 item-0-2" "item-1-0 . item-1-2" "item-2-0 . item-2-2" '
-  [1, 0, 1],
-]
- */
-
-export interface IGridTemplateArea {
-  gridTemplateArea: string
-  areaItems: string[]
-}
+export default FssgGrid
 
 export function useGridAreaItems (gridAreas: GridAreas) : ComputedRef<IGridTemplateArea> {
 
@@ -126,20 +118,3 @@ function _createGridTemplateAreas (gridAreas: GridAreas) : [string, string[]] {
 
   return [templateArea.join(' '), [...areaItems]]
 }
-
-export interface IGridContainerOptions {
-  gridAreas: number[][]
-  templateRows?: string
-  templateColumns?: string
-  gap?: string
-  width?: string
-  height?: string
-}
-</script>
-
-<style lang="scss">
-.fssg-grid {
-  width: fit-content;
-  height: fit-content;
-}
-</style>

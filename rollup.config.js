@@ -84,7 +84,7 @@ function createVueComponent (dirName, external = []) {
     },
   ]
 }
-function createVueTsxComponent (dirName, external = []) {
+function createVueTsxComponent (dirName, external = [], externalCss = []) {
   return [
     {
       input: pathResolve('packages', dirName, 'src/index.ts'),
@@ -95,6 +95,7 @@ function createVueTsxComponent (dirName, external = []) {
       plugins: [
         typescript({
           'module': 'esnext',
+          useTsconfigDeclarationDir: true
         }),
         commonjs(),
         babel({ babelHelpers: 'bundled', extensions: ['.ts', '.js', '.tsx'], plugins: [['@vue/babel-plugin-jsx']] }),
@@ -107,19 +108,20 @@ function createVueTsxComponent (dirName, external = []) {
       output: [
         { format: 'esm', file: pathResolve('packages', dirName, 'dist/index.d.ts') },
       ],
+      external:[...externalCss],
       plugins: [dts()]
     }
   ]
 }
 
 export default [
-  // ...createCore('fssgis-observable'),
-  // ...createCore('fssgis-utils'),
-  // ...createCore('fssgis-ext'),
-  // ...createCore('fssgis-storage'),
-  // ...createCore('fssgis-axios', ['axios']),
-  // ...createMap('fssgis-map', ['@fssgis/utils', '@fssgis/observable']),
-  // ...createCore('fssgis-attributes', ['vue']),
+  ...createCore('fssgis-observable'),
+  ...createCore('fssgis-utils'),
+  ...createCore('fssgis-ext'),
+  ...createCore('fssgis-storage'),
+  ...createCore('fssgis-axios', ['axios']),
+  ...createMap('fssgis-map', ['@fssgis/utils', '@fssgis/observable']),
+  ...createCore('fssgis-attributes', ['vue']),
   ...createVueTsxComponent('fssgis-icon'),
-  // ...createVueComponent('fssgis-grid', ['@fssgis/utils', '@fssgis/icon']),
+  ...createVueTsxComponent('fssgis-grid', ['@fssgis/utils', '@fssgis/icon'], ['./fssg-grid.scss', './fssg-box.scss']),
 ]

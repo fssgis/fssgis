@@ -1,3 +1,2 @@
-import FssgGrid from './FssgGrid.vue'
-
-export default FssgGrid
+export * from './FssgGrid'
+export { default } from './FssgGrid'

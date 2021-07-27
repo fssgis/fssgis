@@ -1,3 +1,2 @@
-import FssgBoxV4 from './FssgBoxV4.vue'
-
-export default FssgBoxV4
+export * from './FssgBoxV4'
+export { default } from './FssgBoxV4'

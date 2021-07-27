@@ -1,4 +1,2 @@
-import FssgGrid from './fssg-grid'
-export default FssgGrid
-
+export * from './fssg-grid'
 export * from './boxes'

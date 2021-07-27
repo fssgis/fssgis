@@ -1,4 +1,4 @@
-import { computed, CSSProperties, defineComponent } from "vue";
+import { computed, CSSProperties, defineComponent } from 'vue'
 
 export default defineComponent({
   props: {

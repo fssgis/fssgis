@@ -13,7 +13,7 @@ import './fssg-box.scss'
 export interface IStatistics {
   title: string
   value?: string | number
-  unit: string
+  unit?: string
   iconUrl?: string
   iconStyle?: CSSProperties
   titleStyle?: CSSProperties

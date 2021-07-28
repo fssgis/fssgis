@@ -45,7 +45,7 @@ export const FssgBoxV1 = defineComponent({
               ? props.values.map((item, index) => <FssgBoxV4 key={ index } { ...item } />)
               : <>
                   <span class="fssg-box--value" style={ props.valueStyle }>{ toValue(props.value) }</span>
-                  <span class="fssg-box--unit" style={ props.unitStyle }>{ props.unit }</span>
+                  <span class="fssg-box--unit" style={ props.unitStyle }>{ props.unit ?? '' }</span>
                 </>
           }
         </div>,

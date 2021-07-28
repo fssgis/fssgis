@@ -30,6 +30,7 @@ function getGuideSidebar() {
         { text: 'Using Vue in Markdown', link: '/guide/using-vue' },
         { text: '图标组件 @fssgis/icon', link: '/guide/fssgis-icon' },
         { text: 'Grid布局组件 @fssgis/grid', link: '/guide/fssgis-grid' },
+        { text: '工具库 @fssgis/utils', link: '/guide/fssgis-utils' },
       ]
     },
     {

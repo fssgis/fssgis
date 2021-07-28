@@ -28,7 +28,7 @@ export const FssgBoxV4 = defineComponent({
       inline
       options={ gridOptions }
       v-slots={{
-        item1: () => <div>
+        item1: () => <div class="fssg-box-content">
           { props.iconUrl ? <FssgIcon url={ props.iconUrl } style={ props.iconStyle } /> : '' }
           <span class="fssg-box--title" style={ props.titleStyle }>{ props.title }</span>
           <span class="fssg-box--value" style={ props.valueStyle }>{ toValue(props.value) }</span>

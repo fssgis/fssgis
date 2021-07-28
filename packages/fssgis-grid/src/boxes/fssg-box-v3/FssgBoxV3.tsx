@@ -16,9 +16,9 @@ export const FssgBoxV3 = defineComponent({
 
     const gridOptions = {
       gridAreas: [
-        [1],
-        [2],
-        [3],
+        [4, 1],
+        [2, 2],
+        [3, 3],
       ],
     }
 
@@ -30,9 +30,11 @@ export const FssgBoxV3 = defineComponent({
       inline
       options={ gridOptions }
       v-slots={{
-        item1: () => <div>
-          { props.iconUrl ? <FssgIcon url={ props.iconUrl } style={ props.iconStyle } /> : '' }
+        item1: () => <div class="fssg-box-title">
           <span class="fssg-box--title" style={ props.titleStyle }>{ props.title }</span>
+        </div>,
+        item4: () => <div>
+          { props.iconUrl ? <FssgIcon url={ props.iconUrl } style={ props.iconStyle } /> : '' }
         </div>,
         item2: () => <div>
           <span class="fssg-box--value" style={ props.valueStyle }>{ toValue(props.value) }</span>

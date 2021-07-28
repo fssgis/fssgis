@@ -11,11 +11,19 @@
   }
 }
 
-.fssg-box--v1 {
+.fssg-box--v1,
+.fssg-box--v3 {
   .fssg-box-icon {
     text-align: right;
   }
   .fssg-box-title {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.fssg-box--v4 {
+  .fssg-box-content {
     display: flex;
     align-items: center;
   }

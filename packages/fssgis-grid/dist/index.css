@@ -9,10 +9,17 @@
   align-items: center;
 }
 
-.fssg-box--v1 .fssg-box-icon {
+.fssg-box--v1 .fssg-box-icon,
+.fssg-box--v3 .fssg-box-icon {
   text-align: right;
 }
-.fssg-box--v1 .fssg-box-title {
+.fssg-box--v1 .fssg-box-title,
+.fssg-box--v3 .fssg-box-title {
+  display: flex;
+  align-items: center;
+}
+
+.fssg-box--v4 .fssg-box-content {
   display: flex;
   align-items: center;
 }

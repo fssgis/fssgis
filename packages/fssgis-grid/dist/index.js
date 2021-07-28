@@ -120,7 +120,9 @@ const FssgBoxV4 = defineComponent({
       "inline": true,
       "options": gridOptions
     }, {
-      item1: () => createVNode("div", null, [props.iconUrl ? createVNode(FssgIcon, {
+      item1: () => createVNode("div", {
+        "class": "fssg-box-content"
+      }, [props.iconUrl ? createVNode(FssgIcon, {
         "url": props.iconUrl,
         "style": props.iconStyle
       }, null) : '', createVNode("span", {
@@ -149,20 +151,23 @@ const FssgBoxV3 = defineComponent({
 
   setup(props) {
     const gridOptions = {
-      gridAreas: [[1], [2], [3]]
+      gridAreas: [[4, 1], [2, 2], [3, 3]]
     };
     return () => createVNode(FssgGrid, {
       "class": "fssg-box fssg-box--v3",
       "inline": true,
       "options": gridOptions
     }, {
-      item1: () => createVNode("div", null, [props.iconUrl ? createVNode(FssgIcon, {
-        "url": props.iconUrl,
-        "style": props.iconStyle
-      }, null) : '', createVNode("span", {
+      item1: () => createVNode("div", {
+        "class": "fssg-box-title"
+      }, [createVNode("span", {
         "class": "fssg-box--title",
         "style": props.titleStyle
       }, [props.title])]),
+      item4: () => createVNode("div", null, [props.iconUrl ? createVNode(FssgIcon, {
+        "url": props.iconUrl,
+        "style": props.iconStyle
+      }, null) : '']),
       item2: () => createVNode("div", null, [createVNode("span", {
         "class": "fssg-box--value",
         "style": props.valueStyle

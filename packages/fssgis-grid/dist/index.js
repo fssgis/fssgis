@@ -235,7 +235,7 @@ const FssgBoxV1 = defineComponent({
       gridAreas: [[1], [2]]
     };
     return () => createVNode(FssgGrid, {
-      "class": "fssg-box fssg-box--v2",
+      "class": "fssg-box fssg-box--v1",
       "inline": true,
       "options": gridOptions
     }, {

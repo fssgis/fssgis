@@ -29,7 +29,7 @@ export const FssgBoxV1 = defineComponent({
 
     return () =>
     <FssgGrid
-      class="fssg-box fssg-box--v2"
+      class="fssg-box fssg-box--v1"
       inline
       options={ gridOptions }
       v-slots={{

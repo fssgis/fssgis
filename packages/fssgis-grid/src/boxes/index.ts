@@ -19,6 +19,8 @@ export interface IStatistics {
   titleStyle?: CSSProperties
   valueStyle?: CSSProperties
   unitStyle?: CSSProperties
+  style?: CSSProperties
+  onClick?: (e: MouseEvent) => void
 }
 
 export function statisticsProps () {

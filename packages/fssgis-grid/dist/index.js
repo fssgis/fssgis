@@ -232,7 +232,7 @@ const FssgBoxV1 = defineComponent({
 
   setup(props) {
     const gridOptions = {
-      gridAreas: [[1], [2]]
+      gridAreas: [[1, 2], [3, 3]]
     };
     return () => createVNode(FssgGrid, {
       "class": "fssg-box fssg-box--v1",
@@ -244,11 +244,14 @@ const FssgBoxV1 = defineComponent({
       }, [props.iconUrl ? createVNode(FssgIcon, {
         "url": props.iconUrl,
         "style": props.iconStyle
-      }, null) : '', createVNode("span", {
+      }, null) : '']),
+      item2: () => createVNode("div", {
+        "class": "fssg-box-title"
+      }, [createVNode("span", {
         "class": "fssg-box--title",
         "style": props.titleStyle
       }, [props.title])]),
-      item2: () => createVNode("div", null, [props.values ? props.values.map((item, index) => createVNode(FssgBoxV4, mergeProps({
+      item3: () => createVNode("div", null, [props.values ? props.values.map((item, index) => createVNode(FssgBoxV4, mergeProps({
         "key": index
       }, item), null)) : createVNode(Fragment, null, [createVNode("span", {
         "class": "fssg-box--value",

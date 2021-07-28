@@ -9,6 +9,14 @@
   align-items: center;
 }
 
+.fssg-box--v1 .fssg-box-icon {
+  text-align: right;
+}
+.fssg-box--v1 .fssg-box-title {
+  display: flex;
+  align-items: center;
+}
+
 .fssg-grid {
   width: fit-content;
   height: fit-content;

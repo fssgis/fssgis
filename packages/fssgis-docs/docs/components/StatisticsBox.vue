@@ -59,7 +59,7 @@ export default defineComponent({
       { iconUrl, title: '物品', unit: '个' },
     ]
 
-    const testValuesItem = { iconUrl, title: '物品', values: [
+    const testValuesItem = { iconUrl, iconStyle: { width: '40px', height: '40px' }, title: '物品', values: [
       { title: '物品', value: '3', unit: '个' },
       { title: '物品', value: '2', unit: '个' },
     ], unit: '个' }

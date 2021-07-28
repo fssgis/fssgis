@@ -14,6 +14,11 @@ export interface IStatistics {
   title: string
   value?: string | number
   unit: string
+  iconUrl?: string
+  iconStyle?: CSSProperties
+  titleStyle?: CSSProperties
+  valueStyle?: CSSProperties
+  unitStyle?: CSSProperties
 }
 
 export function statisticsProps () {

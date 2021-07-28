@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, nextTick, computed, reactive, createVNode, mergeProps, Fragment } from 'vue';
+import { defineComponent, ref, onMounted, nextTick, computed, reactive, createVNode, Fragment, mergeProps } from 'vue';
 import { $extend, isNullOrUndefined } from '@fssgis/utils';
 import FssgIcon from '@fssgis/icon';
 
@@ -230,11 +230,13 @@ const FssgBoxV1 = defineComponent({
     }
   },
 
-  setup(props) {
+  setup(props, {
+    slots
+  }) {
     const gridOptions = {
       gridAreas: [[1, 2], [3, 3]]
     };
-    return () => createVNode(FssgGrid, {
+    return () => createVNode(Fragment, null, [slots.before?.() ?? '', createVNode(FssgGrid, {
       "class": "fssg-box fssg-box--v1",
       "inline": true,
       "options": gridOptions
@@ -259,8 +261,8 @@ const FssgBoxV1 = defineComponent({
       }, [toValue(props.value)]), createVNode("span", {
         "class": "fssg-box--unit",
         "style": props.unitStyle
-      }, [props.unit])])])
-    });
+      }, [props.unit ?? ''])])])
+    }), slots.after?.() ?? '']);
   }
 
 });

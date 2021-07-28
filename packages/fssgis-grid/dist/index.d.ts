@@ -298,7 +298,7 @@ declare const FssgBoxV1: vue.DefineComponent<{
 interface IStatistics {
     title: string;
     value?: string | number;
-    unit: string;
+    unit?: string;
     iconUrl?: string;
     iconStyle?: CSSProperties;
     titleStyle?: CSSProperties;

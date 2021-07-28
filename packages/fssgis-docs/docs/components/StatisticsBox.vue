@@ -8,7 +8,11 @@
     />
     <FssgBoxV1
       :="testValuesItem"
-    />
+    >
+      <template #after>
+        <div>test</div>
+      </template>
+    </FssgBoxV1>
     <br>
     <span>FssgBoxV2：</span>
     <FssgBoxV2

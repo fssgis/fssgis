@@ -113,7 +113,6 @@ function createVueTsxComponent (dirName, external = [], externalCss = []) {
     }
   ]
 }
-
 export default [
   ...createCore('fssgis-observable'),
   ...createCore('fssgis-utils'),
@@ -124,4 +123,5 @@ export default [
   ...createCore('fssgis-attributes', ['vue']),
   ...createVueTsxComponent('fssgis-icon'),
   ...createVueTsxComponent('fssgis-grid', ['@fssgis/utils', '@fssgis/icon'], ['./fssg-grid.scss', './fssg-box.scss']),
+  ...createMap('fssgis-generic'),
 ]

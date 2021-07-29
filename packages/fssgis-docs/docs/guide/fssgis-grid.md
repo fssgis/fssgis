@@ -10,6 +10,8 @@ Grid布局介绍：http://www.ruanyifeng.com/blog/2019/03/grid-layout-tutorial.h
 
 Grid布局生成器：https://grid.layoutit.com/
 
+<FssgBoxesExample />
+
 ## 安装
 
 ```shell
@@ -39,6 +41,10 @@ import '@fssgis/grid/dist/index.css'
 | inline  | `boolean`          | -      | false  | 是否设置为行内的Grid布局，即`inline-grid` |
 | margin  | `string`           | -      |        | Grid布局中各个项的间隙                    |
 
+| 插槽（slot） | 类型 | 必要性 | 默认值 | 描述                                     |
+| ------------ | ---- | ------ | ------ | ---------------------------------------- |
+| item`[]`     |      | *      |        | 布局内容插槽（item1, item2, ..., item3） |
+
 ```typescript
 type GridAreas = number[][]
 
@@ -49,6 +55,19 @@ interface IFssgGridOptions {
   gap?: string
   width?: string
   height?: string
+}
+
+interface IStatistics {
+  title: string
+  value?: string | number
+  unit?: string
+  iconUrl?: string
+  iconStyle?: CSSProperties
+  titleStyle?: CSSProperties
+  valueStyle?: CSSProperties
+  unitStyle?: CSSProperties
+  style?: CSSProperties
+  onClick?: (e: MouseEvent) => void
 }
 ```
 
@@ -64,4 +83,14 @@ interface IFssgGridOptions {
 | titleStyle | `CSSProperties`     | -      | {}     | 标题样式 |
 | valueStyle | `CSSProperties`     | -      | {}     | 值样式   |
 | unitStyle  | `CSSProperties`     | -      | {}     | 单位样式 |
+| style      | `CSSProperties`     | -      | {}     | 组件样式 |
 
+### FssgBoxV1
+
+| 属性   | 类型            | 必要性 | 默认值 | 描述   |
+| ------ | --------------- | ------ | ------ | ------ |
+| values | `IStatistics[]` | -      |        | 统计量 |
+
+## 案例
+
+<FssgGridExample />

@@ -53,9 +53,6 @@ class Observable {
      */
     fire(name, data) {
         const key = name.toLowerCase();
-        if (!this._eventPool.has(key)) {
-            return this;
-        }
         const eventList = this._eventPool.get(key);
         if (!eventList) {
             return this;
@@ -70,7 +67,9 @@ class Observable {
         }, data || {});
         for (let i = 0; i < len; i++) {
             const callback = eventList[i];
-            callback(params);
+            if (typeof callback(params) === 'boolean') {
+                return this;
+            }
             if (eventList.length < len) {
                 i--;
                 len = eventList.length;

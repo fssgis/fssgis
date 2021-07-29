@@ -172,3 +172,18 @@ test('off未层on的监听类型不会异常', () => {
   testObj.dec()
   expect(count).toBe(2)
 })
+
+test('能够终止事件传递', () => {
+  const testObj = new TestClass()
+  testObj.on('change', () => count++) // 不会触发
+  testObj.on('change', () => {
+    count++
+    return false
+  })
+  let count = 0
+  testObj.on('change', () => count++)
+  testObj.inc()
+  testObj.dec()
+  testObj.dec()
+  expect(count).toBe(6)
+})

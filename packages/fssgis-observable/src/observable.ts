@@ -64,9 +64,6 @@ export class Observable <T> { // eslint-disable-line @typescript-eslint/no-expli
     data?: T[K]
   ) : this {
     const key = (name as string).toLowerCase() as K
-    if (!this._eventPool.has(key)) {
-      return this
-    }
     const eventList = this._eventPool.get(key)
     if (!eventList) {
       return this
@@ -81,7 +78,9 @@ export class Observable <T> { // eslint-disable-line @typescript-eslint/no-expli
     }, data || {})
     for (let i = 0; i < len; i++) {
       const callback = eventList[i]
-      callback(params)
+      if (typeof callback(params) === 'boolean') {
+        return this
+      }
       if (eventList.length < len) {
         i--
         len = eventList.length

@@ -1,0 +1,94 @@
+export type WatchCallback<T> = (
+  newValue: T,
+  oldValue: T,
+  propertyName: string,
+  target: Watcher
+) => void
+
+export interface IHandle<T> {
+  propName: string
+  callback: WatchCallback<T>
+}
+
+export function observe<T> (cls: T) : T {
+  return new Proxy(cls as any, { // eslint-disable-line
+    construct (target, args) {
+      // eslint-disable-next-line
+      // @ts-ignore
+      const obj = new target(...args)
+      return new Proxy(obj, {
+        set: (target, key, value, receiver) => {
+          const oldValue = target[key]
+          // eslint-disable-next-line
+          // @ts-ignore
+          target._handles.forEach((handle) => {
+            if (handle.propName === key) {
+              handle.callback(value, oldValue, key, target)
+            }
+          })
+          return Reflect.set(target, key, value, receiver)
+        },
+      })
+    },
+  }) as T
+}
+
+export interface IWatchHandle {
+  remove () : void
+}
+
+export class Watcher {
+
+  private _handles: Set<IHandle<unknown>> = new Set()
+
+  public get <T extends keyof this> (propName: T) : this[T] {
+    return this[propName]
+  }
+
+
+  public set <T extends keyof this> (propName: T, propValue: this[T]) : this
+  public set (prop: { [P in keyof this]?: this[P]}) : this
+  public set (arg0: any, propValue?: any) : this { // eslint-disable-line
+    if (typeof arg0 !== 'string') {
+      for (const key in arg0) {
+        this.set(key as any, arg0[key]) // eslint-disable-line
+      }
+      return this
+    }
+    this[arg0] = propValue
+    return this
+  }
+
+
+
+  public watch <T extends keyof this> (propName: T, callback: (
+    value: this[T],
+    oldValue: this[T],
+    propertyName: T,
+    target: this
+  ) => void) : IWatchHandle
+  public watch <T extends keyof this> (propNames: T[], callback: (
+    value: this[T],
+    oldValue: this[T],
+    propertyName: T,
+    target: this
+  ) => void) : IWatchHandle
+  public watch (arg0: string | string[], callback: any) : IWatchHandle { // eslint-disable-line
+    const handles: IHandle<unknown>[] = []
+    const propNames = Array.isArray(arg0) ? [...arg0] : [arg0]
+    propNames.forEach(propName => {
+      const handle: IHandle<unknown> = { propName, callback }
+      handles.push(handle)
+      this._handles.add(handle)
+    })
+    const remove = () => {
+      handles.forEach(h => {
+        this._handles.delete(h)
+      })
+    }
+    return { remove }
+  }
+
+}
+
+export default Watcher

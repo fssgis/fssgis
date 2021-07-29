@@ -1,0 +1,14 @@
+{
+  "name": "@fssgis/watcher",
+  "version": "0.0.0",
+  "description": "🎉JavaScript监听者，被动监听",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "keywords": [
+    "javascript",
+    "typescript",
+    "watcher",
+    "core"
+  ]
+}

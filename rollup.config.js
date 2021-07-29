@@ -114,6 +114,7 @@ function createVueTsxComponent (dirName, external = [], externalCss = []) {
   ]
 }
 export default [
+  ...createCore('fssgis-watcher'),
   ...createCore('fssgis-observable'),
   ...createCore('fssgis-utils'),
   ...createCore('fssgis-ext'),

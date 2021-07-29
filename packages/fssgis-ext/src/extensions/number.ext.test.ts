@@ -44,4 +44,6 @@ test('toChineseString() can run', () => {
   expect(ext(100000000).toChineseString()).toBe('一亿')
   expect(ext(1.1).toChineseString()).toBe('一点一')
   expect(ext(1.00000001).toChineseString()).toBe('一点零零零零零零零一')
+  expect(ext(10000).toChineseString()).toBe('一万')
+  expect(ext(101).toChineseString()).toBe('一百零一')
 })

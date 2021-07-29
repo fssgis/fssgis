@@ -1,6 +1,5 @@
 import extDate from './date.ext'
 
-/* istanbul ignore next */
 export interface IStringExtension {
   trimAll () : string
   toDate () : Date
@@ -10,7 +9,7 @@ export interface IStringExtension {
 export function extString (str: string) : IStringExtension {
   return {
     trimAll () {
-      return str.replace(new RegExp(' ', 'gm'), '')
+      return str.replace(new RegExp(' ', 'g'), '')
     },
     toDate () {
       return new Date(str)

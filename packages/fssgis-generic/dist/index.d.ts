@@ -43,6 +43,6 @@ let t2 : ReturnType<typeof test2> // Promise<number>
 let t3 : ReturnPromiseType<typeof test> // number
 let t4 : ReturnPromiseType<typeof test2> // number
  */
-declare type ReturnPromiseType<Type extends (...args: unknown[]) => unknown> = Type extends (...args: unknown[]) => Promise<infer Return> ? Return : ReturnType<Type>;
+declare type ReturnPromiseType<Type extends (...args: any[]) => any> = Type extends (...args: any[]) => Promise<infer Return> ? Return : ReturnType<Type>;
 
 export { Concrete, Optional, ReturnPromiseType };

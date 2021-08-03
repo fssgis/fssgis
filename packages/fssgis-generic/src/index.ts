@@ -47,8 +47,8 @@ let t3 : ReturnPromiseType<typeof test> // number
 let t4 : ReturnPromiseType<typeof test2> // number
  */
 export type ReturnPromiseType<
-  Type extends (...args: unknown[]) => unknown
-> = Type extends (...args: unknown[]) => Promise<infer Return>
+  Type extends (...args: any[]) => any // eslint-disable-line
+> = Type extends (...args: any[]) => Promise<infer Return> // eslint-disable-line
   ? Return
   : ReturnType<Type>;
 

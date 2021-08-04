@@ -40,6 +40,68 @@ declare const FssgGrid: vue.DefineComponent<{
 
 declare function useGridAreaItems(gridAreas: GridAreas): ComputedRef<IGridTemplateArea>;
 
+declare const FssgBoxV5: vue.DefineComponent<{
+    iconUrl: {
+        type: StringConstructor;
+        default: string;
+    };
+    iconStyle: {
+        type: vue.PropType<vue.CSSProperties>;
+        default: () => {};
+    };
+    titleStyle: {
+        type: vue.PropType<vue.CSSProperties>;
+        default: () => {};
+    };
+    valueStyle: {
+        type: vue.PropType<vue.CSSProperties>;
+        default: () => {};
+    };
+    unitStyle: {
+        type: vue.PropType<vue.CSSProperties>;
+        default: () => {};
+    };
+    title: {
+        type: StringConstructor;
+        default: string;
+    };
+    value: {
+        type: (StringConstructor | NumberConstructor)[];
+        default: null;
+    };
+    unit: {
+        type: StringConstructor;
+        default: string;
+    };
+}, () => JSX.Element, unknown, {}, {}, vue.ComponentOptionsMixin, vue.ComponentOptionsMixin, Record<string, any>, string, vue.VNodeProps & vue.AllowedComponentProps & vue.ComponentCustomProps, Readonly<{
+    iconUrl?: unknown;
+    iconStyle?: unknown;
+    titleStyle?: unknown;
+    valueStyle?: unknown;
+    unitStyle?: unknown;
+    title?: unknown;
+    value?: unknown;
+    unit?: unknown;
+} & {
+    value: string | number;
+    title: string;
+    iconUrl: string;
+    iconStyle: vue.CSSProperties;
+    titleStyle: vue.CSSProperties;
+    valueStyle: vue.CSSProperties;
+    unitStyle: vue.CSSProperties;
+    unit: string;
+} & {}>, {
+    value: string | number;
+    title: string;
+    iconUrl: string;
+    iconStyle: vue.CSSProperties;
+    titleStyle: vue.CSSProperties;
+    valueStyle: vue.CSSProperties;
+    unitStyle: vue.CSSProperties;
+    unit: string;
+}>;
+
 declare const FssgBoxV4: vue.DefineComponent<{
     iconUrl: {
         type: StringConstructor;
@@ -345,4 +407,4 @@ declare function statisticsStyleProps(): {
 };
 declare function toValue(value?: string | number | null, initValue?: string): string | number;
 
-export { FssgBoxV1, FssgBoxV2, FssgBoxV3, FssgBoxV4, FssgGrid, GridAreas, IFssgGridOptions, IGridTemplateArea, IStatistics, statisticsProps, statisticsStyleProps, toValue, useGridAreaItems };
+export { FssgBoxV1, FssgBoxV2, FssgBoxV3, FssgBoxV4, FssgBoxV5, FssgGrid, GridAreas, IFssgGridOptions, IGridTemplateArea, IStatistics, statisticsProps, statisticsStyleProps, toValue, useGridAreaItems };

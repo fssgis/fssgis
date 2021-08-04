@@ -34,6 +34,12 @@
       :key="index"
       :="item"
     />
+    <span>FssgBoxV5：</span>
+    <FssgBoxV5
+      v-for="(item, index) in testItems"
+      :key="index"
+      :="item"
+    />
   </div>
 </template>
 
@@ -42,7 +48,7 @@ import { defineComponent } from 'vue'
 // import FssgBoxV1 from '@fssgis/grid/src/boxes/fssg-box-v1'
 // import FssgBoxV2 from '@fssgis/grid/src/boxes/fssg-box-v2'
 // import FssgBoxV3 from '@fssgis/grid/src/boxes/fssg-box-v3'
-import { FssgBoxV4, FssgBoxV3, FssgBoxV2, FssgBoxV1 } from '@fssgis/grid'
+import { FssgBoxV4, FssgBoxV3, FssgBoxV2, FssgBoxV1, FssgBoxV5 } from '@fssgis/grid'
 import '@fssgis/grid/dist/index.css'
 
 export default defineComponent({
@@ -51,6 +57,7 @@ export default defineComponent({
     FssgBoxV2,
     FssgBoxV3,
     FssgBoxV4,
+    FssgBoxV5,
   },
   setup () {
 

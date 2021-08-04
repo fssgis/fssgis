@@ -3,6 +3,7 @@
 import { CSSProperties, PropType } from 'vue'
 import { isNullOrUndefined } from '@fssgis/utils'
 
+export * from './fssg-box-v5'
 export * from './fssg-box-v4'
 export * from './fssg-box-v3'
 export * from './fssg-box-v2'

@@ -102,6 +102,46 @@ function _createGridTemplateAreas(gridAreas) {
   return [templateArea.join(' '), [...areaItems]];
 }
 
+const FssgBoxV5 = defineComponent({
+  components: {
+    FssgIcon,
+    FssgGrid
+  },
+  props: { ...statisticsProps(),
+    ...statisticsStyleProps()
+  },
+
+  setup(props) {
+    const gridOptions = {
+      gridAreas: [[1], [2], [3]]
+    };
+    return () => createVNode(FssgGrid, {
+      "class": "fssg-box fssg-box--v2",
+      "inline": true,
+      "options": gridOptions
+    }, {
+      item1: () => createVNode("div", {
+        "class": "fssg-box-icon"
+      }, [props.iconUrl ? createVNode(FssgIcon, {
+        "url": props.iconUrl,
+        "style": props.iconStyle
+      }, null) : '']),
+      item2: () => createVNode("div", null, [createVNode("span", {
+        "class": "fssg-box--title",
+        "style": props.titleStyle
+      }, [props.title])]),
+      item3: () => createVNode("div", null, [createVNode("span", {
+        "class": "fssg-box--value",
+        "style": props.valueStyle
+      }, [toValue(props.value)]), createVNode("span", {
+        "class": "fssg-box--unit",
+        "style": props.unitStyle
+      }, [props.unit])])
+    });
+  }
+
+});
+
 const FssgBoxV4 = defineComponent({
   components: {
     FssgIcon,
@@ -317,4 +357,4 @@ function toValue(value, initValue = '---') {
   return isNullOrUndefined(value) || value === '' ? initValue : value;
 }
 
-export { FssgBoxV1, FssgBoxV2, FssgBoxV3, FssgBoxV4, FssgGrid, statisticsProps, statisticsStyleProps, toValue, useGridAreaItems };
+export { FssgBoxV1, FssgBoxV2, FssgBoxV3, FssgBoxV4, FssgBoxV5, FssgGrid, statisticsProps, statisticsStyleProps, toValue, useGridAreaItems };

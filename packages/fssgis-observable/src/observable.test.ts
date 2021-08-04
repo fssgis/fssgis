@@ -182,8 +182,7 @@ test('能够终止事件传递', () => {
   })
   let count = 0
   testObj.on('change', () => count++)
+  testObj.on('change', () => count++)
   testObj.inc()
-  testObj.dec()
-  testObj.dec()
-  expect(count).toBe(6)
+  expect(count).toBe(3)
 })

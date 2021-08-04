@@ -7,7 +7,7 @@
   "scripts": {
     "publish": "lerna publish --no-push",
     "build": "npx rollup --config",
-    "dev:docs": "npx vitepress dev ./packages/fssgis-docs/docs",
+    "dev:docs": "npx vitepress dev ./packages/fssgis-docs/docs --host=0.0.0.0",
     "build:docs": "npx vitepress build ./packages/fssgis-docs/docs",
     "build:packages": "node build/index.js",
     "test": "npx jest",

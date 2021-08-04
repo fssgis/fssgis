@@ -57,7 +57,7 @@ class Observable {
         if (!eventList) {
             return this;
         }
-        let len = eventList.length;
+        const len = eventList.length;
         if (len === 0) {
             return this;
         }
@@ -65,15 +65,15 @@ class Observable {
             name: key,
             origin: this
         }, data || {});
-        for (let i = 0; i < len; i++) {
+        for (let i = len - 1; i >= 0; i--) {
             const callback = eventList[i];
             if (typeof callback(params) === 'boolean') {
                 return this;
             }
-            if (eventList.length < len) {
-                i--;
-                len = eventList.length;
-            }
+            // if (eventList.length < len) {
+            //   i--
+            //   len = eventList.length
+            // }
         }
         return this;
     }

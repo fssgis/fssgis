@@ -9,5 +9,8 @@
     "javascript",
     "typescript",
     "core"
-  ]
+  ],
+  "dependencies": {
+    "@fssgis/generic": "^1.0.0-alpha.23"
+  }
 }

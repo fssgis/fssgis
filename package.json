@@ -1,6 +1,9 @@
 {
   "name": "fssgis",
   "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "workspaces": [
     "packages/*"
   ],

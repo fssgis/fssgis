@@ -1,11 +1,11 @@
 {
   "name": "@fssgis/grid",
-  "version": "1.0.0-alpha.24",
+  "version": "1.0.0-alpha.25",
   "description": "✨基于vue3实现的grid布局容器组件✨",
   "main": "dist/index.js",
   "dependencies": {
-    "@fssgis/icon": "^1.0.0-alpha.14",
-    "@fssgis/utils": "^1.0.0-alpha.3",
+    "@fssgis/icon": "^1.0.0-alpha.15",
+    "@fssgis/utils": "^1.0.0-alpha.4",
     "vue": "^3.1.5"
   }
 }

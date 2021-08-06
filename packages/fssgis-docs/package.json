@@ -1,11 +1,11 @@
 {
   "name": "@fssgis/docs",
-  "version": "1.0.0-alpha.24",
+  "version": "1.0.0-alpha.25",
   "private": true,
   "description": "🎉fssgis文档",
   "dependencies": {
-    "@fssgis/grid": "^1.0.0-alpha.24",
-    "@fssgis/icon": "^1.0.0-alpha.14",
+    "@fssgis/grid": "^1.0.0-alpha.25",
+    "@fssgis/icon": "^1.0.0-alpha.15",
     "vitepress": "^0.15.6",
     "vue": "^3.1.5"
   }

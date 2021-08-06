@@ -174,7 +174,7 @@ export function $extend<T> (_deep: boolean, sourceObj: Optional<T>, targetObj: O
   * @param immediate 是否立即执行
   */
 /* istanbul ignore next */
-export function debounce <T extends Function> (fn: T, wait: number, immediate: boolean = false) : (T & { cancle() : void }) | null { // eslint-disable-line
+export function debounce <T extends Function> (fn: T, wait: number, immediate: boolean = false) : (T & { cancle() : void }) { // eslint-disable-line
   let handle, ret = null
   const debounced = function () {
     clearTimeout(handle)
@@ -207,7 +207,7 @@ export function debounce <T extends Function> (fn: T, wait: number, immediate: b
 export function throttle<T extends Function> (fn: T, wait: number, options: { // eslint-disable-line
   leading: boolean
   trailing: boolean
-} = { leading: true, trailing: true }) : (T & { cancle() : void }) | null {
+} = { leading: true, trailing: true }) : (T & { cancle() : void }) {
   let handle, previous = 0
   const throttled = function () {
     const now = Date.now()

@@ -61,7 +61,7 @@ declare function $extend<T>(_deep: boolean, sourceObj: Optional<T>, targetObj: O
   */
 declare function debounce<T extends Function>(fn: T, wait: number, immediate?: boolean): (T & {
     cancle(): void;
-}) | null;
+});
 /**
   * 节流
   * （当持续触发事件时，
@@ -75,7 +75,7 @@ declare function throttle<T extends Function>(fn: T, wait: number, options?: {
     trailing: boolean;
 }): (T & {
     cancle(): void;
-}) | null;
+});
 /**
   * 列表转树形结构
   * @param list 列表数组

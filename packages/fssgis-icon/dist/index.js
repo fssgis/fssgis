@@ -35,4 +35,47 @@ var FssgIcon = defineComponent({
 
 });
 
+var FssgIconFont = defineComponent({
+  props: {
+    name: {
+      type: String,
+      required: true
+    },
+    size: {
+      type: [String, Number],
+      default: '16px'
+    },
+    color: {
+      type: String,
+      default: ''
+    }
+  },
+
+  setup(props) {
+    const classNames = computed(() => {
+      return `iconfont fssg-icon-${props.name}`;
+    });
+    const style = computed(() => {
+      const ret = {};
+      const size = props.size;
+
+      if (size) {
+        ret.fontSize = isNaN(size) ? size : `${size}px`;
+      }
+
+      if (props.color) {
+        ret.color = props.color;
+      }
+
+      return ret;
+    });
+    return () => createVNode("span", {
+      "class": classNames.value,
+      "style": style.value
+    }, null);
+  }
+
+});
+
 export default FssgIcon;
+export { FssgIconFont };

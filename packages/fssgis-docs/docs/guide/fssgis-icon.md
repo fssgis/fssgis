@@ -79,3 +79,40 @@ export default defineComponent({
 <FssgIcon url="http://cdn.onlinewebfonts.com/svg/img_433041.png" width="36px" height="36px"/>
 <FssgIcon url="http://cdn.onlinewebfonts.com/svg/img_433041.png"  width="48px" height="48px" />
 <FssgIcon url="http://cdn.onlinewebfonts.com/svg/img_433041.png"  width="64px" height="64px" />
+
+### 字体图标
+
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_2728604_r31h4bhg9c.css?spm=a313x.7781069.1998910419.64&file=font_2728604_r31h4bhg9c.css">
+
+字体大小（尺寸）、颜色控制
+
+```js
+import "@fssgis/icon/dist/iconfont.css" // or import a online css url
+```
+
+```vue
+<template>
+  <FssgIconFont name="mouse" />
+  <FssgIconFont name="mouse" size="24px" />
+  <FssgIconFont name="mouse" size="36px" />
+  <FssgIconFont name="mouse" size="48px" />
+  <FssgIconFont name="mouse" size="64px" />
+  <FssgIconFont name="mouse" size="24px" color="red" />
+  <FssgIconFont name="mouse" size="24px" color="rgb(0, 0, 255)" />
+  <FssgIconFont name="mouse" size="24px" color="rgba(0, 255, 0, 1)" />
+  <FssgIconFont name="mouse" size="24px" color="#43286775" />
+</template>
+<script setup>
+import { FssgIconFont } from '@fssgis/icon'
+</script>
+```
+
+<FssgIconFont name="mouse" />
+  <FssgIconFont name="mouse" size="24px" />
+  <FssgIconFont name="mouse" size="36px" />
+  <FssgIconFont name="mouse" size="48px" />
+  <FssgIconFont name="mouse" size="64px" />
+  <FssgIconFont name="mouse" size="24px" color="red" />
+  <FssgIconFont name="mouse" size="24px" color="rgb(0, 0, 255)" />
+  <FssgIconFont name="mouse" size="24px" color="rgba(0, 255, 0, 1)" />
+  <FssgIconFont name="mouse" size="24px" color="#43286775" />

@@ -1,6 +1,6 @@
 {
   "name": "@fssgis/utils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "🎉JavaScript工具集",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -11,6 +11,6 @@
     "core"
   ],
   "dependencies": {
-    "@fssgis/generic": "^1.0.1"
+    "@fssgis/generic": "^1.0.2"
   }
 }

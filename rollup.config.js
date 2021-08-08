@@ -125,4 +125,5 @@ export default [
   ...createVueTsxComponent('fssgis-icon'),
   ...createVueTsxComponent('fssgis-grid', ['@fssgis/utils', '@fssgis/icon'], ['./fssg-grid.scss', './fssg-box.scss']),
   ...createMap('fssgis-generic'),
+  ...createMap('fssg-map', ['@fssgis/utils', '@fssgis/observable']),
 ]

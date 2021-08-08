@@ -1,0 +1,20 @@
+{
+  "name": "@fssgis/fssg-map",
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "description": "🎉基于业务功能型的地图API二次开发标准与基础库",
+  "keywords": [
+    "javascript",
+    "typescript",
+    "map",
+    "base"
+  ],
+  "dependencies": {
+    "@fssgis/observable": "^1.0.1",
+    "@fssgis/utils": "^1.0.1"
+  }
+}

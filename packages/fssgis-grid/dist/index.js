@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, nextTick, computed, reactive, createVNode, mergeProps, Fragment } from 'vue';
+import { defineComponent, ref, onMounted, computed, reactive, createVNode, mergeProps, Fragment } from 'vue';
 import { $extend, isNullOrUndefined } from '@fssgis/utils';
 import FssgIcon from '@fssgis/icon';
 
@@ -19,8 +19,7 @@ const FssgGrid = defineComponent({
     slots
   }) {
     const fssgGrid = ref();
-    onMounted(async () => {
-      await nextTick();
+    onMounted(() => {
       const dom = fssgGrid.value;
       state.gridAreaItems.areaItems.forEach((className, index) => {
         const d = dom.children.item(index);

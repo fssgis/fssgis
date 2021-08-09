@@ -34,8 +34,7 @@ export const FssgGrid = defineComponent({
   setup (props, { slots }) {
     const fssgGrid = ref<InstanceType<typeof HTMLDivElement>>()
 
-    onMounted(async () => {
-      await nextTick()
+    onMounted(() => {
       const dom = fssgGrid.value as HTMLDivElement
       state.gridAreaItems.areaItems.forEach((className, index) => {
         const d = dom.children.item(index) as HTMLDivElement

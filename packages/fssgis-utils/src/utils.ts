@@ -97,7 +97,7 @@ export function loadJs (jsUrl: string) : void {
   * @param targetObj 目标对象
   */
 /* istanbul ignore next */
-export function $extend<T> (_deep: boolean, sourceObj: Optional<T>, targetObj: Optional<T>) : T { // eslint-disable-line
+export function $extend<T> (_deep: boolean, sourceObj: T, targetObj: T) : T { // eslint-disable-line
   function isPlainObject (obj) {
     const class2type = {}
     const getProto = Object.getPrototypeOf

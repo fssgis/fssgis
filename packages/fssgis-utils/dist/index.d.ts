@@ -1,5 +1,3 @@
-import { Optional } from '@fssgis/generic';
-
 /**
  * 深度复制（采用JSON解析方式）
  * @param obj 复制对象
@@ -46,7 +44,7 @@ declare function loadJs(jsUrl: string): void;
   * @param sourceObj 源对象
   * @param targetObj 目标对象
   */
-declare function $extend<T>(_deep: boolean, sourceObj: Optional<T>, targetObj: Optional<T>): T;
+declare function $extend<T>(_deep: boolean, sourceObj: T, targetObj: T): T;
 /**
   * 防抖
   * （当持续触发事件时，

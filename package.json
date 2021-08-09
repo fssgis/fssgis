@@ -14,7 +14,8 @@
     "build:docs": "npx vitepress build ./packages/fssgis-docs/docs",
     "build:packages": "node build/index.js",
     "test": "npx jest",
-    "test:dev": "npx jest --watch"
+    "test:dev": "npx jest --watch",
+    "test:vite": "vite --config ./packages/test-vite/vite.config.js"
   },
   "devDependencies": {
     "@rollup/plugin-babel": "^5.3.0",
@@ -24,7 +25,9 @@
     "@types/jest": "^26.0.24",
     "@typescript-eslint/eslint-plugin": "^4.28.4",
     "@typescript-eslint/parser": "^4.28.4",
+    "@vitejs/plugin-vue": "^1.4.0",
     "@vue/babel-plugin-jsx": "^1.0.6",
+    "@vue/compiler-sfc": "^3.1.5",
     "eslint": "^7.31.0",
     "eslint-plugin-vue": "^7.14.0",
     "nodemon": "^2.0.12",
@@ -39,6 +42,7 @@
     "sass-loader": "^12.1.0",
     "ts-jest": "^27.0.4",
     "typescript": "^4.3.4",
+    "vite": "^2.4.4",
     "vitepress": "^0.15.6"
   },
   "dependencies": {

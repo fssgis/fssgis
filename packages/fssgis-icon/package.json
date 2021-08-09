@@ -1,6 +1,6 @@
 {
   "name": "@fssgis/icon",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "✨vue icon 图标组件✨",
   "main": "dist/index.js"
 }

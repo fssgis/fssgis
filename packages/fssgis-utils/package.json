@@ -1,6 +1,6 @@
 {
   "name": "@fssgis/utils",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "🎉JavaScript工具集",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",

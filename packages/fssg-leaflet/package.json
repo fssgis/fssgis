@@ -1,0 +1,22 @@
+{
+  "name": "@fssgis/fssg-leaflet",
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "1.0.3",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "description": "🎉使用Leaflet实现的基于业务功能型的地图库",
+  "keywords": [
+    "javascript",
+    "typescript",
+    "map",
+    "leaflet"
+  ],
+  "dependencies": {
+    "@fssgis/fssg-map": "^1.0.3",
+    "@fssgis/observable": "^1.0.3",
+    "@fssgis/utils": "^1.0.4",
+    "leaflet": "^1.7.1"
+  }
+}

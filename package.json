@@ -10,18 +10,16 @@
   ],
   "scripts": {
     "publish": "lerna publish --no-push",
-  
     "dev:docs": "npx vitepress dev ./packages/fssgis-docs/docs --host=0.0.0.0",
-
     "build": "npx rollup --config",
     "build:all": "npx rollup --config ./build/index.js",
     "build:docs": "npx vitepress build ./packages/fssgis-docs/docs",
-    "build:axios": "npx rollup --config ./build/build.fssgis-axios.js",
-    "build:ext": "npx rollup --config ./build/build.fssgis-ext.js",
-    "build:observable": "npx rollup --config ./build/build.fssgis-observable.js",
-    "build:utils": "npx rollup --config ./build/build.fssgis-utils.js",
-    "build:watcher": "npx rollup --config ./build/build.fssgis-watcher.js",
-
+    "build:axios": "npx rollup --config ./build/build.fssgis-axios.js -w",
+    "build:ext": "npx rollup --config ./build/build.fssgis-ext.js -w",
+    "build:observable": "npx rollup --config ./build/build.fssgis-observable.js -w",
+    "build:utils": "npx rollup --config ./build/build.fssgis-utils.js -w",
+    "build:watcher": "npx rollup --config ./build/build.fssgis-watcher.js -w",
+    "build:leaflet": "npx rollup --config ./build/build.fssg-leaflet.js -w",
     "test": "npx jest",
     "test:dev": "npx jest --watch",
     "test:vite": "vite --config ./packages/test-vite/vite.config.js"
@@ -32,6 +30,8 @@
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.0.4",
     "@types/jest": "^26.0.24",
+    "@types/leaflet": "^1.7.4",
+    "@types/proj4leaflet": "^1.0.6",
     "@typescript-eslint/eslint-plugin": "^4.28.4",
     "@typescript-eslint/parser": "^4.28.4",
     "@vitejs/plugin-vue": "^1.4.0",

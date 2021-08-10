@@ -6,6 +6,7 @@ import CreateGuid from '../../components/fssgis-utils/CreateGuid.vue'
 import CreateIntRandom from '../../components/fssgis-utils/CreateIntRandom.vue'
 import FssgBoxesExample from '../../components/fssgis-grid/FssgBoxesExample.vue'
 import FssgGridExample from '../../components/fssgis-grid/FssgGridExample.vue'
+import FssgLeafletQuickStartGuide from '../../components/fssg-leaflet/QuickStartGuide.vue'
 
 export default {
   ...DefaultTheme,
@@ -24,5 +25,6 @@ export default {
     app.component('CreateIntRandom', CreateIntRandom)
     app.component('FssgBoxesExample', FssgBoxesExample)
     app.component('FssgGridExample', FssgGridExample)
+    app.component('FssgLeafletQuickStartGuide', FssgLeafletQuickStartGuide)
   }
 }

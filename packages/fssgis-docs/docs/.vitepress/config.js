@@ -36,7 +36,8 @@ function getGuideSidebar() {
     {
       text: '地图库',
       children: [
-        { text: '基础地图库', link: '/guide/map/fssg-map' }
+        { text: '基础地图库', link: '/guide/map/fssg-map' },
+        { text: 'Leaflet地图库', link: '/guide/map/fssg-leaflet' },
       ]
     },
     {

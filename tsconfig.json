@@ -10,7 +10,7 @@
     "esModuleInterop": true,
     "lib": ["esnext", "dom"],
     "allowJs": true,
-    "outDir": "./x",
+    "outDir": "./_",
     "declaration": false,
     "experimentalDecorators": true,
     "strictNullChecks": true,

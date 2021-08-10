@@ -1,25 +1,13 @@
-const path =  require('path')
-const fs =  require('fs/promises')
+import fssgisAxios from './build.fssgis-axios'
+import fssgisExt from './build.fssgis-ext'
+import fssgisObservable from './build.fssgis-observable'
+import fssgisUtils from './build.fssgis-utils'
+import fssgisWatcher from './build.fssgis-watcher'
 
-const pathResolve = (...args) => path.resolve(...args)
-const encoding = 'utf-8'
-
-execBuild()
-
-async function execBuild () {
-
-  const packagePaths = (
-    await fs.readdir(pathResolve('packages'), { encoding })
-  ).map(n => pathResolve('packages', n))
-
-  await buildPackage(packagePaths[0])
-
-}
-
-async function buildPackage (packagePath) {
-  const packageJSON = JSON.parse(
-    await fs.readFile(pathResolve(packagePath, 'package.json'), { encoding })
-  )
-  console.log(packageJSON)
-}
-
+export default [
+  ...fssgisAxios,
+  ...fssgisExt,
+  ...fssgisObservable,
+  ...fssgisUtils,
+  ...fssgisWatcher,
+]

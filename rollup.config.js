@@ -84,6 +84,7 @@ function createVueComponent (dirName, external = []) {
     },
   ]
 }
+
 function createVueTsxComponent (dirName, external = [], externalCss = []) {
   return [
     {
@@ -113,6 +114,7 @@ function createVueTsxComponent (dirName, external = [], externalCss = []) {
     }
   ]
 }
+
 export default [
   ...createCore('fssgis-watcher'),
   ...createCore('fssgis-observable'),

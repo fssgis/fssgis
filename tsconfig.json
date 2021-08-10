@@ -18,7 +18,8 @@
     "noImplicitOverride": true
   },
   "include": [
-    "./packages/*/src"
+    "./packages/*/src",
+    "./projects/*/src",
   ],
   "exclude": [
     "./**/*.test.ts",

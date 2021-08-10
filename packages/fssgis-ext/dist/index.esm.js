@@ -180,7 +180,7 @@ function extNumber(num) {
 function extString(str) {
     return {
         trimAll() {
-            return str.replace(new RegExp(' ', 'gm'), '');
+            return str.replace(new RegExp(' ', 'g'), '');
         },
         toDate() {
             return new Date(str);

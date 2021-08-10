@@ -16,7 +16,8 @@
     }
   },
   "packages": [
-    "packages/*"
+    "packages/*",
+    "projects/*"
   ],
   "version": "independent"
 }

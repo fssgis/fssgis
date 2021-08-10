@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "description": "🎉使用Leaflet实现的基于业务功能型的地图库",

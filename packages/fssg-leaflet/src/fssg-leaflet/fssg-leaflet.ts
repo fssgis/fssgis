@@ -125,7 +125,7 @@ export class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvents
    * @param _latLng 经纬度
    * @returns 投影坐标
    */
-  private latLngToXY (_latLng: LatLng) : Point {
+  public latLngToXY (_latLng: LatLng) : Point {
     const crs = this.options_.mapOptions?.crs
     if (crs) {
       return crs.project(_latLng)
@@ -138,7 +138,7 @@ export class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvents
    * @param xy 投影坐标
    * @returns 经纬度
    */
-  private xyToLatLng (xy: Point) : LatLng {
+  public xyToLatLng (xy: Point) : LatLng {
     const crs = this.options_.mapOptions?.crs
     if (crs) {
       return crs.unproject(xy)

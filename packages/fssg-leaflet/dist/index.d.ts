@@ -1,5 +1,5 @@
 import { IFssgMapOptions, IFssgMapEvents, FssgMap, IFssgMapContainer, IFssgMapPluginOptions, IFssgMapPluginEvents, FssgMapPlugin } from '@fssgis/fssg-map';
-import { MapOptions, Map, ZoomPanOptions } from 'leaflet';
+import { MapOptions, Map, ZoomPanOptions, LatLng, Point } from 'leaflet';
 
 /**
  * 地图应用配置项
@@ -72,13 +72,13 @@ declare class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvent
      * @param _latLng 经纬度
      * @returns 投影坐标
      */
-    private latLngToXY;
+    latLngToXY(_latLng: LatLng): Point;
     /**
      * 经纬度转投影坐标
      * @param xy 投影坐标
      * @returns 经纬度
      */
-    private xyToLatLng;
+    xyToLatLng(xy: Point): LatLng;
 }
 
 /**

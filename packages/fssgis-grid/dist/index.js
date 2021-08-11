@@ -411,7 +411,7 @@ const FssgBox = defineComponent({
       }, [createVNode("span", {
         "class": "fssg-box--value",
         "style": props.valueStyle
-      }, [props.value])]),
+      }, [toValue(props.value)])]),
       item9996: () => createVNode("div", {
         "class": "fssg-box-unit"
       }, [createVNode("span", {

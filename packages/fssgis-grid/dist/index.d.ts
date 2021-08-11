@@ -469,23 +469,23 @@ declare const FssgBox: vue.DefineComponent<{
     unit?: unknown;
 } & {
     value: string | number;
+    title: string;
     grid: Grid;
     iconUrl: string;
     iconStyle: vue.CSSProperties;
     titleStyle: vue.CSSProperties;
     valueStyle: vue.CSSProperties;
     unitStyle: vue.CSSProperties;
-    title: string;
     unit: string;
 } & {}>, {
     value: string | number;
+    title: string;
     grid: Grid;
     iconUrl: string;
     iconStyle: vue.CSSProperties;
     titleStyle: vue.CSSProperties;
     valueStyle: vue.CSSProperties;
     unitStyle: vue.CSSProperties;
-    title: string;
     unit: string;
 }>;
 

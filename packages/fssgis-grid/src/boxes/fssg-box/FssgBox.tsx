@@ -53,7 +53,7 @@ export const FssgBox = defineComponent({
           <span class="fssg-box--title" style={ props.titleStyle }>{ props.title }</span>
         </div>,
         item9997: () => <div class="fssg-box-value">
-          <span class="fssg-box--value" style={ props.valueStyle }>{ props.value }</span>
+          <span class="fssg-box--value" style={ props.valueStyle }>{ toValue(props.value) }</span>
         </div>,
         item9996: () => <div class="fssg-box-unit">
           <span class="fssg-box--unit" style={ props.unitStyle }>{ props.unit }</span>

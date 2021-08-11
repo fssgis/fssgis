@@ -23,6 +23,22 @@ export interface IMap extends LeafletMap {
   $owner: FssgLeaflet
 }
 
+/**
+ * 经纬度接口
+ */
+export interface ILonlat {
+  lon: number
+  lat: number
+}
+
+/**
+ * 平面坐标接口
+ */
+export interface IXY {
+  x: number
+  y: number
+}
+
 export interface ILocateOptions extends ZoomPanOptions {
   x?: number
   y?: number
@@ -138,12 +154,13 @@ export class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvents
    * @param xy 投影坐标
    * @returns 经纬度
    */
-  public xyToLatLng (xy: Point) : LatLng {
+  public xyToLatLng (xy: Point | IXY) : LatLng {
     const crs = this.options_.mapOptions?.crs
+    const _xy = xy instanceof Point ? xy : point(xy.x, xy.y)
     if (crs) {
-      return crs.unproject(xy)
+      return crs.unproject(_xy)
     }
-    return this._map.unproject(xy)
+    return this._map.unproject(_xy)
   }
 
   /**
@@ -159,6 +176,25 @@ export class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvents
       lon: _latlng.lng,
       lat: _latlng.lat,
     }
+  }
+
+  /**
+   * 经纬度对象转leaflet敬畏度对象
+   * @param lonlat 经纬度
+   * @returns leaflet经纬度对象
+   */
+  public lonlatToLatlng (lonlat: ILonlat) : LatLng {
+    return latLng(lonlat.lat, lonlat.lon)
+  }
+
+  /**
+   * 经纬度转投影坐标
+   * @param lonlat 经纬度
+   * @returns 投影坐标
+   */
+  public lonlatToXY (lonlat: ILonlat) : Point {
+    const _latlng = this.lonlatToLatlng(lonlat)
+    return this.latLngToXY(_latlng)
   }
 
 }

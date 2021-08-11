@@ -1,5 +1,5 @@
 import { IFssgMapOptions, IFssgMapEvents, FssgMap, IFssgMapContainer, IFssgMapPluginOptions, IFssgMapPluginEvents, FssgMapPlugin } from '@fssgis/fssg-map';
-import { MapOptions, Map, ZoomPanOptions, LatLng, Point } from 'leaflet';
+import { MapOptions, Map, ZoomPanOptions, LatLng, Point, Layer, IconOptions, MarkerOptions, Marker } from 'leaflet';
 
 /**
  * 地图应用配置项
@@ -17,6 +17,20 @@ interface IFssgLeafletEvents extends IFssgMapEvents {
  */
 interface IMap extends Map {
     $owner: FssgLeaflet;
+}
+/**
+ * 经纬度接口
+ */
+interface ILonlat {
+    lon: number;
+    lat: number;
+}
+/**
+ * 平面坐标接口
+ */
+interface IXY {
+    x: number;
+    y: number;
 }
 interface ILocateOptions extends ZoomPanOptions {
     x?: number;
@@ -78,7 +92,7 @@ declare class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvent
      * @param xy 投影坐标
      * @returns 经纬度
      */
-    xyToLatLng(xy: Point): LatLng;
+    xyToLatLng(xy: Point | IXY): LatLng;
     /**
      * 获取中心点经纬度和投影坐标信息
      * @returns 中心点的经纬度和投影坐标信息
@@ -89,6 +103,18 @@ declare class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvent
         lon: number;
         lat: number;
     };
+    /**
+     * 经纬度对象转leaflet敬畏度对象
+     * @param lonlat 经纬度
+     * @returns leaflet经纬度对象
+     */
+    lonlatToLatlng(lonlat: ILonlat): LatLng;
+    /**
+     * 经纬度转投影坐标
+     * @param lonlat 经纬度
+     * @returns 投影坐标
+     */
+    lonlatToXY(lonlat: ILonlat): Point;
 }
 
 /**
@@ -107,6 +133,10 @@ declare class FssgLeafletPlugin<T_OPTIONS extends IFssgLeafletPluginOptions = IF
      */
     protected map_: IMap;
     /**
+     * 绑定的地图应用实例
+     */
+    get $(): FssgLeaflet;
+    /**
      * 安装插件
      * @param fssgLeaflet 地图应用实例
      * @returns this
@@ -114,4 +144,37 @@ declare class FssgLeafletPlugin<T_OPTIONS extends IFssgLeafletPluginOptions = IF
     installPlugin(fssgLeaflet: FssgLeaflet): this;
 }
 
-export { FssgLeaflet, FssgLeafletPlugin, IFssgLeafletEvents, IFssgLeafletOptions, IFssgLeafletPluginEvents, IFssgLeafletPluginOptions, ILocateOptions, IMap };
+/**
+ * 图元控制插件配置项
+ */
+interface IMapElementOptions extends IFssgLeafletPluginOptions {
+}
+/**
+ * 图元控制插件事件集
+ */
+interface IMapElementEvents extends IFssgLeafletPluginEvents {
+}
+/**
+ * 图元控制插件
+ */
+declare class MapElement extends FssgLeafletPlugin<IMapElementOptions, IMapElementEvents> {
+    /**
+     * 图元存储池
+     */
+    private _elementPool;
+    /**
+     * 构造图元控制插件
+     * @param options 配置项
+     */
+    constructor(options?: IMapElementOptions);
+    /**
+     * 添加图元
+     * @param layer 图元
+     * @returns this
+     */
+    add(layer: Layer): this;
+    addMarkerByXY(xy: IXY, iconOptions?: IconOptions, options?: MarkerOptions): Marker;
+    clearAll(): this;
+}
+
+export { FssgLeaflet, FssgLeafletPlugin, IFssgLeafletEvents, IFssgLeafletOptions, IFssgLeafletPluginEvents, IFssgLeafletPluginOptions, ILocateOptions, ILonlat, IMap, IMapElementEvents, IMapElementOptions, IXY, MapElement };

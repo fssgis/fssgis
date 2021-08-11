@@ -29,6 +29,13 @@ export class FssgLeafletPlugin<
   protected map_: IMap
 
   /**
+   * 绑定的地图应用实例
+   */
+  public get $ () : FssgLeaflet {
+    return this.map_.$owner
+  }
+
+  /**
    * 安装插件
    * @param fssgLeaflet 地图应用实例
    * @returns this

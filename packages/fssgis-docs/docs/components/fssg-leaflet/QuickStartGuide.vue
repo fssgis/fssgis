@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue'
-import { FssgLeaflet } from '@fssgis/fssg-leaflet'
+import { FssgLeaflet, MapElement } from '@fssgis/fssg-leaflet'
 import 'leaflet/dist/leaflet.css'
 import leaflet, { bounds, point } from 'leaflet'
 import 'proj4leaflet'
@@ -38,7 +38,7 @@ export default defineComponent({
           0.14929144441622216,
         ],
         origin: [-4923200.0, 1.00021E7],
-        bounds: bounds(point(685374.1991923138, 2536658.69889), point(705540.4047339347, 2608331.5927683935)),
+        bounds: bounds(point(635374.1991923138, 2536658.69889), point(746762.8750076861, 2611299.7513099997)),
       }
     )
 
@@ -46,12 +46,13 @@ export default defineComponent({
       mapOptions: {
         crs,
         zoom: 11,
-        center: [23.162156, 112.901596], // 112.901596,23.162156 x 687425.557, y 2575602.824,
+        center: [23.286122, 112.901157], // 112.901596,23.162156 x 687425.557, y 2575602.824,
         minZoom: 11,
         maxZoom: 18,
       },
       debug: true
     })
+      .use(new MapElement())
 
     const layer = leaflet.tileLayer('http://172.16.0.101:6080/arcgis/rest/services/DZDT/dzdt_ss/MapServer/tile/{z}/{y}/{x}?blankTile=true')
 

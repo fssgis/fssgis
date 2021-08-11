@@ -1,5 +1,5 @@
 import { FssgMap, FssgMapPlugin } from '@fssgis/fssg-map';
-import { map, point, latLng } from 'leaflet';
+import { map, point, latLng, Point, icon, marker } from 'leaflet';
 
 /**
  * 深度复制（采用JSON解析方式）
@@ -106,10 +106,11 @@ class FssgLeaflet extends FssgMap {
      */
     xyToLatLng(xy) {
         const crs = this.options_.mapOptions?.crs;
+        const _xy = xy instanceof Point ? xy : point(xy.x, xy.y);
         if (crs) {
-            return crs.unproject(xy);
+            return crs.unproject(_xy);
         }
-        return this._map.unproject(xy);
+        return this._map.unproject(_xy);
     }
     /**
      * 获取中心点经纬度和投影坐标信息
@@ -125,6 +126,23 @@ class FssgLeaflet extends FssgMap {
             lat: _latlng.lat,
         };
     }
+    /**
+     * 经纬度对象转leaflet敬畏度对象
+     * @param lonlat 经纬度
+     * @returns leaflet经纬度对象
+     */
+    lonlatToLatlng(lonlat) {
+        return latLng(lonlat.lat, lonlat.lon);
+    }
+    /**
+     * 经纬度转投影坐标
+     * @param lonlat 经纬度
+     * @returns 投影坐标
+     */
+    lonlatToXY(lonlat) {
+        const _latlng = this.lonlatToLatlng(lonlat);
+        return this.latLngToXY(_latlng);
+    }
 }
 
 class FssgLeafletPlugin extends FssgMapPlugin {
@@ -132,6 +150,12 @@ class FssgLeafletPlugin extends FssgMapPlugin {
      * leaflet地图实例
      */
     map_;
+    /**
+     * 绑定的地图应用实例
+     */
+    get $() {
+        return this.map_.$owner;
+    }
     /**
      * 安装插件
      * @param fssgLeaflet 地图应用实例
@@ -143,4 +167,49 @@ class FssgLeafletPlugin extends FssgMapPlugin {
     }
 }
 
-export { FssgLeaflet, FssgLeafletPlugin };
+/**
+ * 图元控制插件
+ */
+class MapElement extends FssgLeafletPlugin {
+    /**
+     * 图元存储池
+     */
+    _elementPool;
+    /**
+     * 构造图元控制插件
+     * @param options 配置项
+     */
+    constructor(options) {
+        super(options, {});
+        this._elementPool = new Set();
+    }
+    /**
+     * 添加图元
+     * @param layer 图元
+     * @returns this
+     */
+    add(layer) {
+        this._elementPool.add(layer.addTo(this.map_));
+        return this;
+    }
+    addMarkerByXY(xy, iconOptions, options) {
+        let leafletIcon = undefined;
+        if (iconOptions) {
+            leafletIcon = icon(iconOptions);
+        }
+        const latlng = this.$.xyToLatLng(xy);
+        const _marker = marker(latlng, {
+            icon: leafletIcon,
+            ...options,
+        }).addTo(this.map_);
+        this._elementPool.add(_marker);
+        return _marker;
+    }
+    clearAll() {
+        this._elementPool.forEach(item => item.removeFrom(this.map_));
+        this._elementPool.clear();
+        return this;
+    }
+}
+
+export { FssgLeaflet, FssgLeafletPlugin, MapElement };

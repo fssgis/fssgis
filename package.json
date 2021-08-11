@@ -20,6 +20,7 @@
     "build:utils": "npx rollup --config ./build/build.fssgis-utils.js -w",
     "build:watcher": "npx rollup --config ./build/build.fssgis-watcher.js -w",
     "build:leaflet": "npx rollup --config ./build/build.fssg-leaflet.js -w",
+    "build:grid": "npx rollup --config ./build/build.fssgis-grid.js -w",
     "test": "npx jest",
     "test:dev": "npx jest --watch",
     "test:vite": "vite --config ./packages/test-vite/vite.config.js"

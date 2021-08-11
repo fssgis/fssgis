@@ -419,6 +419,76 @@ declare const FssgBoxV1: vue.DefineComponent<{
     unit: string;
 }>;
 
+declare type Grid = Array<Array<number | 'i' | 't' | 'v' | 'u'>>;
+declare const FssgBox: vue.DefineComponent<{
+    grid: {
+        type: PropType<Grid>;
+        default: () => never[];
+    };
+    iconUrl: {
+        type: StringConstructor;
+        default: string;
+    };
+    iconStyle: {
+        type: PropType<vue.CSSProperties>;
+        default: () => {};
+    };
+    titleStyle: {
+        type: PropType<vue.CSSProperties>;
+        default: () => {};
+    };
+    valueStyle: {
+        type: PropType<vue.CSSProperties>;
+        default: () => {};
+    };
+    unitStyle: {
+        type: PropType<vue.CSSProperties>;
+        default: () => {};
+    };
+    title: {
+        type: StringConstructor;
+        default: string;
+    };
+    value: {
+        type: (StringConstructor | NumberConstructor)[];
+        default: null;
+    };
+    unit: {
+        type: StringConstructor;
+        default: string;
+    };
+}, () => JSX.Element, unknown, {}, {}, vue.ComponentOptionsMixin, vue.ComponentOptionsMixin, Record<string, any>, string, vue.VNodeProps & vue.AllowedComponentProps & vue.ComponentCustomProps, Readonly<{
+    grid?: unknown;
+    iconUrl?: unknown;
+    iconStyle?: unknown;
+    titleStyle?: unknown;
+    valueStyle?: unknown;
+    unitStyle?: unknown;
+    title?: unknown;
+    value?: unknown;
+    unit?: unknown;
+} & {
+    value: string | number;
+    grid: Grid;
+    iconUrl: string;
+    iconStyle: vue.CSSProperties;
+    titleStyle: vue.CSSProperties;
+    valueStyle: vue.CSSProperties;
+    unitStyle: vue.CSSProperties;
+    title: string;
+    unit: string;
+} & {}>, {
+    value: string | number;
+    grid: Grid;
+    iconUrl: string;
+    iconStyle: vue.CSSProperties;
+    titleStyle: vue.CSSProperties;
+    valueStyle: vue.CSSProperties;
+    unitStyle: vue.CSSProperties;
+    title: string;
+    unit: string;
+}>;
+
 interface IStatistics {
     title: string;
     value?: string | number;
@@ -469,4 +539,4 @@ declare function statisticsStyleProps(): {
 };
 declare function toValue(value?: string | number | null, initValue?: string): string | number;
 
-export { FssgBoxV1, FssgBoxV2, FssgBoxV3, FssgBoxV4, FssgBoxV5, FssgBoxV6, FssgGrid, GridAreas, IFssgGridOptions, IGridTemplateArea, IStatistics, statisticsProps, statisticsStyleProps, toValue, useGridAreaItems };
+export { FssgBox, FssgBoxV1, FssgBoxV2, FssgBoxV3, FssgBoxV4, FssgBoxV5, FssgBoxV6, FssgGrid, Grid, GridAreas, IFssgGridOptions, IGridTemplateArea, IStatistics, statisticsProps, statisticsStyleProps, toValue, useGridAreaItems };

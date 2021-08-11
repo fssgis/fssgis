@@ -354,6 +354,76 @@ const FssgBoxV1 = defineComponent({
 
 });
 
+const FssgBox = defineComponent({
+  components: {
+    FssgIcon,
+    FssgGrid
+  },
+  props: { ...statisticsProps(),
+    ...statisticsStyleProps(),
+    grid: {
+      type: Array,
+      default: () => []
+    }
+  },
+
+  setup(props, {
+    slots
+  }) {
+    const fields = {
+      'i': 9999,
+      't': 9998,
+      'v': 9997,
+      'u': 9996
+    };
+    const gridAreas = computed(() => {
+      const ret = [];
+      props.grid.forEach(rows => {
+        const newRows = [];
+        rows.forEach(value => {
+          newRows.push(fields[value] ?? value);
+        });
+        ret.push(newRows);
+      });
+      return ret;
+    });
+    return () => createVNode(FssgGrid, {
+      "class": "fssg-box",
+      "inline": true,
+      "options": {
+        gridAreas: gridAreas.value
+      }
+    }, {
+      item9999: () => createVNode("div", {
+        "class": "fssg-box-icon"
+      }, [props.iconUrl ? createVNode(FssgIcon, {
+        "url": props.iconUrl,
+        "style": props.iconStyle
+      }, null) : '']),
+      item9998: () => createVNode("div", {
+        "class": "fssg-box-title"
+      }, [createVNode("span", {
+        "class": "fssg-box--title",
+        "style": props.titleStyle
+      }, [props.title])]),
+      item9997: () => createVNode("div", {
+        "class": "fssg-box-value"
+      }, [createVNode("span", {
+        "class": "fssg-box--value",
+        "style": props.valueStyle
+      }, [props.value])]),
+      item9996: () => createVNode("div", {
+        "class": "fssg-box-unit"
+      }, [createVNode("span", {
+        "class": "fssg-box--unit",
+        "style": props.unitStyle
+      }, [props.unit])]),
+      ...slots
+    });
+  }
+
+});
+
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 function statisticsProps() {
   return {
@@ -399,4 +469,4 @@ function toValue(value, initValue = '---') {
   return isNullOrUndefined(value) || value === '' ? initValue : value;
 }
 
-export { FssgBoxV1, FssgBoxV2, FssgBoxV3, FssgBoxV4, FssgBoxV5, FssgBoxV6, FssgGrid, statisticsProps, statisticsStyleProps, toValue, useGridAreaItems };
+export { FssgBox, FssgBoxV1, FssgBoxV2, FssgBoxV3, FssgBoxV4, FssgBoxV5, FssgBoxV6, FssgGrid, statisticsProps, statisticsStyleProps, toValue, useGridAreaItems };

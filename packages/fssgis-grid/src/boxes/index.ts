@@ -9,6 +9,7 @@ export * from './fssg-box-v4'
 export * from './fssg-box-v3'
 export * from './fssg-box-v2'
 export * from './fssg-box-v1'
+export * from './fssg-box'
 
 import './fssg-box.scss'
 

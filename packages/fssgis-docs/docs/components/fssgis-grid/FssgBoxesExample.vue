@@ -48,6 +48,20 @@
       :key="index"
       :="item"
     />
+    <br>
+    <span>FssgBox：</span>
+    <FssgBox
+      v-for="(item, index) in testItems"
+      :key="index"
+      :="item"
+      :grid="[
+        ['i', 't', 'v', 'u', 1]
+      ]"
+    >
+      <template #item1>
+        <div>。</div>
+      </template>
+    </FssgBox>
   </div>
 </template>
 
@@ -56,7 +70,7 @@ import { defineComponent } from 'vue'
 // import FssgBoxV1 from '@fssgis/grid/src/boxes/fssg-box-v1'
 // import FssgBoxV2 from '@fssgis/grid/src/boxes/fssg-box-v2'
 // import FssgBoxV3 from '@fssgis/grid/src/boxes/fssg-box-v3'
-import { FssgBoxV4, FssgBoxV3, FssgBoxV2, FssgBoxV1, FssgBoxV5, FssgBoxV6} from '@fssgis/grid'
+import { FssgBoxV4, FssgBoxV3, FssgBoxV2, FssgBoxV1, FssgBoxV5, FssgBoxV6, FssgBox } from '@fssgis/grid'
 import '@fssgis/grid/dist/index.css'
 
 export default defineComponent({
@@ -67,6 +81,7 @@ export default defineComponent({
     FssgBoxV4,
     FssgBoxV5,
     FssgBoxV6,
+    FssgBox,
   },
   setup () {
 

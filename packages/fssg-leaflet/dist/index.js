@@ -111,6 +111,20 @@ class FssgLeaflet extends FssgMap {
         }
         return this._map.unproject(xy);
     }
+    /**
+     * 获取中心点经纬度和投影坐标信息
+     * @returns 中心点的经纬度和投影坐标信息
+     */
+    getCenter() {
+        const _latlng = this._map.getCenter();
+        const xy = this.latLngToXY(_latlng);
+        return {
+            x: xy.x,
+            y: xy.y,
+            lon: _latlng.lng,
+            lat: _latlng.lat,
+        };
+    }
 }
 
 class FssgLeafletPlugin extends FssgMapPlugin {

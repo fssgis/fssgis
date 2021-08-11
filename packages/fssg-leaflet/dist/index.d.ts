@@ -79,6 +79,16 @@ declare class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvent
      * @returns 经纬度
      */
     xyToLatLng(xy: Point): LatLng;
+    /**
+     * 获取中心点经纬度和投影坐标信息
+     * @returns 中心点的经纬度和投影坐标信息
+     */
+    getCenter(): {
+        x: number;
+        y: number;
+        lon: number;
+        lat: number;
+    };
 }
 
 /**

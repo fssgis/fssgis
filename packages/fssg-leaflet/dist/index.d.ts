@@ -1,5 +1,5 @@
 import { IFssgMapOptions, IFssgMapEvents, FssgMap, IFssgMapContainer, IFssgMapPluginOptions, IFssgMapPluginEvents, FssgMapPlugin } from '@fssgis/fssg-map';
-import { MapOptions, Map } from 'leaflet';
+import { MapOptions, Map, ZoomPanOptions } from 'leaflet';
 
 /**
  * 地图应用配置项
@@ -18,6 +18,13 @@ interface IFssgLeafletEvents extends IFssgMapEvents {
 interface IMap extends Map {
     $owner: FssgLeaflet;
 }
+interface ILocateOptions extends ZoomPanOptions {
+    x?: number;
+    y?: number;
+    lon?: number;
+    lat?: number;
+    zoom?: number;
+}
 /**
  * 地图应用
  */
@@ -30,13 +37,48 @@ declare class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvent
      * leaflet地图实例
      */
     get map(): IMap;
+    /**
+     * 构造地图应用
+     * @param container 地图容器
+     * @param options 配置项
+     */
     constructor(container: IFssgMapContainer, options?: IFssgLeafletOptions);
+    /**
+     * 初始化地图实例
+     * @returns this
+     */
     private _initMap;
+    /**
+     * 定位
+     * @param latLng 经纬度对象
+     * @param zoom 缩放等级
+     * @param options 配置项
+     * @returns this
+     */
+    private _locateTo;
     /**
      * 安装地图应用
      * @returns this
      */
     mount(): this;
+    /**
+     * 定位
+     * @param options 配置项
+     * @returns this
+     */
+    locateTo(options: ILocateOptions): this;
+    /**
+     * 经纬度转投影坐标
+     * @param _latLng 经纬度
+     * @returns 投影坐标
+     */
+    private latLngToXY;
+    /**
+     * 经纬度转投影坐标
+     * @param xy 投影坐标
+     * @returns 经纬度
+     */
+    private xyToLatLng;
 }
 
 /**
@@ -62,4 +104,4 @@ declare class FssgLeafletPlugin<T_OPTIONS extends IFssgLeafletPluginOptions = IF
     installPlugin(fssgLeaflet: FssgLeaflet): this;
 }
 
-export { FssgLeaflet, FssgLeafletPlugin, IFssgLeafletEvents, IFssgLeafletOptions, IFssgLeafletPluginEvents, IFssgLeafletPluginOptions, IMap };
+export { FssgLeaflet, FssgLeafletPlugin, IFssgLeafletEvents, IFssgLeafletOptions, IFssgLeafletPluginEvents, IFssgLeafletPluginOptions, ILocateOptions, IMap };

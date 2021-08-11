@@ -6,7 +6,7 @@
 import { defineComponent, onMounted } from 'vue'
 import { FssgLeaflet } from '@fssgis/fssg-leaflet'
 import 'leaflet/dist/leaflet.css'
-import leaflet from 'leaflet'
+import leaflet, { bounds, point } from 'leaflet'
 import 'proj4leaflet'
 
 export default defineComponent({
@@ -35,8 +35,10 @@ export default defineComponent({
           1.1943315553297773,
           0.5971657776648887,
           0.2985828888324443,
+          0.14929144441622216,
         ],
         origin: [-4923200.0, 1.00021E7],
+        bounds: bounds(point(685374.1991923138, 2536658.69889), point(705540.4047339347, 2608331.5927683935)),
       }
     )
 
@@ -44,7 +46,9 @@ export default defineComponent({
       mapOptions: {
         crs,
         zoom: 11,
-        center: [23.162156, 112.901596], // 112.901596,23.162156
+        center: [23.162156, 112.901596], // 112.901596,23.162156 x 687425.557, y 2575602.824,
+        minZoom: 11,
+        maxZoom: 18,
       },
       debug: true
     })
@@ -65,7 +69,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 #leaflet-container {
-  height: 500px;
+  height: 700px;
   width: 100%;
 }
 </style>

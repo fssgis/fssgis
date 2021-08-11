@@ -177,4 +177,64 @@ declare class MapElement extends FssgLeafletPlugin<IMapElementOptions, IMapEleme
     clearAll(): this;
 }
 
-export { FssgLeaflet, FssgLeafletPlugin, IFssgLeafletEvents, IFssgLeafletOptions, IFssgLeafletPluginEvents, IFssgLeafletPluginOptions, ILocateOptions, ILonlat, IMap, IMapElementEvents, IMapElementOptions, IXY, MapElement };
+/**
+ * 底图控制插件配置项
+ */
+interface IBasemapOptions extends IFssgLeafletPluginOptions {
+    items?: {
+        key: string;
+        type?: 'tile';
+        url?: string;
+        lyrs?: {
+            type: 'tile';
+            url: string;
+        }[];
+    }[];
+    selectedKey?: string;
+    visible?: boolean;
+}
+/**
+ * 底图控制插件事件集
+ */
+interface IBasemapEvents extends IFssgLeafletPluginEvents {
+    'changed:selected-key': {
+        selectedKey: string;
+    };
+    'changed:visible': {
+        visible: boolean;
+    };
+}
+interface IBasemapItem {
+    layers: Layer[];
+    options: NonNullable<IBasemapOptions['items']>[0];
+}
+/**
+ * 底图插件
+ */
+declare class Basemap extends FssgLeafletPlugin<IBasemapOptions, IBasemapEvents> {
+    private _basemapLayer;
+    private _selectedKey;
+    private _visible;
+    private _itemPools;
+    get visible(): boolean;
+    set visible(v: boolean);
+    /**
+     * 构造底图插件
+     * @param options 配置项
+     */
+    constructor(options?: IBasemapOptions);
+    /**
+     * 初始化
+     * @returns this
+     */
+    private _init;
+    private _initBasemapItems;
+    /**
+     * 安装插件
+     * @param fssgLeaflet 地图应用
+     * @returns this
+     */
+    installPlugin(fssgLeaflet: FssgLeaflet): this;
+}
+
+export { Basemap, FssgLeaflet, FssgLeafletPlugin, IBasemapEvents, IBasemapItem, IBasemapOptions, IFssgLeafletEvents, IFssgLeafletOptions, IFssgLeafletPluginEvents, IFssgLeafletPluginOptions, ILocateOptions, ILonlat, IMap, IMapElementEvents, IMapElementOptions, IXY, MapElement };

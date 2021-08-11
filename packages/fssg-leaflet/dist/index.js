@@ -1,5 +1,6 @@
 import { FssgMap, FssgMapPlugin } from '@fssgis/fssg-map';
-import { map, point, latLng, Point, icon, marker } from 'leaflet';
+import { map, point, latLng, Point, icon, marker, LayerGroup, tileLayer } from 'leaflet';
+import { $extend } from '@fssgis/utils';
 
 /**
  * 深度复制（采用JSON解析方式）
@@ -212,4 +213,111 @@ class MapElement extends FssgLeafletPlugin {
     }
 }
 
-export { FssgLeaflet, FssgLeafletPlugin, MapElement };
+class ExtLayer extends LayerGroup {
+    options_;
+    layer_;
+    visible_;
+    get visible() {
+        return this.visible_;
+    }
+    set visible(v) {
+        if (this.visible_ !== v) {
+            this.visible_ = v;
+            (v && this.layer_)
+                ? this.addLayer(this.layer_)
+                : this.removeLayer(this.layer_);
+            this.fire('changed:visible');
+        }
+    }
+    constructor(layer, options) {
+        super();
+        layer && (this.layer_ = layer);
+        this.options_ = $extend(true, this.options_, {
+            visible: true,
+        }, options ?? {});
+        this._init();
+    }
+    _init() {
+        this.visible_ = this.options_.visible;
+        if (this.visible_ && this.layer_) {
+            this.addLayer(this.layer_);
+        }
+        return this;
+    }
+    setLayer(layer) {
+        (this.visible_ && this.layer_) && this.removeLayer(this.layer_);
+        this.layer_ = layer;
+        this.visible_ && this.addLayer(layer);
+        return this;
+    }
+}
+
+/**
+ * 底图插件
+ */
+class Basemap extends FssgLeafletPlugin {
+    _basemapLayer;
+    _selectedKey;
+    _visible;
+    _itemPools;
+    get visible() {
+        return this._visible;
+    }
+    set visible(v) {
+        this._basemapLayer.visible = v;
+        this._visible = v;
+        this.fire('changed:visible', { visible: v });
+    }
+    /**
+     * 构造底图插件
+     * @param options 配置项
+     */
+    constructor(options) {
+        super(options, {
+            items: [],
+            selectedKey: options?.items?.[0].key,
+            visible: true,
+        });
+    }
+    /**
+     * 初始化
+     * @returns this
+     */
+    _init() {
+        this._selectedKey = this.options_.selectedKey;
+        this._visible = this.options_.visible;
+        this._basemapLayer = new ExtLayer(undefined, { visible: this._visible })
+            .addTo(this.map_)
+            .setZIndex(0);
+        this._itemPools = new Map();
+        return this
+            ._initBasemapItems();
+    }
+    _initBasemapItems() {
+        this.options_.items?.forEach(item => {
+            let layer = undefined;
+            if (item.type === 'tile' && item.url) {
+                layer = tileLayer(item.url);
+            }
+            if (layer) {
+                this._itemPools.set(item.key, { options: item, layers: [layer] });
+            }
+        });
+        const selectedItem = this._itemPools.get(this._selectedKey);
+        if (selectedItem) {
+            this._basemapLayer.setLayer(selectedItem.layers[0]);
+        }
+        return this;
+    }
+    /**
+     * 安装插件
+     * @param fssgLeaflet 地图应用
+     * @returns this
+     */
+    installPlugin(fssgLeaflet) {
+        return super.installPlugin(fssgLeaflet)
+            ._init();
+    }
+}
+
+export { Basemap, FssgLeaflet, FssgLeafletPlugin, MapElement };

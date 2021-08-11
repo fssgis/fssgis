@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue'
-import { FssgLeaflet, MapElement } from '@fssgis/fssg-leaflet'
+import { Basemap, FssgLeaflet, MapElement } from '@fssgis/fssg-leaflet'
 import 'leaflet/dist/leaflet.css'
 import leaflet, { bounds, point } from 'leaflet'
 import 'proj4leaflet'
@@ -53,12 +53,19 @@ export default defineComponent({
       debug: true
     })
       .use(new MapElement())
-
-    const layer = leaflet.tileLayer('http://172.16.0.101:6080/arcgis/rest/services/DZDT/dzdt_ss/MapServer/tile/{z}/{y}/{x}?blankTile=true')
+      .use(new Basemap({
+        selectedKey: '白色电子地图',
+        items: [
+          {
+            key: '白色电子地图',
+            type: 'tile',
+            url: 'http://172.16.0.101:6080/arcgis/rest/services/DZDT/dzdt_ss/MapServer/tile/{z}/{y}/{x}?blankTile=true'
+          }
+        ]
+      }))
 
     onMounted(() => {
       fssgLeaflet.mount()
-      fssgLeaflet.map.addLayer(layer)
     })
 
     return {

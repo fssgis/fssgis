@@ -17,6 +17,7 @@
     "@fssgis/fssg-map": "^1.0.3",
     "@fssgis/observable": "^1.0.3",
     "@fssgis/utils": "^1.0.4",
-    "leaflet": "^1.7.1"
+    "leaflet": "^1.7.1",
+    "leaflet.label": "^0.2.4"
   }
 }

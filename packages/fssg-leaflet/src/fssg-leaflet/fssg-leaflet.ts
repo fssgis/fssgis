@@ -1,6 +1,7 @@
 import { FssgMap, IFssgMapContainer, IFssgMapEvents, IFssgMapOptions } from '@fssgis/fssg-map'
 import { Map as LeafletMap, MapOptions, map, LatLng, ZoomPanOptions, latLng, point, Point } from 'leaflet'
 import { isNullOrUndefined } from '../../../fssgis-utils/src'
+import { Basemap, MapElement } from '../plugins'
 
 /**
  * 地图应用配置项
@@ -51,6 +52,9 @@ export interface ILocateOptions extends ZoomPanOptions {
  * 地图应用
  */
 export class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvents> {
+
+  public basemap: Basemap
+  public mapElement: MapElement
 
   /**
    * leaflet地图实例
@@ -103,7 +107,9 @@ export class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvents
    */
   private _locateTo (latLng: LatLng, zoom?: number, options?: ZoomPanOptions) : this {
     zoom = zoom ?? this._map.getZoom()
-    this._map.flyTo(latLng, zoom, options)
+    this._map.flyTo(latLng, zoom, {
+      ...options,
+    })
     return this
   }
 
@@ -154,9 +160,9 @@ export class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvents
    * @param xy 投影坐标
    * @returns 经纬度
    */
-  public xyToLatLng (xy: Point | IXY) : LatLng {
+  public xyToLatLng (xy: IXY) : LatLng {
     const crs = this.options_.mapOptions?.crs
-    const _xy = xy instanceof Point ? xy : point(xy.x, xy.y)
+    const _xy = point(xy.x, xy.y)
     if (crs) {
       return crs.unproject(_xy)
     }

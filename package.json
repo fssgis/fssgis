@@ -54,5 +54,8 @@
     "typescript": "^4.3.4",
     "vite": "^2.4.4",
     "vitepress": "^0.15.6"
+  },
+  "dependencies": {
+    "@types/leaflet-label": "^0.2.36"
   }
 }

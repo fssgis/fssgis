@@ -1,9 +1,27 @@
 <template>
   <div id="leaflet-container" />
+  <button @click="set">
+    set
+  </button>
+  <button @click="clear">
+    clear
+  </button><br>
+  ----<br>
+  <ul>
+    <li
+      v-for="(item, index) in data"
+      :key="index"
+    >
+      {{ item.name }}
+      <button @click="locate(item)">
+        定位
+      </button>
+    </li>
+  </ul>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue'
+import { defineComponent, onMounted, reactive } from 'vue'
 import { Basemap, FssgLeaflet, MapElement } from '@fssgis/fssg-leaflet'
 import 'leaflet/dist/leaflet.css'
 import leaflet, { bounds, point } from 'leaflet'
@@ -54,22 +72,57 @@ export default defineComponent({
     })
       .use(new MapElement())
       .use(new Basemap({
-        selectedKey: '白色电子地图',
-        items: [
-          {
-            key: '白色电子地图',
-            type: 'tile',
-            url: 'http://172.16.0.101:6080/arcgis/rest/services/DZDT/dzdt_ss/MapServer/tile/{z}/{y}/{x}?blankTile=true'
-          }
-        ]
+        items: [{
+          key: '白色电子地图', type: 'tile',
+          url: 'http://172.16.0.101:6080/arcgis/rest/services/DZDT/dzdt_ss/MapServer/tile/{z}/{y}/{x}?blankTile=true'
+        }]
       }))
 
     onMounted(() => {
       fssgLeaflet.mount()
     })
 
-    return {
+    const data = reactive([
+        { name: '测试1', x: 687425.557, y: 2575602.824, iconUrl: 'https://leafletjs.com/docs/images/github-round.png' },
+        { name: '测试2', x: 687125.557, y: 2575202.824, iconUrl: 'https://leafletjs.com/docs/images/github-round.png' },
+        { type: 'green', name: '测试3', x: 687825.557, y: 2565102.824, iconUrl: 'https://leafletjs.com/docs/images/forum-round.png' },
+        { type: 'green', name: '测试4', x: 697825.557, y: 2575102.824, iconUrl: 'https://leafletjs.com/docs/images/forum-round.png' },
+    ])
 
+    function set () {
+      fssgLeaflet.mapElement.setMarkersByList(data, {
+        xField: 'x',
+        yField: 'y',
+        labelField: 'name',
+        iconUrlField: 'iconUrl',
+        iconOptions: {
+          iconSize: [36, 36],
+        },
+        labelOptions: {
+          className: 'leaflet-label',
+          iconAnchor: [30, -22]
+        },
+        classNameField: 'type',
+      })
+    }
+
+    function clear () {
+      fssgLeaflet.mapElement.clearAll()
+    }
+
+    function locate (item: typeof data[0]) {
+      fssgLeaflet.locateTo({
+        x: item.x,
+        y: item.y,
+        zoom: fssgLeaflet.map.getZoom() + .5
+      })
+    }
+
+    return {
+      set,
+      clear,
+      data,
+      locate,
     }
   },
 })
@@ -79,5 +132,17 @@ export default defineComponent({
 #leaflet-container {
   height: 700px;
   width: 100%;
+}
+:deep(.leaflet-label) {
+  font-size: 16px;
+  white-space: nowrap;
+  width: 60px !important;
+  text-align: center;
+  height: fit-content !important;
+  font-weight: bold;
+  cursor: default;
+}
+:deep(.green) {
+  color: green;
 }
 </style>

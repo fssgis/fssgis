@@ -92,7 +92,7 @@ function loadJs(jsUrl) {
   * @param targetObj 目标对象
   */
 /* istanbul ignore next */
-function $extend(_deep, sourceObj, targetObj) {
+function $extend(_deep, sourceObj, ...otherObjs) {
     function isPlainObject(obj) {
         const class2type = {};
         const getProto = Object.getPrototypeOf;

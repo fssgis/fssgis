@@ -44,7 +44,7 @@ declare function loadJs(jsUrl: string): void;
   * @param sourceObj 源对象
   * @param targetObj 目标对象
   */
-declare function $extend<T>(_deep: boolean, sourceObj: T, targetObj: T): T;
+declare function $extend<T>(_deep: boolean, sourceObj: T, ...otherObjs: T[]): T;
 /**
   * 防抖
   * （当持续触发事件时，

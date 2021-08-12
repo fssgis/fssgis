@@ -1,6 +1,6 @@
 {
   "name": "@fssgis/map",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "🎉基于业务功能型的地图API二次开发标准库",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,6 +11,6 @@
   ],
   "dependencies": {
     "@fssgis/observable": "^1.0.3",
-    "@fssgis/utils": "^1.0.4"
+    "@fssgis/utils": "^1.0.5"
   }
 }

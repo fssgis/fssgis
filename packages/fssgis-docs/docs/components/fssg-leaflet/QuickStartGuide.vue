@@ -1,23 +1,25 @@
 <template>
-  <div id="leaflet-container" />
-  <button @click="set">
-    set
-  </button>
-  <button @click="clear">
-    clear
-  </button><br>
-  ----<br>
-  <ul>
-    <li
-      v-for="(item, index) in data"
-      :key="index"
-    >
-      {{ item.name }}
-      <button @click="locate(item)">
-        定位
-      </button>
-    </li>
-  </ul>
+  <div>
+    <div id="leaflet-container" />
+    <button @click="set">
+      set
+    </button>
+    <button @click="clear">
+      clear
+    </button><br>
+    ----<br>
+    <ul>
+      <li
+        v-for="(item, index) in data"
+        :key="index"
+      >
+        {{ item.name }}
+        <button @click="locate(item)">
+          定位
+        </button>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script lang="ts">

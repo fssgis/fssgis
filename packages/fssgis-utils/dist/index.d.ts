@@ -69,8 +69,8 @@ declare function debounce<T extends Function>(fn: T, wait: number, immediate?: b
   * @param options 配置项
   */
 declare function throttle<T extends Function>(fn: T, wait: number, options?: {
-    leading: boolean;
-    trailing: boolean;
+    leading?: boolean;
+    trailing?: boolean;
 }): (T & {
     cancle(): void;
 });

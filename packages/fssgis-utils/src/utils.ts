@@ -205,8 +205,8 @@ export function debounce <T extends Function> (fn: T, wait: number, immediate: b
   */
 /* istanbul ignore next */
 export function throttle<T extends Function> (fn: T, wait: number, options: { // eslint-disable-line
-  leading: boolean
-  trailing: boolean
+  leading?: boolean
+  trailing?: boolean
 } = { leading: true, trailing: true }) : (T & { cancle() : void }) {
   let handle, previous = 0
   const throttled = function () {

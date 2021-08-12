@@ -1,4 +1,4 @@
-import { DivIcon, divIcon, DivIconOptions, icon, Icon, IconOptions, LabelOptions, Layer, Marker, marker, MarkerOptions } from 'leaflet'
+import { DivIcon, icon, Icon, IconOptions, Layer, Marker, marker, MarkerOptions, TooltipOptions } from 'leaflet'
 import { IXY } from '../../fssg-leaflet'
 import FssgLeafletPlugin, { IFssgLeafletPluginEvents, IFssgLeafletPluginOptions } from '../../fssg-leaflet-plugin'
 
@@ -71,7 +71,7 @@ export class MapElement extends FssgLeafletPlugin<IMapElementOptions, IMapElemen
     xField: keyof T
     yField: keyof T
     labelField: keyof T
-    labelOptions?: DivIconOptions
+    labelOptions?: TooltipOptions
     classNameField?: keyof T
     iconUrlField?: keyof T
     iconOptions?: IconOptions
@@ -88,11 +88,8 @@ export class MapElement extends FssgLeafletPlugin<IMapElementOptions, IMapElemen
         _icon = icon({ iconUrl: item[iconUrlField] as string, ...iconOptions })
       }
       const _marker = marker(this.$.xyToLatLng({ x, y }), { icon: _icon ?? new Icon.Default() })
-      const _markerLabel = marker(this.$.xyToLatLng({ x, y }), {
-        icon: divIcon({ html: label, iconAnchor: [0, -22], ...labelOptions, className: `${className as string} ${labelOptions?.className}` }),
-      })
+        .bindTooltip(label, { permanent: true, sticky: true, className, ...labelOptions })
       this.add(_marker)
-      this.add(_markerLabel)
 
     })
     return this

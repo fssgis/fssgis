@@ -16,7 +16,6 @@ export default [
       '@fssgis/observable',
       '@fssgis/utils',
       'leaflet',
-      'leaflet.label',
     ],
     plugins: [
       typescript(),

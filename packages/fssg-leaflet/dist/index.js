@@ -1,5 +1,5 @@
 import { FssgMap, FssgMapPlugin } from '@fssgis/fssg-map';
-import { map, point, latLng, icon, marker, Icon, divIcon, LayerGroup, tileLayer } from 'leaflet';
+import { map, point, latLng, icon, marker, Icon, LayerGroup, tileLayer } from 'leaflet';
 import { $extend } from '@fssgis/utils';
 
 /**
@@ -227,12 +227,9 @@ class MapElement extends FssgLeafletPlugin {
             if (iconUrlField) {
                 _icon = icon({ iconUrl: item[iconUrlField], ...iconOptions });
             }
-            const _marker = marker(this.$.xyToLatLng({ x, y }), { icon: _icon ?? new Icon.Default() });
-            const _markerLabel = marker(this.$.xyToLatLng({ x, y }), {
-                icon: divIcon({ html: label, iconAnchor: [0, -22], ...labelOptions, className: `${className} ${labelOptions?.className}` }),
-            });
+            const _marker = marker(this.$.xyToLatLng({ x, y }), { icon: _icon ?? new Icon.Default() })
+                .bindTooltip(label, { permanent: true, sticky: true, className, ...labelOptions });
             this.add(_marker);
-            this.add(_markerLabel);
         });
         return this;
     }

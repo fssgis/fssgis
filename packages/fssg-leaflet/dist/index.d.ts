@@ -1,5 +1,5 @@
 import { IFssgMapPluginOptions, IFssgMapPluginEvents, FssgMapPlugin, IFssgMapOptions, IFssgMapEvents, FssgMap, IFssgMapContainer } from '@fssgis/fssg-map';
-import { Layer, IconOptions, MarkerOptions, Marker, DivIconOptions, MapOptions, Map, ZoomPanOptions, LatLng, Point } from 'leaflet';
+import { Layer, IconOptions, MarkerOptions, Marker, TooltipOptions, MapOptions, Map, ZoomPanOptions, LatLng, Point } from 'leaflet';
 
 /**
  * 地图应用插件配置项
@@ -63,7 +63,7 @@ declare class MapElement extends FssgLeafletPlugin<IMapElementOptions, IMapEleme
         xField: keyof T;
         yField: keyof T;
         labelField: keyof T;
-        labelOptions?: DivIconOptions;
+        labelOptions?: TooltipOptions;
         classNameField?: keyof T;
         iconUrlField?: keyof T;
         iconOptions?: IconOptions;

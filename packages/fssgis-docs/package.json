@@ -7,6 +7,7 @@
     "@fssgis/fssg-leaflet": "^1.0.7",
     "@fssgis/grid": "^1.0.9",
     "@fssgis/icon": "^1.0.3",
+    "@fssgis/ui": "^0.0.0",
     "leaflet": "^1.7.1",
     "proj4leaflet": "^1.0.2",
     "vitepress": "^0.15.6",

@@ -1,10 +1,10 @@
 {
   "name": "@fssgis/docs",
-  "version": "1.0.11",
+  "version": "1.0.12-alpha.0",
   "private": true,
   "description": "🎉fssgis文档",
   "dependencies": {
-    "@fssgis/fssg-leaflet": "^1.0.7",
+    "@fssgis/fssg-leaflet": "^1.0.8-alpha.0",
     "@fssgis/grid": "^1.0.9",
     "@fssgis/icon": "^1.0.3",
     "@fssgis/ui": "^1.0.0",

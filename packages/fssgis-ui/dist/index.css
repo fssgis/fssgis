@@ -1,0 +1,30 @@
+.fssg-grid {
+  width: fit-content;
+  height: fit-content;
+}
+
+.fssg-box {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.fssg-box--v2 .fssg-box-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fssg-box--v1 .fssg-box-icon,
+.fssg-box--v3 .fssg-box-icon {
+  text-align: right;
+}
+.fssg-box--v1 .fssg-box-title,
+.fssg-box--v3 .fssg-box-title {
+  display: flex;
+  align-items: center;
+}
+
+.fssg-box--v4 .fssg-box-content {
+  display: flex;
+  align-items: center;
+}

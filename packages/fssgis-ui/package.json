@@ -1,0 +1,14 @@
+{
+  "name": "@fssgis/ui",
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "0.0.0",
+  "description": "✨fssgis的vue ui组件库✨",
+  "main": "dist/index.js",
+  "dependencies": {
+    "@fssgis/ext": "^1.0.4",
+    "@fssgis/utils": "^1.0.6",
+    "vue": "^3.2.2"
+  }
+}

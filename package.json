@@ -10,10 +10,10 @@
   ],
   "scripts": {
     "publish": "lerna publish --no-push",
-    "dev:docs": "npx vitepress dev ./packages/fssgis-docs/docs --host=0.0.0.0",
+    "dev:docs": "npx vitepress dev ./projects/fssgis-docs/docs --host=0.0.0.0",
     "build": "npx rollup --config",
     "build:all": "npx rollup --config ./build/index.js",
-    "build:docs": "npx vitepress build ./packages/fssgis-docs/docs",
+    "build:docs": "npx vitepress build ./projects/fssgis-docs/docs",
     "build:axios": "npx rollup --config ./build/build.fssgis-axios.js -w",
     "build:ext": "npx rollup --config ./build/build.fssgis-ext.js -w",
     "build:observable": "npx rollup --config ./build/build.fssgis-observable.js -w",
@@ -27,6 +27,8 @@
     "test:vite": "vite --config ./packages/test-vite/vite.config.js"
   },
   "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@babel/preset-env": "^7.15.0",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^19.0.1",
     "@rollup/plugin-json": "^4.1.0",
@@ -39,6 +41,7 @@
     "@vitejs/plugin-vue": "^1.4.0",
     "@vue/babel-plugin-jsx": "^1.0.6",
     "@vue/compiler-sfc": "^3.1.5",
+    "babel-preset-es2015": "^6.24.1",
     "eslint": "^7.31.0",
     "eslint-plugin-vue": "^7.14.0",
     "nodemon": "^2.0.12",

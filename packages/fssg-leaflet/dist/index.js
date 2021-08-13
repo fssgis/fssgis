@@ -2,54 +2,297 @@ import { FssgMap, FssgMapPlugin } from '@fssgis/fssg-map';
 import { map, point, latLng, icon, marker, Icon, LayerGroup, tileLayer } from 'leaflet';
 import { $extend } from '@fssgis/utils';
 
-/**
- * 深度复制（采用JSON解析方式）
- * @param obj 复制对象
- */
-function isNullOrUndefined(obj) {
-    return obj === null || obj === undefined;
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+
+    if (enumerableOnly) {
+      symbols = symbols.filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      });
+    }
+
+    keys.push.apply(keys, symbols);
+  }
+
+  return keys;
 }
 
+function _objectSpread2(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+
+    if (i % 2) {
+      ownKeys(Object(source), true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+  }
+
+  return target;
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+function _objectWithoutProperties(source, excluded) {
+  if (source == null) return {};
+
+  var target = _objectWithoutPropertiesLoose(source, excluded);
+
+  var key, i;
+
+  if (Object.getOwnPropertySymbols) {
+    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+    for (i = 0; i < sourceSymbolKeys.length; i++) {
+      key = sourceSymbolKeys[i];
+      if (excluded.indexOf(key) >= 0) continue;
+      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+      target[key] = source[key];
+    }
+  }
+
+  return target;
+}
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+
+  return _assertThisInitialized(self);
+}
+
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived),
+        result;
+
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+
+    return _possibleConstructorReturn(this, result);
+  };
+}
+
+function _superPropBase(object, property) {
+  while (!Object.prototype.hasOwnProperty.call(object, property)) {
+    object = _getPrototypeOf(object);
+    if (object === null) break;
+  }
+
+  return object;
+}
+
+function _get(target, property, receiver) {
+  if (typeof Reflect !== "undefined" && Reflect.get) {
+    _get = Reflect.get;
+  } else {
+    _get = function _get(target, property, receiver) {
+      var base = _superPropBase(target, property);
+
+      if (!base) return;
+      var desc = Object.getOwnPropertyDescriptor(base, property);
+
+      if (desc.get) {
+        return desc.get.call(receiver);
+      }
+
+      return desc.value;
+    };
+  }
+
+  return _get(target, property, receiver || target);
+}
+
+function isNullOrUndefined(obj) {
+  return obj === null || obj === undefined;
+}
+
+var _excluded = ["x", "y", "lon", "lat", "zoom"];
 /**
  * 地图应用
  */
-class FssgLeaflet extends FssgMap {
-    basemap;
-    mapElement;
+
+var FssgLeaflet = /*#__PURE__*/function (_FssgMap) {
+  _inherits(FssgLeaflet, _FssgMap);
+
+  var _super = _createSuper(FssgLeaflet);
+
+  /**
+   * 构造地图应用
+   * @param container 地图容器
+   * @param options 配置项
+   */
+  function FssgLeaflet(container) {
+    var _this;
+
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, FssgLeaflet);
+
+    _this = _super.call(this, container, options, {
+      debugName: 'fssgLeaflet',
+      debug: false,
+      mapOptions: {
+        zoom: 1,
+        center: [0, 0],
+        zoomControl: true,
+        attributionControl: false
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "basemap", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "mapElement", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "_map", void 0);
+
+    return _this;
+  }
+  /**
+   * 初始化地图实例
+   * @returns this
+   */
+
+
+  _createClass(FssgLeaflet, [{
+    key: "map",
+    get:
     /**
      * leaflet地图实例
      */
-    _map;
+
     /**
      * leaflet地图实例
      */
-    get map() {
-        return this._map;
+    function get() {
+      return this._map;
     }
-    /**
-     * 构造地图应用
-     * @param container 地图容器
-     * @param options 配置项
-     */
-    constructor(container, options = {}) {
-        super(container, options, {
-            debugName: 'fssgLeaflet',
-            debug: false,
-            mapOptions: {
-                zoom: 1,
-                center: [0, 0],
-                zoomControl: true,
-                attributionControl: false,
-            }
-        });
-    }
-    /**
-     * 初始化地图实例
-     * @returns this
-     */
-    _initMap() {
-        this._map = Object.assign(map(this.container, this.options_.mapOptions), { $owner: this });
-        return this;
+  }, {
+    key: "_initMap",
+    value: function _initMap() {
+      this._map = Object.assign(map(this.container, this.options_.mapOptions), {
+        $owner: this
+      });
+      return this;
     }
     /**
      * 定位
@@ -58,182 +301,319 @@ class FssgLeaflet extends FssgMap {
      * @param options 配置项
      * @returns this
      */
-    _locateTo(latLng, zoom, options) {
-        zoom = zoom ?? this._map.getZoom();
-        this._map.flyTo(latLng, zoom, {
-            ...options,
-        });
-        return this;
+
+  }, {
+    key: "_locateTo",
+    value: function _locateTo(latLng, zoom, options) {
+      var _zoom;
+
+      zoom = (_zoom = zoom) !== null && _zoom !== void 0 ? _zoom : this._map.getZoom();
+
+      this._map.flyTo(latLng, zoom, _objectSpread2({}, options));
+
+      return this;
     }
     /**
      * 安装地图应用
      * @returns this
      */
-    mount() {
-        return this
-            ._initMap()
-            .fire('loaded');
+
+  }, {
+    key: "mount",
+    value: function mount() {
+      return this._initMap().fire('loaded');
     }
     /**
      * 定位
      * @param options 配置项
      * @returns this
      */
-    locateTo(options) {
-        const { x, y, lon, lat, zoom, ...zoomPanOptions } = options;
-        if (!isNullOrUndefined(x) && !isNullOrUndefined(y)) {
-            const latLng = this.xyToLatLng(point(x, y));
-            this._locateTo(latLng, zoom, zoomPanOptions);
-            return this;
-        }
-        if (!isNullOrUndefined(lon) && !isNullOrUndefined(lat)) {
-            this._locateTo(latLng(lat, lon), zoom, zoomPanOptions);
-            return this;
-        }
+
+  }, {
+    key: "locateTo",
+    value: function locateTo(options) {
+      var x = options.x,
+          y = options.y,
+          lon = options.lon,
+          lat = options.lat,
+          zoom = options.zoom,
+          zoomPanOptions = _objectWithoutProperties(options, _excluded);
+
+      if (!isNullOrUndefined(x) && !isNullOrUndefined(y)) {
+        var _latLng2 = this.xyToLatLng(point(x, y));
+
+        this._locateTo(_latLng2, zoom, zoomPanOptions);
+
         return this;
+      }
+
+      if (!isNullOrUndefined(lon) && !isNullOrUndefined(lat)) {
+        this._locateTo(latLng(lat, lon), zoom, zoomPanOptions);
+
+        return this;
+      }
+
+      return this;
     }
     /**
      * 经纬度转投影坐标
      * @param _latLng 经纬度
      * @returns 投影坐标
      */
-    latLngToXY(_latLng) {
-        const crs = this.options_.mapOptions?.crs;
-        if (crs) {
-            return crs.project(_latLng);
-        }
-        return this._map.project(_latLng);
+
+  }, {
+    key: "latLngToXY",
+    value: function latLngToXY(_latLng) {
+      var _this$options_$mapOpt;
+
+      var crs = (_this$options_$mapOpt = this.options_.mapOptions) === null || _this$options_$mapOpt === void 0 ? void 0 : _this$options_$mapOpt.crs;
+
+      if (crs) {
+        return crs.project(_latLng);
+      }
+
+      return this._map.project(_latLng);
     }
     /**
      * 经纬度转投影坐标
      * @param xy 投影坐标
      * @returns 经纬度
      */
-    xyToLatLng(xy) {
-        const crs = this.options_.mapOptions?.crs;
-        const _xy = point(xy.x, xy.y);
-        if (crs) {
-            return crs.unproject(_xy);
-        }
-        return this._map.unproject(_xy);
+
+  }, {
+    key: "xyToLatLng",
+    value: function xyToLatLng(xy) {
+      var _this$options_$mapOpt2;
+
+      var crs = (_this$options_$mapOpt2 = this.options_.mapOptions) === null || _this$options_$mapOpt2 === void 0 ? void 0 : _this$options_$mapOpt2.crs;
+
+      var _xy = point(xy.x, xy.y);
+
+      if (crs) {
+        return crs.unproject(_xy);
+      }
+
+      return this._map.unproject(_xy);
     }
     /**
      * 获取中心点经纬度和投影坐标信息
      * @returns 中心点的经纬度和投影坐标信息
      */
-    getCenter() {
-        const _latlng = this._map.getCenter();
-        const xy = this.latLngToXY(_latlng);
-        return {
-            x: xy.x,
-            y: xy.y,
-            lon: _latlng.lng,
-            lat: _latlng.lat,
-        };
+
+  }, {
+    key: "getCenter",
+    value: function getCenter() {
+      var _latlng = this._map.getCenter();
+
+      var xy = this.latLngToXY(_latlng);
+      return {
+        x: xy.x,
+        y: xy.y,
+        lon: _latlng.lng,
+        lat: _latlng.lat
+      };
     }
     /**
      * 经纬度对象转leaflet敬畏度对象
      * @param lonlat 经纬度
      * @returns leaflet经纬度对象
      */
-    lonlatToLatlng(lonlat) {
-        return latLng(lonlat.lat, lonlat.lon);
+
+  }, {
+    key: "lonlatToLatlng",
+    value: function lonlatToLatlng(lonlat) {
+      return latLng(lonlat.lat, lonlat.lon);
     }
     /**
      * 经纬度转投影坐标
      * @param lonlat 经纬度
      * @returns 投影坐标
      */
-    lonlatToXY(lonlat) {
-        const _latlng = this.lonlatToLatlng(lonlat);
-        return this.latLngToXY(_latlng);
-    }
-}
 
-class FssgLeafletPlugin extends FssgMapPlugin {
-    /**
-     * leaflet地图实例
-     */
-    map_;
+  }, {
+    key: "lonlatToXY",
+    value: function lonlatToXY(lonlat) {
+      var _latlng = this.lonlatToLatlng(lonlat);
+
+      return this.latLngToXY(_latlng);
+    }
+  }]);
+
+  return FssgLeaflet;
+}(FssgMap);
+
+var FssgLeafletPlugin = /*#__PURE__*/function (_FssgMapPlugin) {
+  _inherits(FssgLeafletPlugin, _FssgMapPlugin);
+
+  var _super = _createSuper(FssgLeafletPlugin);
+
+  function FssgLeafletPlugin() {
+    var _this;
+
+    _classCallCheck(this, FssgLeafletPlugin);
+
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    _this = _super.call.apply(_super, [this].concat(args));
+
+    _defineProperty(_assertThisInitialized(_this), "map_", void 0);
+
+    return _this;
+  }
+
+  _createClass(FssgLeafletPlugin, [{
+    key: "$",
+    get:
     /**
      * 绑定的地图应用实例
      */
-    get $() {
-        return this.map_.$owner;
+    function get() {
+      return this.map_.$owner;
     }
     /**
      * 安装插件
      * @param fssgLeaflet 地图应用实例
      * @returns this
      */
-    installPlugin(fssgLeaflet) {
-        this.map_ = fssgLeaflet.map;
-        return this;
+
+  }, {
+    key: "installPlugin",
+    value: function installPlugin(fssgLeaflet) {
+      this.map_ = fssgLeaflet.map;
+      return this;
     }
-}
+  }]);
+
+  return FssgLeafletPlugin;
+}(FssgMapPlugin);
 
 /**
  * 图元控制插件
  */
-class MapElement extends FssgLeafletPlugin {
-    /**
-     * 图元存储池
-     */
-    _elementPool;
-    /**
-     * 构造图元控制插件
-     * @param options 配置项
-     */
-    constructor(options) {
-        super(options, {});
-        this._elementPool = new Set();
+
+var MapElement = /*#__PURE__*/function (_FssgLeafletPlugin) {
+  _inherits(MapElement, _FssgLeafletPlugin);
+
+  var _super = _createSuper(MapElement);
+
+  /**
+   * 图元存储池
+   */
+
+  /**
+   * 构造图元控制插件
+   * @param options 配置项
+   */
+  function MapElement(options) {
+    var _this;
+
+    _classCallCheck(this, MapElement);
+
+    _this = _super.call(this, options, {});
+
+    _defineProperty(_assertThisInitialized(_this), "_elementPool", void 0);
+
+    _this._elementPool = new Set();
+    return _this;
+  }
+  /**
+   * 添加图元
+   * @param layer 图元
+   * @returns this
+   */
+
+
+  _createClass(MapElement, [{
+    key: "add",
+    value: function add(layer) {
+      this._elementPool.add(layer.addTo(this.map_));
+
+      return this;
     }
-    /**
-     * 添加图元
-     * @param layer 图元
-     * @returns this
-     */
-    add(layer) {
-        this._elementPool.add(layer.addTo(this.map_));
-        return this;
+  }, {
+    key: "addMarkerByXY",
+    value: function addMarkerByXY(xy, iconOptions, options) {
+      var _leafletIcon;
+
+      var leafletIcon = undefined;
+
+      if (iconOptions) {
+        leafletIcon = icon(iconOptions);
+      }
+
+      var latlng = this.$.xyToLatLng(xy);
+
+      var _marker = marker(latlng, _objectSpread2({
+        icon: (_leafletIcon = leafletIcon) !== null && _leafletIcon !== void 0 ? _leafletIcon : new Icon.Default()
+      }, options)).addTo(this.map_);
+
+      this._elementPool.add(_marker);
+
+      return _marker;
     }
-    addMarkerByXY(xy, iconOptions, options) {
-        let leafletIcon = undefined;
-        if (iconOptions) {
-            leafletIcon = icon(iconOptions);
+  }, {
+    key: "clearAll",
+    value: function clearAll() {
+      var _this2 = this;
+
+      this._elementPool.forEach(function (item) {
+        return item.removeFrom(_this2.map_);
+      });
+
+      this._elementPool.clear();
+
+      return this;
+    }
+  }, {
+    key: "setMarkersByList",
+    value: function setMarkersByList(list, options) {
+      var _this3 = this;
+
+      this.clearAll();
+      var xField = options.xField,
+          yField = options.yField,
+          labelField = options.labelField,
+          iconUrlField = options.iconUrlField,
+          iconOptions = options.iconOptions,
+          labelOptions = options.labelOptions,
+          classNameField = options.classNameField;
+      list.forEach(function (item) {
+        var _icon2;
+
+        var x = item[xField];
+        var y = item[yField];
+        var label = item[labelField];
+        var className = item[classNameField !== null && classNameField !== void 0 ? classNameField : ''];
+
+        var _icon;
+
+        if (iconUrlField) {
+          _icon = icon(_objectSpread2({
+            iconUrl: item[iconUrlField]
+          }, iconOptions));
         }
-        const latlng = this.$.xyToLatLng(xy);
-        const _marker = marker(latlng, {
-            icon: leafletIcon ?? new Icon.Default(),
-            ...options,
-        }).addTo(this.map_);
-        this._elementPool.add(_marker);
-        return _marker;
+
+        var _marker = marker(_this3.$.xyToLatLng({
+          x: x,
+          y: y
+        }), {
+          icon: (_icon2 = _icon) !== null && _icon2 !== void 0 ? _icon2 : new Icon.Default()
+        }).bindTooltip(label, _objectSpread2({
+          permanent: true,
+          sticky: true,
+          className: className
+        }, labelOptions));
+
+        _this3.add(_marker);
+      });
+      return this;
     }
-    clearAll() {
-        this._elementPool.forEach(item => item.removeFrom(this.map_));
-        this._elementPool.clear();
-        return this;
-    }
-    setMarkersByList(list, options) {
-        this.clearAll();
-        const { xField, yField, labelField, iconUrlField, iconOptions, labelOptions, classNameField } = options;
-        list.forEach(item => {
-            const x = item[xField];
-            const y = item[yField];
-            const label = item[labelField];
-            const className = item[classNameField ?? ''];
-            let _icon;
-            if (iconUrlField) {
-                _icon = icon({ iconUrl: item[iconUrlField], ...iconOptions });
-            }
-            const _marker = marker(this.$.xyToLatLng({ x, y }), { icon: _icon ?? new Icon.Default() })
-                .bindTooltip(label, { permanent: true, sticky: true, className, ...labelOptions });
-            this.add(_marker);
-        });
-        return this;
-    }
-}
+  }]);
+
+  return MapElement;
+}(FssgLeafletPlugin);
 /*
     Leaflet.label, a plugin that adds labels to markers and vectors for Leaflet powered maps.
     (c) 2012-2013, Jacob Toye, Smartrak
@@ -659,111 +1039,178 @@ class MapElement extends FssgLeafletPlugin {
 //   })
 //   }(this, document))
 
-class ExtLayer extends LayerGroup {
-    options_;
-    layer_;
-    visible_;
-    get visible() {
-        return this.visible_;
+var ExtLayer = /*#__PURE__*/function (_LayerGroup) {
+  _inherits(ExtLayer, _LayerGroup);
+
+  var _super = _createSuper(ExtLayer);
+
+  function ExtLayer(layer, options) {
+    var _this;
+
+    _classCallCheck(this, ExtLayer);
+
+    _this = _super.call(this);
+
+    _defineProperty(_assertThisInitialized(_this), "options_", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "layer_", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "visible_", void 0);
+
+    layer && (_this.layer_ = layer);
+    _this.options_ = $extend(true, _this.options_, {
+      visible: true
+    }, options !== null && options !== void 0 ? options : {});
+
+    _this._init();
+
+    return _this;
+  }
+
+  _createClass(ExtLayer, [{
+    key: "visible",
+    get: function get() {
+      return this.visible_;
+    },
+    set: function set(v) {
+      if (this.visible_ !== v) {
+        this.visible_ = v;
+        v && this.layer_ ? this.addLayer(this.layer_) : this.removeLayer(this.layer_);
+        this.fire('changed:visible');
+      }
     }
-    set visible(v) {
-        if (this.visible_ !== v) {
-            this.visible_ = v;
-            (v && this.layer_)
-                ? this.addLayer(this.layer_)
-                : this.removeLayer(this.layer_);
-            this.fire('changed:visible');
-        }
+  }, {
+    key: "_init",
+    value: function _init() {
+      this.visible_ = this.options_.visible;
+
+      if (this.visible_ && this.layer_) {
+        this.addLayer(this.layer_);
+      }
+
+      return this;
     }
-    constructor(layer, options) {
-        super();
-        layer && (this.layer_ = layer);
-        this.options_ = $extend(true, this.options_, {
-            visible: true,
-        }, options ?? {});
-        this._init();
+  }, {
+    key: "setLayer",
+    value: function setLayer(layer) {
+      this.visible_ && this.layer_ && this.removeLayer(this.layer_);
+      this.layer_ = layer;
+      this.visible_ && this.addLayer(layer);
+      return this;
     }
-    _init() {
-        this.visible_ = this.options_.visible;
-        if (this.visible_ && this.layer_) {
-            this.addLayer(this.layer_);
-        }
-        return this;
-    }
-    setLayer(layer) {
-        (this.visible_ && this.layer_) && this.removeLayer(this.layer_);
-        this.layer_ = layer;
-        this.visible_ && this.addLayer(layer);
-        return this;
-    }
-}
+  }]);
+
+  return ExtLayer;
+}(LayerGroup);
 
 /**
  * 底图插件
  */
-class Basemap extends FssgLeafletPlugin {
-    _basemapLayer;
-    _selectedKey;
-    _visible;
-    _itemPools;
-    get visible() {
-        return this._visible;
+
+var Basemap = /*#__PURE__*/function (_FssgLeafletPlugin) {
+  _inherits(Basemap, _FssgLeafletPlugin);
+
+  var _super = _createSuper(Basemap);
+
+  /**
+   * 构造底图插件
+   * @param options 配置项
+   */
+  function Basemap(options) {
+    var _options$items;
+
+    var _this;
+
+    _classCallCheck(this, Basemap);
+
+    _this = _super.call(this, options, {
+      items: [],
+      selectedKey: options === null || options === void 0 ? void 0 : (_options$items = options.items) === null || _options$items === void 0 ? void 0 : _options$items[0].key,
+      visible: true
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "_basemapLayer", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "_selectedKey", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "_visible", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "_itemPools", void 0);
+
+    return _this;
+  }
+  /**
+   * 初始化
+   * @returns this
+   */
+
+
+  _createClass(Basemap, [{
+    key: "visible",
+    get: function get() {
+      return this._visible;
+    },
+    set: function set(v) {
+      this._basemapLayer.visible = v;
+      this._visible = v;
+      this.fire('changed:visible', {
+        visible: v
+      });
     }
-    set visible(v) {
-        this._basemapLayer.visible = v;
-        this._visible = v;
-        this.fire('changed:visible', { visible: v });
+  }, {
+    key: "_init",
+    value: function _init() {
+      this._selectedKey = this.options_.selectedKey;
+      this._visible = this.options_.visible;
+      this._basemapLayer = new ExtLayer(undefined, {
+        visible: this._visible
+      }).addTo(this.map_).setZIndex(0);
+      this._itemPools = new Map();
+      return this._initBasemapItems();
     }
-    /**
-     * 构造底图插件
-     * @param options 配置项
-     */
-    constructor(options) {
-        super(options, {
-            items: [],
-            selectedKey: options?.items?.[0].key,
-            visible: true,
-        });
-    }
-    /**
-     * 初始化
-     * @returns this
-     */
-    _init() {
-        this._selectedKey = this.options_.selectedKey;
-        this._visible = this.options_.visible;
-        this._basemapLayer = new ExtLayer(undefined, { visible: this._visible })
-            .addTo(this.map_)
-            .setZIndex(0);
-        this._itemPools = new Map();
-        return this
-            ._initBasemapItems();
-    }
-    _initBasemapItems() {
-        this.options_.items?.forEach(item => {
-            let layer = undefined;
-            if (item.type === 'tile' && item.url) {
-                layer = tileLayer(item.url);
-            }
-            if (layer) {
-                this._itemPools.set(item.key, { options: item, layers: [layer] });
-            }
-        });
-        const selectedItem = this._itemPools.get(this._selectedKey);
-        if (selectedItem) {
-            this._basemapLayer.setLayer(selectedItem.layers[0]);
+  }, {
+    key: "_initBasemapItems",
+    value: function _initBasemapItems() {
+      var _this$options_$items,
+          _this2 = this;
+
+      (_this$options_$items = this.options_.items) === null || _this$options_$items === void 0 ? void 0 : _this$options_$items.forEach(function (item) {
+        var layer = undefined;
+
+        if (item.type === 'tile' && item.url) {
+          layer = tileLayer(item.url);
         }
-        return this;
+
+        if (layer) {
+          _this2._itemPools.set(item.key, {
+            options: item,
+            layers: [layer]
+          });
+        }
+      });
+
+      var selectedItem = this._itemPools.get(this._selectedKey);
+
+      if (selectedItem) {
+        this._basemapLayer.setLayer(selectedItem.layers[0]);
+      }
+
+      return this;
     }
     /**
      * 安装插件
      * @param fssgLeaflet 地图应用
      * @returns this
      */
-    installPlugin(fssgLeaflet) {
-        return super.installPlugin(fssgLeaflet)
-            ._init();
+
+  }, {
+    key: "installPlugin",
+    value: function installPlugin(fssgLeaflet) {
+      return _get(_getPrototypeOf(Basemap.prototype), "installPlugin", this).call(this, fssgLeaflet)._init();
     }
-}
+  }]);
+
+  return Basemap;
+}(FssgLeafletPlugin);
 
 export { Basemap, FssgLeaflet, FssgLeafletPlugin, MapElement };

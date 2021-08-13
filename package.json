@@ -10,10 +10,10 @@
   ],
   "scripts": {
     "publish": "lerna publish --no-push",
-    "dev:docs": "npx vitepress dev ./project/fssgis-docs/docs --host=0.0.0.0",
+    "dev:docs": "npx vitepress dev ./packages/fssgis-docs/docs --host=0.0.0.0",
     "build": "npx rollup --config",
     "build:all": "npx rollup --config ./build/index.js",
-    "build:docs": "npx vitepress build ./project/fssgis-docs/docs",
+    "build:docs": "npx vitepress build ./packages/fssgis-docs/docs",
     "build:axios": "npx rollup --config ./build/build.fssgis-axios.js -w",
     "build:ext": "npx rollup --config ./build/build.fssgis-ext.js -w",
     "build:observable": "npx rollup --config ./build/build.fssgis-observable.js -w",

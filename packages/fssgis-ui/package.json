@@ -3,12 +3,12 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.0.0",
+  "version": "1.0.1-alpha.0",
   "description": "✨fssgis的vue ui组件库✨",
   "main": "dist/index.js",
   "dependencies": {
-    "@fssgis/ext": "^1.0.4",
-    "@fssgis/utils": "^1.0.6",
+    "@fssgis/ext": "^1.0.5-alpha.0",
+    "@fssgis/utils": "^1.0.7-alpha.0",
     "vue": "^3.2.2"
   }
 }

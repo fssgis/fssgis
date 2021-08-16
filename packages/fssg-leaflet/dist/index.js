@@ -309,6 +309,13 @@ var FssgLeaflet = /*#__PURE__*/function (_FssgMap) {
 
       zoom = (_zoom = zoom) !== null && _zoom !== void 0 ? _zoom : this._map.getZoom();
 
+      var maxZoom = this._map.getMaxZoom();
+
+      var minZoom = this._map.getMinZoom();
+
+      zoom > maxZoom && (zoom = maxZoom);
+      zoom < minZoom && (zoom = minZoom);
+
       this._map.flyTo(latLng, zoom, _objectSpread2({}, options));
 
       return this;

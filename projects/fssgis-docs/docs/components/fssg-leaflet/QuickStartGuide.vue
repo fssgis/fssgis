@@ -102,7 +102,6 @@ export default defineComponent({
         },
         labelOptions: {
           className: 'leaflet-label',
-          iconAnchor: [30, -22]
         },
         classNameField: 'type',
       })

@@ -107,6 +107,10 @@ export class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvents
    */
   private _locateTo (latLng: LatLng, zoom?: number, options?: ZoomPanOptions) : this {
     zoom = zoom ?? this._map.getZoom()
+    const maxZoom = this._map.getMaxZoom()
+    const minZoom = this._map.getMinZoom()
+    zoom > maxZoom && (zoom = maxZoom)
+    zoom < minZoom && (zoom = minZoom)
     this._map.flyTo(latLng, zoom, {
       ...options,
     })

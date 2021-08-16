@@ -41,7 +41,6 @@
     "@vitejs/plugin-vue": "^1.4.0",
     "@vue/babel-plugin-jsx": "^1.0.6",
     "@vue/compiler-sfc": "^3.1.5",
-    "babel-preset-es2015": "^6.24.1",
     "eslint": "^7.31.0",
     "eslint-plugin-vue": "^7.14.0",
     "nodemon": "^2.0.12",
@@ -58,8 +57,5 @@
     "typescript": "^4.3.4",
     "vite": "^2.4.4",
     "vitepress": "^0.15.6"
-  },
-  "dependencies": {
-    "@types/leaflet-label": "^0.2.36"
   }
 }

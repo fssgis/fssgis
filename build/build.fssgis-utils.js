@@ -23,7 +23,9 @@ export default [
         babelHelpers: 'bundled',
         extensions: ['.ts', '.js', '.tsx'],
         presets: [
-          '@babel/preset-env'
+          ["@babel/preset-env", { "targets": {
+            "chrome": "81"
+          }}]
         ]
       })
     ]

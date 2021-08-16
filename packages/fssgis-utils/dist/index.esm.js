@@ -1,201 +1,19 @@
-function ownKeys(object, enumerableOnly) {
-  var keys = Object.keys(object);
-
-  if (Object.getOwnPropertySymbols) {
-    var symbols = Object.getOwnPropertySymbols(object);
-
-    if (enumerableOnly) {
-      symbols = symbols.filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-      });
-    }
-
-    keys.push.apply(keys, symbols);
-  }
-
-  return keys;
-}
-
-function _objectSpread2(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-
-    if (i % 2) {
-      ownKeys(Object(source), true).forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
-    } else if (Object.getOwnPropertyDescriptors) {
-      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-    } else {
-      ownKeys(Object(source)).forEach(function (key) {
-        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-      });
-    }
-  }
-
-  return target;
-}
-
-function _typeof(obj) {
-  "@babel/helpers - typeof";
-
-  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-    _typeof = function (obj) {
-      return typeof obj;
-    };
-  } else {
-    _typeof = function (obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-    };
-  }
-
-  return _typeof(obj);
-}
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
-  try {
-    var info = gen[key](arg);
-    var value = info.value;
-  } catch (error) {
-    reject(error);
-    return;
-  }
-
-  if (info.done) {
-    resolve(value);
-  } else {
-    Promise.resolve(value).then(_next, _throw);
-  }
-}
-
-function _asyncToGenerator(fn) {
-  return function () {
-    var self = this,
-        args = arguments;
-    return new Promise(function (resolve, reject) {
-      var gen = fn.apply(self, args);
-
-      function _next(value) {
-        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
-      }
-
-      function _throw(err) {
-        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
-      }
-
-      _next(undefined);
-    });
-  };
-}
-
-function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
-
-function _slicedToArray(arr, i) {
-  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
-}
-
-function _toConsumableArray(arr) {
-  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
-}
-
-function _arrayWithoutHoles(arr) {
-  if (Array.isArray(arr)) return _arrayLikeToArray(arr);
-}
-
-function _arrayWithHoles(arr) {
-  if (Array.isArray(arr)) return arr;
-}
-
-function _iterableToArray(iter) {
-  if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
-}
-
-function _iterableToArrayLimit(arr, i) {
-  var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
-
-  if (_i == null) return;
-  var _arr = [];
-  var _n = true;
-  var _d = false;
-
-  var _s, _e;
-
-  try {
-    for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) {
-      _arr.push(_s.value);
-
-      if (i && _arr.length === i) break;
-    }
-  } catch (err) {
-    _d = true;
-    _e = err;
-  } finally {
-    try {
-      if (!_n && _i["return"] != null) _i["return"]();
-    } finally {
-      if (_d) throw _e;
-    }
-  }
-
-  return _arr;
-}
-
-function _unsupportedIterableToArray(o, minLen) {
-  if (!o) return;
-  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
-  var n = Object.prototype.toString.call(o).slice(8, -1);
-  if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
-}
-
-function _arrayLikeToArray(arr, len) {
-  if (len == null || len > arr.length) len = arr.length;
-
-  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
-
-  return arr2;
-}
-
-function _nonIterableSpread() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-
-function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-
 /**
  * 深度复制（采用JSON解析方式）
  * @param obj 复制对象
  */
-var deepCopyJSON = function deepCopyJSON(obj) {
-  return JSON.parse(JSON.stringify(obj));
-};
+const deepCopyJSON = obj => JSON.parse(JSON.stringify(obj));
 /**
   * 深度复制（采用递归式）
   * @param obj 复制对象
   */
 
 function deepCopy(obj) {
-  var newObj = Array.isArray(obj) ? [] : {};
+  const newObj = Array.isArray(obj) ? [] : {};
 
-  for (var key in obj) {
+  for (const key in obj) {
     // if (Object.prototype.hasOwnProperty.call(obj, key)) {
-    newObj[key] = _typeof(obj[key]) === 'object' && obj[key] !== null ? deepCopy(obj[key]) : obj[key]; // }
+    newObj[key] = typeof obj[key] === 'object' && obj[key] !== null ? deepCopy(obj[key]) : obj[key]; // }
   }
 
   return newObj;
@@ -207,7 +25,7 @@ function createGuid() {
     return ((1 + Math.random()) * 0x10000 | 0).toString(16).substring(1);
   }
 
-  return "".concat(S4()).concat(S4(), "-").concat(S4(), "-").concat(S4(), "-").concat(S4(), "-").concat(S4()).concat(S4()).concat(S4());
+  return `${S4()}${S4()}-${S4()}-${S4()}-${S4()}-${S4()}${S4()}${S4()}`;
 }
 /**
   * 创建指定范围的随机整数
@@ -223,9 +41,9 @@ function createIntRandom(minInt, maxInt) {
 /* istanbul ignore next */
 
 function isFromMobileBrowser() {
-  var _navigator$userAgent$, _navigator, _navigator$userAgent;
+  var _navigator, _navigator$userAgent;
 
-  return (_navigator$userAgent$ = !!((_navigator = navigator) !== null && _navigator !== void 0 && (_navigator$userAgent = _navigator.userAgent) !== null && _navigator$userAgent !== void 0 && _navigator$userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i))) !== null && _navigator$userAgent$ !== void 0 ? _navigator$userAgent$ : false;
+  return !!((_navigator = navigator) !== null && _navigator !== void 0 && (_navigator$userAgent = _navigator.userAgent) !== null && _navigator$userAgent !== void 0 && _navigator$userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)) ?? false;
 }
 /**
   * 复制文本
@@ -234,38 +52,17 @@ function isFromMobileBrowser() {
 
 /* istanbul ignore next */
 
-function copyText(_x) {
-  return _copyText.apply(this, arguments);
+async function copyText(text) {
+  await navigator.clipboard.writeText(text);
+  return text;
 }
 /**
   * 随机获取数组的其中一个子集
   * @param arr 数组
   */
 
-function _copyText() {
-  _copyText = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(text) {
-    return regeneratorRuntime.wrap(function _callee$(_context) {
-      while (1) {
-        switch (_context.prev = _context.next) {
-          case 0:
-            _context.next = 2;
-            return navigator.clipboard.writeText(text);
-
-          case 2:
-            return _context.abrupt("return", text);
-
-          case 3:
-          case "end":
-            return _context.stop();
-        }
-      }
-    }, _callee);
-  }));
-  return _copyText.apply(this, arguments);
-}
-
 function getArrayItemRandom(arr) {
-  var index = createIntRandom(0, arr.length - 1);
+  const index = createIntRandom(0, arr.length - 1);
   return arr[index];
 }
 /**
@@ -276,7 +73,7 @@ function getArrayItemRandom(arr) {
 /* istanbul ignore next */
 
 function loadCss(cssUrl) {
-  var link = document.createElement('link');
+  const link = document.createElement('link');
   link.rel = 'stylesheet';
   link.type = 'text/css';
   link.href = cssUrl;
@@ -291,7 +88,7 @@ function loadCss(cssUrl) {
 /* istanbul ignore next */
 
 function loadJs(jsUrl) {
-  var script = document.createElement('script');
+  const script = document.createElement('script');
   script.src = jsUrl;
   document.head.appendChild(script);
 }
@@ -304,34 +101,30 @@ function loadJs(jsUrl) {
 
 /* istanbul ignore next */
 
-function $extend(_deep, sourceObj) {
-  for (var _len = arguments.length, otherObjs = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-    otherObjs[_key - 2] = arguments[_key];
-  }
-
+function $extend(_deep, sourceObj, ...otherObjs) {
   function isPlainObject(obj) {
-    var class2type = {};
-    var getProto = Object.getPrototypeOf;
-    var toString = class2type.toString;
-    var hasOwn = class2type.hasOwnProperty;
-    var fnToString = hasOwn.toString;
-    var ObjectFunctionString = fnToString.call(Object);
+    const class2type = {};
+    const getProto = Object.getPrototypeOf;
+    const toString = class2type.toString;
+    const hasOwn = class2type.hasOwnProperty;
+    const fnToString = hasOwn.toString;
+    const ObjectFunctionString = fnToString.call(Object);
 
     if (!obj || toString.call(obj) !== '[object Object]') {
       return false;
     }
 
-    var proto = getProto(obj);
+    const proto = getProto(obj);
 
     if (!proto) {
       return true;
     }
 
-    var Ctor = hasOwn.call(proto, 'constructor') && proto.constructor;
+    const Ctor = hasOwn.call(proto, 'constructor') && proto.constructor;
     return typeof Ctor === 'function' && fnToString.call(Ctor) === ObjectFunctionString;
   }
 
-  var options,
+  let options,
       name,
       src,
       copy,
@@ -351,7 +144,7 @@ function $extend(_deep, sourceObj) {
     i = 2;
   }
 
-  if (_typeof(target) !== 'object' && typeof target !== 'function') {
+  if (typeof target !== 'object' && typeof target !== 'function') {
     target = {};
   }
 
@@ -404,27 +197,21 @@ function $extend(_deep, sourceObj) {
 
 /* istanbul ignore next */
 
-function debounce(fn, wait) {
-  var immediate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-  var handle,
+function debounce(fn, wait, immediate = false) {
+  let handle,
       ret = null;
 
-  var debounced = function debounced() {
-    var _arguments = arguments;
+  const debounced = function () {
     clearTimeout(handle);
 
     if (immediate === true) {
       if (!handle) {
-        ret = fn.apply(void 0, arguments); // eslint-disable-line
+        ret = fn(...arguments); // eslint-disable-line
       }
 
-      handle = setTimeout(function () {
-        return fn.apply(void 0, _toConsumableArray(_arguments));
-      }, wait); // eslint-disable-line
+      handle = setTimeout(() => fn(...arguments), wait); // eslint-disable-line
     } else {
-      handle = setTimeout(function () {
-        return fn.apply(void 0, _toConsumableArray(_arguments));
-      }, wait); // eslint-disable-line
+      handle = setTimeout(() => fn(...arguments), wait); // eslint-disable-line
     }
 
     return ret;
@@ -448,23 +235,21 @@ function debounce(fn, wait) {
 
 /* istanbul ignore next */
 
-function throttle(fn, wait) {
-  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {
-    leading: true,
-    trailing: true
-  };
-  var handle,
+function throttle(fn, wait, options = {
+  leading: true,
+  trailing: true
+}) {
+  let handle,
       previous = 0;
 
-  var throttled = function throttled() {
-    var _arguments2 = arguments;
-    var now = Date.now();
+  const throttled = function () {
+    const now = Date.now();
 
     if (!previous && !options.leading) {
       previous = now;
     }
 
-    var remaining = wait - (now - previous);
+    const remaining = wait - (now - previous);
 
     if (remaining <= 0 || remaining > wait) {
       if (handle) {
@@ -473,12 +258,12 @@ function throttle(fn, wait) {
       }
 
       previous = now;
-      fn.apply(void 0, arguments); // eslint-disable-line
+      fn(...arguments); // eslint-disable-line
     } else if (!handle && options.trailing) {
-      handle = setTimeout(function () {
+      handle = setTimeout(() => {
         previous = !options.leading ? 0 : Date.now();
         handle = null;
-        fn.apply(void 0, _toConsumableArray(_arguments2)); // eslint-disable-line
+        fn(...arguments); // eslint-disable-line
       }, remaining);
     }
   };
@@ -499,17 +284,15 @@ function throttle(fn, wait) {
   */
 
 function listToTree(list, options) {
-  var _options = {
+  const _options = {
     idField: 'id',
     parentIdField: 'parentId',
-    checkParentIdCallback: function checkParentIdCallback(parentId) {
-      return !!parentId;
-    }
+    checkParentIdCallback: parentId => !!parentId
   };
-  Object.assign(_options, options !== null && options !== void 0 ? options : {});
-  var map = {};
-  var node, i;
-  var roots = [];
+  Object.assign(_options, options ?? {});
+  const map = {};
+  let node, i;
+  const roots = [];
 
   for (i = 0; i < list.length; i += 1) {
     map[list[i][_options.idField]] = i;
@@ -536,15 +319,11 @@ function listToTree(list, options) {
   */
 
 function parseListField(list, parseFields) {
-  return list.map(function (item) {
-    var newItem = _objectSpread2({}, item); // eslint-disable-line @typescript-eslint/no-explicit-any
+  return list.map(item => {
+    const newItem = { ...item
+    }; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-
-    parseFields.forEach(function (_ref) {
-      var _ref2 = _slicedToArray(_ref, 2),
-          fromField = _ref2[0],
-          toField = _ref2[1];
-
+    parseFields.forEach(([fromField, toField]) => {
       newItem[toField] = newItem[fromField];
     });
     return newItem;
@@ -553,9 +332,9 @@ function parseListField(list, parseFields) {
 /* istanbul ignore next */
 
 function whenRightReturn(time, intervalCallback) {
-  return new Promise(function (resolve) {
-    var handleId = setInterval(function () {
-      var ret = intervalCallback();
+  return new Promise(resolve => {
+    const handleId = setInterval(() => {
+      const ret = intervalCallback();
 
       if (ret) {
         clearInterval(handleId);

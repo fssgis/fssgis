@@ -127,4 +127,9 @@ declare abstract class FssgMap<T_OPTIONS extends IFssgMapOptions = IFssgMapOptio
     abstract mount(): this;
 }
 
-export { BaseClass, FssgMap, FssgMapPlugin, IBaseClassEvents, IBaseClassOptions, IFssgMapContainer, IFssgMapEvents, IFssgMapOptions, IFssgMapPluginEvents, IFssgMapPluginOptions };
+/** 天地图墨卡托投影路径集合 */
+declare const BASEMAP_TIAN_DI_TU_3857: Record<string, string>;
+/** 天地图经纬度投影路径集合 */
+declare const BASEMAP_TIAN_DI_TU_4326: Record<string, string>;
+
+export { BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseClass, FssgMap, FssgMapPlugin, IBaseClassEvents, IBaseClassOptions, IFssgMapContainer, IFssgMapEvents, IFssgMapOptions, IFssgMapPluginEvents, IFssgMapPluginOptions };

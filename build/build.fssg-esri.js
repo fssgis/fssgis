@@ -20,6 +20,8 @@ export default [
       '@arcgis/core/views/MapView',
       '@arcgis/core/config',
       '@arcgis/core/geometry/Point',
+      '@arcgis/core/layers/WebTileLayer',
+      '@arcgis/core/Basemap',
     ],
     plugins: [
       typescript(),

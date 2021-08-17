@@ -2,7 +2,7 @@ import { FssgMap, IFssgMapEvents, IFssgMapOptions } from '@fssgis/fssg-map'
 import ArcGISMap from '@arcgis/core/Map'
 import MapView from '@arcgis/core/views/MapView'
 import esriConfig from '@arcgis/core/config'
-import Point from '@arcgis/core/geometry/Point'
+import { Basemap } from '../plugins'
 
 esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S'
 
@@ -30,6 +30,8 @@ export type IView = __esri.MapView & IOwner
 
 
 export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
+
+  public basemap: Basemap
 
   //#region 私有属性
 

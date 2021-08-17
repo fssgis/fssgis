@@ -1,4 +1,103 @@
-import { IFssgMapOptions, IFssgMapEvents, FssgMap, IFssgMapPluginOptions, IFssgMapPluginEvents, FssgMapPlugin } from '@fssgis/fssg-map';
+import { IFssgMapPluginOptions, IFssgMapPluginEvents, FssgMapPlugin, IFssgMapOptions, IFssgMapEvents, FssgMap } from '@fssgis/fssg-map';
+
+/**
+ * 地图应用插件配置项
+ */
+interface IFssgEsriPluginOptions extends IFssgMapPluginOptions {
+}
+/**
+ * 地图应用插件事件集
+ */
+interface IFssgEsriPluginEvents extends IFssgMapPluginEvents {
+}
+declare class FssgEsriPlugin<T_OPTIONS extends IFssgEsriPluginOptions = IFssgEsriPluginOptions, T_EVENTS extends IFssgEsriPluginEvents = IFssgEsriPluginEvents> extends FssgMapPlugin<T_OPTIONS & IFssgEsriPluginOptions, T_EVENTS & IFssgEsriPluginEvents> {
+    /**
+     * 地图对象
+     */
+    protected map_: IMap;
+    /**
+     * 视图对象
+     */
+    protected view_: IView;
+    /**
+     * 绑定的地图应用实例
+     */
+    get $(): FssgEsri;
+    /**
+     * 安装插件
+     * @param FssgEsri 地图应用实例
+     * @returns this
+     */
+    installPlugin(fssgEsri: FssgEsri): this;
+}
+
+/**
+ * 底图控制插件配置项
+ */
+interface IBasemapOptions extends IFssgEsriPluginOptions {
+    items?: {
+        key: string;
+        type?: 'webtilelayer';
+        url?: string;
+        props?: __esri.LayerProperties;
+        lyrs?: {
+            type: 'webtilelayer';
+            url: string;
+            props?: __esri.LayerProperties;
+        }[];
+    }[];
+    selectedKey?: string;
+    visible?: boolean;
+}
+/**
+ * 底图控制插件事件集
+ */
+interface IBasemapEvents extends IFssgEsriPluginEvents {
+    'changed:selected-key': {
+        selectedKey: string;
+    };
+    'changed:visible': {
+        visible: boolean;
+    };
+}
+interface IBasemapItem {
+    layers: __esri.Layer[];
+    options: NonNullable<IBasemapOptions['items']>[0];
+}
+/**
+ * 底图控制插件
+ */
+declare class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
+    static readonly BASEMAP_TIAN_DI_TU_3857: Record<string, string>;
+    static readonly BASEMAP_TIAN_DI_TU_4326: Record<string, string>;
+    private _selectedKey;
+    private _visible;
+    private _itemPool;
+    get visible(): boolean;
+    set visible(v: boolean);
+    constructor(options?: IBasemapOptions);
+    get selectedKey(): string;
+    set selectedKey(key: string);
+    private _init;
+    /**
+     * 创建天地图底图项
+     * @returns this
+     */
+    private _createTianDiTu;
+    installPlugin(fssgEsri: FssgEsri): this;
+    /**
+     * 创建底图项
+     * @param key 底图项Key值
+     * @param layer 底图图层
+     */
+    createBasemapItem(key: string, layer: __esri.Layer): this;
+    /**
+     * 创建底图项
+     * @param key 底图项Key值
+     * @param layers 底图图层数组
+     */
+    createBasemapItem(key: string, layers: __esri.Layer[]): this;
+}
 
 /**
  * 地图应用配置项
@@ -22,6 +121,7 @@ interface IOwner {
 declare type IMap = __esri.Map & IOwner;
 declare type IView = __esri.MapView & IOwner;
 declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
+    basemap: Basemap;
     /**
      * 地图对象
      */
@@ -71,35 +171,4 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     mount(): this;
 }
 
-/**
- * 地图应用插件配置项
- */
-interface IFssgEsriPluginOptions extends IFssgMapPluginOptions {
-}
-/**
- * 地图应用插件事件集
- */
-interface IFssgEsriPluginEvents extends IFssgMapPluginEvents {
-}
-declare class FssgEsriPlugin<T_OPTIONS extends IFssgEsriPluginOptions = IFssgEsriPluginOptions, T_EVENTS extends IFssgEsriPluginEvents = IFssgEsriPluginEvents> extends FssgMapPlugin<T_OPTIONS & IFssgEsriPluginOptions, T_EVENTS & IFssgEsriPluginEvents> {
-    /**
-     * 地图对象
-     */
-    protected map_: IMap;
-    /**
-     * 视图对象
-     */
-    protected view_: IView;
-    /**
-     * 绑定的地图应用实例
-     */
-    get $(): FssgEsri;
-    /**
-     * 安装插件
-     * @param FssgEsri 地图应用实例
-     * @returns this
-     */
-    installPlugin(fssgEsri: FssgEsri): this;
-}
-
-export { FssgEsri, FssgEsriPlugin, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IMap, IOwner, IView };
+export { Basemap, FssgEsri, FssgEsriPlugin, IBasemapEvents, IBasemapItem, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IMap, IOwner, IView };

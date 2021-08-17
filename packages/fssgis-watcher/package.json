@@ -1,6 +1,6 @@
 {
   "name": "@fssgis/watcher",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "🎉JavaScript监听者，被动监听",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",

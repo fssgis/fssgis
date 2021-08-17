@@ -51,6 +51,12 @@ function getGuideSidebar() {
       children: [
         { text: '介绍及基础使用', link: '/guide/esri/base' },
       ]
+    },
+    {
+      text: '@fssgis/fssg-esri-hooks钩子库',
+      children: [
+        { text: 'FssgEsri响应式钩子', link: '/guide/esri-hooks/fssg-esri-hooks' },
+      ]
     }
   ]
 }

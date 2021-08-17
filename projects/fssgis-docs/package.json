@@ -5,6 +5,7 @@
   "description": "🎉fssgis文档",
   "dependencies": {
     "@fssgis/fssg-esri": "^0.0.0",
+    "@fssgis/fssg-esri-hooks": "^0.0.0",
     "@fssgis/fssg-leaflet": "^1.0.9",
     "@fssgis/grid": "^1.0.10-alpha.0",
     "@fssgis/icon": "^1.0.3",

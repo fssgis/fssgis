@@ -79,7 +79,7 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
       },
       mapOptions: {},
       debug: false,
-      debugName: 'fssgMap',
+      debugName: 'fssgEsri',
     })
   }
 

@@ -6,6 +6,9 @@ import FssgBoxesExample from '../../components/fssgis-grid/FssgBoxesExample.vue'
 import FssgGridExample from '../../components/fssgis-grid/FssgGridExample.vue'
 import FssgLeafletQuickStartGuide from '../../components/fssg-leaflet/QuickStartGuide.vue'
 import EsriBeginToStart from '../../components/fssg-esri/EsriBeginToStart.vue'
+import EsriContainer from '../../components/fssg-esri/EsriContainer.vue'
+import ExampleUseZoom from '../../components/fssg-esri-hooks/ExampleUseZoom.vue'
+import ExampleUseCenter from '../../components/fssg-esri-hooks/ExampleUseCenter.vue'
 
 import { FssgIcon, FssgIconFont } from '@fssgis/ui'
 
@@ -21,5 +24,8 @@ export default {
     app.component('FssgIcon', FssgIcon)
     app.component('FssgIconFont', FssgIconFont)
     app.component('EsriBeginToStart', EsriBeginToStart)
+    app.component('ExampleUseZoom', ExampleUseZoom)
+    app.component('EsriContainer', EsriContainer)
+    app.component('ExampleUseCenter', ExampleUseCenter)
   }
 }

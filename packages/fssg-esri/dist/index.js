@@ -66,7 +66,7 @@ class FssgEsri extends FssgMap {
       },
       mapOptions: {},
       debug: false,
-      debugName: 'fssgMap'
+      debugName: 'fssgEsri'
     });
 
     _defineProperty(this, "_map", void 0);

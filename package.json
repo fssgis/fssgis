@@ -22,6 +22,7 @@
     "build:leaflet": "npx rollup --config ./build/build.fssg-leaflet.js -w",
     "build:map": "npx rollup --config ./build/build.fssg-map.js -w",
     "build:esri": "npx rollup --config ./build/build.fssg-esri.js -w",
+    "build:esri-hooks": "npx rollup --config ./build/build.fssg-esri-hooks.js -w",
     "build:grid": "npx rollup --config ./build/build.fssgis-grid.js -w",
     "build:ui": "npx rollup --config ./build/build.fssgis-ui.js -w",
     "test": "npx jest",

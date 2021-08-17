@@ -8,15 +8,13 @@ import babel from '@rollup/plugin-babel'
 
 export default [
   {
-    input: resolve('packages', 'fssg-leaflet', 'src/index.ts'),
+    input: resolve('packages', 'fssg-map', 'src/index.ts'),
     output: [
-      { format: 'esm', file: resolve('packages', 'fssg-leaflet', 'dist/index.js') },
+      { format: 'esm', file: resolve('packages', 'fssg-map', 'dist/index.js') },
     ],
     external:[
-      '@fssgis/fssg-map',
       '@fssgis/observable',
       '@fssgis/utils',
-      'leaflet',
     ],
     plugins: [
       typescript(),
@@ -36,9 +34,9 @@ export default [
     ]
   },
   {
-    input: resolve('packages', 'fssg-leaflet', 'src/index.ts'),
+    input: resolve('packages', 'fssg-map', 'src/index.ts'),
     output: [
-      { format: 'esm', file: resolve('packages', 'fssg-leaflet', 'dist/index.d.ts') },
+      { format: 'esm', file: resolve('packages', 'fssg-map', 'dist/index.d.ts') },
     ],
     plugins: [dts()]
   }

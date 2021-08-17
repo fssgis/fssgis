@@ -66,7 +66,7 @@ declare class MapElement extends FssgLeafletPlugin<IMapElementOptions, IMapEleme
         labelOptions?: TooltipOptions;
         classNameField?: keyof T;
         iconUrlField?: keyof T;
-        iconOptions?: IconOptions;
+        iconOptions?: Omit<IconOptions, 'iconUrl'>;
     }): this;
 }
 

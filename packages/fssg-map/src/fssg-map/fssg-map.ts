@@ -1,3 +1,4 @@
+import { IFssgMapPluginOptions } from '../fssg-map-plugin'
 import BaseClass, { IBaseClassEvents } from '../base-class'
 import FssgMapPlugin, { IFssgMapPluginEvents } from '../fssg-map-plugin'
 
@@ -82,7 +83,7 @@ export abstract class FssgMap<
    * @param plugin 地图应用插件
    * @returns this
    */
-  public use <T, K extends IFssgMapPluginEvents> (plugin: FssgMapPlugin<T, K>) : this {
+  public use <T extends IFssgMapPluginOptions, K extends IFssgMapPluginEvents> (plugin: FssgMapPlugin<T, K>) : this {
     this.when().then(() => {
       this[plugin.pluginName] = plugin.installPlugin(this as any) // eslint-disable-line
       plugin.fire('loaded')

@@ -31,9 +31,9 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
-import { FssgGrid, IFssgGridOptions } from '@fssgis/grid'
+import { FssgGrid, IFssgGridOptions } from '@fssgis/ui'
 import { createIntRandom, createGuid } from '@fssgis/utils'
-import '@fssgis/grid/dist/index.css'
+import '@fssgis/ui/dist/index.css'
 
 interface IState {
   gridAreasText: string

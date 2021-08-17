@@ -120,7 +120,7 @@ declare abstract class FssgMap<T_OPTIONS extends IFssgMapOptions = IFssgMapOptio
      * @param plugin 地图应用插件
      * @returns this
      */
-    use<T, K extends IFssgMapPluginEvents>(plugin: FssgMapPlugin<T, K>): this;
+    use<T extends IFssgMapPluginOptions, K extends IFssgMapPluginEvents>(plugin: FssgMapPlugin<T, K>): this;
     /**
      * 安装
      */

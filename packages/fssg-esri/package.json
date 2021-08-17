@@ -1,0 +1,22 @@
+{
+  "name": "@fssgis/fssg-esri",
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "description": "🎉使用ArcGIS JS API实现的基于业务功能型的地图库",
+  "keywords": [
+    "javascript",
+    "typescript",
+    "map",
+    "arcgis js api"
+  ],
+  "dependencies": {
+    "@arcgis/core": "^4.20.2",
+    "@fssgis/fssg-map": "^1.0.6",
+    "@fssgis/observable": "^1.0.4-alpha.0",
+    "@fssgis/utils": "^1.0.7"
+  }
+}

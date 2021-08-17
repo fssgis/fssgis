@@ -5,6 +5,7 @@ import CreateIntRandom from '../../components/fssgis-utils/CreateIntRandom.vue'
 import FssgBoxesExample from '../../components/fssgis-grid/FssgBoxesExample.vue'
 import FssgGridExample from '../../components/fssgis-grid/FssgGridExample.vue'
 import FssgLeafletQuickStartGuide from '../../components/fssg-leaflet/QuickStartGuide.vue'
+import EsriBeginToStart from '../../components/fssg-esri/EsriBeginToStart.vue'
 
 import { FssgIcon, FssgIconFont } from '@fssgis/ui'
 
@@ -19,5 +20,6 @@ export default {
     app.component('FssgLeafletQuickStartGuide', FssgLeafletQuickStartGuide)
     app.component('FssgIcon', FssgIcon)
     app.component('FssgIconFont', FssgIconFont)
+    app.component('EsriBeginToStart', EsriBeginToStart)
   }
 }

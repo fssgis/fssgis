@@ -9,6 +9,6 @@
   "dependencies": {
     "@fssgis/ext": "^1.0.5-alpha.0",
     "@fssgis/utils": "^1.0.7",
-    "vue": "^3.2.2"
+    "vue": "^3.2.3"
   }
 }

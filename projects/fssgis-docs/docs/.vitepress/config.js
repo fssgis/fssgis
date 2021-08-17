@@ -45,6 +45,12 @@ function getGuideSidebar() {
       children: [
         { text: 'Frontmatter', link: '/guide/frontmatter' },
       ]
+    },
+    {
+      text: '@fssgis/fssg-esri地图库',
+      children: [
+        { text: '介绍及基础使用', link: '/guide/esri/base' },
+      ]
     }
   ]
 }

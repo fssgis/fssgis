@@ -6,6 +6,9 @@
   <button @click="startWatch">
     开始监听
   </button>
+  <button @click="set">
+    set
+  </button>
   <span>监听状态：{{ watchStatus ? '开' : '关' }}</span>
 </template>
 
@@ -20,15 +23,20 @@ export default defineComponent({
     const { center, stopWatch, startWatch, watchStatus } = useCenter()
 
     const centerStr = computed(() => {
-      const pt = center.value
+      const pt = center.value as __esri.Point
       return `x: ${pt.x}, y: ${pt.y}, lon: ${pt.longitude}, lat: ${pt.latitude}`
     })
+
+    function set () {
+      center.value = [113, 23]
+    }
 
     return {
       stopWatch,
       startWatch,
       watchStatus,
       centerStr,
+      set,
     }
   },
 })

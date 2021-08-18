@@ -6,6 +6,12 @@
   <button @click="startWatch">
     开始监听
   </button>
+  <button @click="zoom++">
+    +
+  </button>
+  <button @click="zoom--">
+    -
+  </button>
   <span>监听状态：{{ watchStatus ? '开' : '关' }}</span>
 </template>
 

@@ -1,6 +1,14 @@
 import { FssgEsri, IFssgEsriOptions } from '@fssgis/fssg-esri';
 import { Ref } from 'vue';
 
+declare function useEsriWatch<T extends __esri.Accessor, K extends keyof T>(accessor: T, property: K, callback: (val: T[K]) => void, options?: {
+    defaultStop?: boolean;
+    sync?: boolean;
+}): {
+    startWatch(): void;
+    stopWatch(): void;
+    watchStatus: Ref<boolean>;
+};
 interface IWatchRef {
     watchStatus: Ref<boolean>;
     stopWatch(): void;
@@ -21,7 +29,7 @@ declare function useZoom(fssgEsri?: FssgEsri): {
     zoom: Ref<number>;
 } & IWatchRef;
 declare function useCenter(fssgEsri?: FssgEsri): {
-    center: Ref<__esri.Point>;
+    center: Ref<__esri.Point | number[]>;
 } & IWatchRef;
 declare function useExtent(fssgEsri?: FssgEsri): {
     extent: Ref<__esri.Extent>;
@@ -36,4 +44,4 @@ declare function createFssgEsri(container: string, options?: IFssgEsriOptions): 
 declare function useFssgEsri(): FssgEsri;
 declare function useFssgEsriLoaded(fssgEsri?: FssgEsri): Ref<boolean>;
 
-export { createFssgEsri, useCenter, useCenterZoom, useExtent, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { createFssgEsri, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

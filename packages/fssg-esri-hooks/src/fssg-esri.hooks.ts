@@ -1,6 +1,31 @@
 import { FssgEsri, IFssgEsriOptions } from '@fssgis/fssg-esri'
-import { getCurrentInstance, inject, InjectionKey, onUnmounted, provide, ref, Ref, shallowReactive, shallowRef, watchEffect } from 'vue'
+import { inject, InjectionKey, provide, ref, Ref, shallowReactive, shallowRef, watch, watchEffect } from 'vue'
 import { whenRightReturn } from '@fssgis/utils'
+import { controllableWatch, tryOnBeforeUnmounted, tryOnUnmounted } from './base.hooks'
+
+export function useEsriWatch<T extends __esri.Accessor, K extends keyof T> (accessor: T, property: K, callback: (val: T[K]) => void, options?: { defaultStop?: boolean, sync?: boolean }): {
+  startWatch() : void
+  stopWatch() : void
+  watchStatus: Ref<boolean>
+} {
+  let handle : __esri.WatchHandle | undefined
+  const watchStatus = ref(!!options?.defaultStop)
+  const stopWatch = () => watchStatus.value = false
+  const startWatch = () => watchStatus.value = true
+  tryOnBeforeUnmounted(() => stopWatch())
+
+  watchEffect(() => {
+    if (watchStatus.value) {
+      handle?.remove()
+      handle = accessor.watch(property as string, callback, options?.sync)
+    } else {
+      handle?.remove()
+      handle = undefined
+    }
+  })
+
+  return { watchStatus, stopWatch, startWatch }
+}
 
 interface IWatchRef {
   watchStatus: Ref<boolean>
@@ -11,57 +36,60 @@ interface IWatchRef {
 export function useWatchRef<T extends __esri.Accessor, K extends keyof T> (accessor: T, property: K) : {
   watchRef: Ref<T[K]>
 } & IWatchRef {
-  let handle : __esri.WatchHandle | undefined
-
   const watchRef = ref(accessor[property]) as Ref<T[K]>
-  const watchStatus = ref(true)
-  const stopWatch = () => watchStatus.value = false
-  const startWatch = () => watchStatus.value = true
 
-  watchEffect(() => {
-    if (watchStatus.value) {
-      handle?.remove()
-      watchRef.value = accessor[property]
-      handle = accessor.watch(property as string, val => watchRef.value = val)
-    } else {
-      handle?.remove()
-      handle = undefined
+  const { watchStatus, ...others } = useEsriWatch(accessor, property, val => {
+    if (watchRef.value !== val) {
+      watchRef.value = val
+    }
+  }, { defaultStop: true })
+
+  const { start, stop } = controllableWatch(watchRef, val => {
+    if (val !== accessor[property]) {
+      accessor[property] = val
     }
   })
 
-  if (getCurrentInstance()) {
-    onUnmounted(() => stopWatch())
-  }
+  watch(watchStatus, status => {
+    if (status) {
+      watchRef.value = accessor[property]
+      start()
+    } else {
+      stop()
+    }
+  }, { immediate: true })
 
-  return { watchRef, startWatch, stopWatch, watchStatus }
+  return { watchRef, watchStatus, ...others }
 }
 
 export function useWatchShallowRef<T extends __esri.Accessor, K extends keyof T> (accessor: T, property: K) : {
   watchRef: Ref<T[K]>
 } & IWatchRef {
-  let handle : __esri.WatchHandle | undefined
-
   const watchRef = shallowRef(accessor[property]) as Ref<T[K]>
-  const watchStatus = ref(true)
-  const stopWatch = () => watchStatus.value = false
-  const startWatch = () => watchStatus.value = true
 
-  watchEffect(() => {
-    if (watchStatus.value) {
-      handle?.remove()
-      watchRef.value = accessor[property]
-      handle = accessor.watch(property as string, val => watchRef.value = val)
-    } else {
-      handle?.remove()
-      handle = undefined
+  const { watchStatus, ...others } = useEsriWatch(accessor, property, val => {
+    if (watchRef.value !== val) {
+      watchRef.value = val
+    }
+  }, { defaultStop: true })
+
+  const { start, stop } = controllableWatch(watchRef, val => {
+    if (val !== accessor[property]) {
+      accessor[property] = val
     }
   })
 
-  if (getCurrentInstance()) {
-    onUnmounted(() => stopWatch())
-  }
+  watchEffect(() => {
+    if (watchStatus.value) {
+      watchRef.value = accessor[property]
+      start()
+    } else {
+      stop()
+    }
+  })
 
-  return { watchRef, startWatch, stopWatch, watchStatus }
+
+  return { watchRef, watchStatus, ...others }
 }
 
 export function useWatchShallowReactive<T extends __esri.Accessor, K extends keyof T> (accessor: T, properties: K[]) : {
@@ -97,9 +125,8 @@ export function useWatchShallowReactive<T extends __esri.Accessor, K extends key
     }
   })
 
-  if (getCurrentInstance()) {
-    onUnmounted(() => stopWatch())
-  }
+  tryOnUnmounted(() => stopWatch())
+
   return { watchReactive, startWatch, stopWatch, watchStatus }
 }
 
@@ -112,7 +139,7 @@ export function useZoom (fssgEsri?: FssgEsri) : { zoom: Ref<number> } & IWatchRe
   return { zoom, ...others }
 }
 
-export function useCenter (fssgEsri?: FssgEsri) : { center: Ref<__esri.Point> } & IWatchRef {
+export function useCenter (fssgEsri?: FssgEsri) : { center: Ref<__esri.Point | number[]> } & IWatchRef {
   if (!fssgEsri) {
     fssgEsri = useFssgEsri()
   }

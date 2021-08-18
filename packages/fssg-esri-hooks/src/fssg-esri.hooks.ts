@@ -120,6 +120,14 @@ export function useCenter (fssgEsri?: FssgEsri) : { center: Ref<__esri.Point> } 
   return { center, ...others }
 }
 
+export function useExtent (fssgEsri?: FssgEsri) : { extent: Ref<__esri.Extent> } & IWatchRef {
+  if (!fssgEsri) {
+    fssgEsri = useFssgEsri()
+  }
+  const { watchRef: extent, ...others } = useWatchShallowRef(fssgEsri.view, 'extent')
+  return { extent, ...others }
+}
+
 export function useCenterZoom (fssgEsri?: FssgEsri) : { state: { center: __esri.Point, zoom: number } } & IWatchRef {
   if (!fssgEsri) {
     fssgEsri = useFssgEsri()

@@ -142,6 +142,20 @@ function useCenter(fssgEsri) {
     ...others
   };
 }
+function useExtent(fssgEsri) {
+  if (!fssgEsri) {
+    fssgEsri = useFssgEsri();
+  }
+
+  const {
+    watchRef: extent,
+    ...others
+  } = useWatchShallowRef(fssgEsri.view, 'extent');
+  return {
+    extent,
+    ...others
+  };
+}
 function useCenterZoom(fssgEsri) {
   if (!fssgEsri) {
     fssgEsri = useFssgEsri();
@@ -178,4 +192,4 @@ function useFssgEsriLoaded(fssgEsri) {
   return loaded;
 }
 
-export { createFssgEsri, useCenter, useCenterZoom, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { createFssgEsri, useCenter, useCenterZoom, useExtent, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

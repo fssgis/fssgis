@@ -23,6 +23,9 @@ declare function useZoom(fssgEsri?: FssgEsri): {
 declare function useCenter(fssgEsri?: FssgEsri): {
     center: Ref<__esri.Point>;
 } & IWatchRef;
+declare function useExtent(fssgEsri?: FssgEsri): {
+    extent: Ref<__esri.Extent>;
+} & IWatchRef;
 declare function useCenterZoom(fssgEsri?: FssgEsri): {
     state: {
         center: __esri.Point;
@@ -33,4 +36,4 @@ declare function createFssgEsri(container: string, options?: IFssgEsriOptions): 
 declare function useFssgEsri(): FssgEsri;
 declare function useFssgEsriLoaded(fssgEsri?: FssgEsri): Ref<boolean>;
 
-export { createFssgEsri, useCenter, useCenterZoom, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { createFssgEsri, useCenter, useCenterZoom, useExtent, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

@@ -156,11 +156,21 @@ class FssgMap extends BaseClass {
  */
 
 class FssgMapPlugin extends BaseClass {
-  //#region 保护属性
+  /**
+   * 从地图应用实例中获取地图应用插件实例
+   * @param fssgMap 地图应用
+   * @returns 地图应用插件
+   */
+  static getFrom(fssgMap) {
+    const name = this.name;
+    return fssgMap[name.replace(name[0], name[0].toLowerCase())];
+  } //#region 保护属性
 
   /**
    * 插件名
    */
+
+
   //#endregion
   //#region getter setter
 

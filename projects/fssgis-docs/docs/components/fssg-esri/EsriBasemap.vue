@@ -11,6 +11,9 @@ import { FssgEsri, Basemap } from '@fssgis/fssg-esri'
 
 export default defineComponent({
   setup () {
+    // eslint-disable-next-line
+    // @ts-ignore
+    window.Basemap = Basemap
     const basemap = new Basemap({
       selectedKey: '彩色地图',
       items: [

@@ -54,6 +54,12 @@ interface IFssgMapPluginOptions extends IBaseClassOptions {
  */
 declare abstract class FssgMapPlugin<T_OPTIONS extends IFssgMapPluginOptions = IFssgMapPluginOptions, T_EVENTS extends IFssgMapPluginEvents = IFssgMapPluginEvents> extends BaseClass<T_OPTIONS & IFssgMapPluginOptions, T_EVENTS & IFssgMapPluginEvents> {
     /**
+     * 从地图应用实例中获取地图应用插件实例
+     * @param fssgMap 地图应用
+     * @returns 地图应用插件
+     */
+    static getFrom<T extends FssgMapPlugin>(fssgMap: FssgMap): T;
+    /**
      * 插件名
      */
     protected pluginName_: string;

@@ -38,7 +38,7 @@ import { /* ... */ } from '@fssgis/fssg-leaflet'
 <br />
 
 <ClientOnly>
-  <FssgLeafletQuickStartGuide />
+  <QuickStartGuide />
 </ClientOnly>
 
 ```vue

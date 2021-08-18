@@ -26,6 +26,16 @@ export abstract class FssgMapPlugin<
   T_EVENTS & IFssgMapPluginEvents
 > {
 
+  /**
+   * 从地图应用实例中获取地图应用插件实例
+   * @param fssgMap 地图应用
+   * @returns 地图应用插件
+   */
+  public static getFrom<T extends FssgMapPlugin> (fssgMap: FssgMap) : T {
+    const name = this.name
+    return fssgMap[name.replace(name[0], name[0].toLowerCase())]
+  }
+
   //#region 保护属性
 
   /**

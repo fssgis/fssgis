@@ -2,7 +2,7 @@ import { FssgEsri, IFssgEsriOptions } from '@fssgis/fssg-esri';
 import { Ref } from 'vue';
 
 declare type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void;
-declare function useEsriWatch<T extends __esri.Accessor, K extends keyof T>(accessor: T, property: K, callback: EsriWatchCallback<T, K>, options?: {
+declare function useEsriWatch<T extends __esri.Accessor, K extends keyof T>(accessor: T, p: K | K[], callback: EsriWatchCallback<T, K>, options?: {
     defaultStop?: boolean;
     sync?: boolean;
 }): {

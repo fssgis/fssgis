@@ -5,7 +5,7 @@ import { controllableWatch, tryOnBeforeUnmounted, tryOnUnmounted } from './base.
 
 export type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void
 
-export function useEsriWatch<T extends __esri.Accessor, K extends keyof T> (accessor: T, property: K, callback: EsriWatchCallback<T, K>, options?: { defaultStop?: boolean, sync?: boolean }): {
+export function useEsriWatch<T extends __esri.Accessor, K extends keyof T> (accessor: T, p: K | K[], callback: EsriWatchCallback<T, K>, options?: { defaultStop?: boolean, sync?: boolean }): {
   startWatch() : void
   stopWatch() : void
   watchStatus: Ref<boolean>
@@ -19,7 +19,7 @@ export function useEsriWatch<T extends __esri.Accessor, K extends keyof T> (acce
   watchEffect(() => {
     if (watchStatus.value) {
       handle?.remove()
-      handle = accessor.watch(property as string, callback as any, options?.sync) // eslint-disable-line
+      handle = accessor.watch(p as string, callback as any, options?.sync) // eslint-disable-line
     } else {
       handle?.remove()
       handle = undefined
@@ -99,14 +99,16 @@ export function useWatchShallowReactive<T extends __esri.Accessor, K extends key
     [K in keyof T]: T[K]
   }, K>
 } & IWatchRef {
-  let handle : __esri.WatchHandle | undefined
 
   const watchReactive = shallowReactive({} as Pick<{
     [K in keyof T]: T[K]
   }, K>)
-  const watchStatus = ref(true)
-  const stopWatch = () => watchStatus.value = false
-  const startWatch = () => watchStatus.value = true
+
+  const { watchStatus, ...others } = useEsriWatch(accessor, properties, (val, _, prop) => {
+    if (watchReactive[prop] !== val) {
+      watchReactive[prop] = val
+    }
+  }, { defaultStop: true })
 
   properties.forEach(prop => {
     watchReactive[prop] = accessor[prop]
@@ -114,22 +116,16 @@ export function useWatchShallowReactive<T extends __esri.Accessor, K extends key
 
   watchEffect(() => {
     if (watchStatus.value) {
-      handle?.remove()
       properties.forEach(prop => {
         watchReactive[prop] = accessor[prop]
       })
-      handle = accessor.watch(properties as string[], (val, _, prop) => {
-        watchReactive[prop] = val
-      })
+      // TODO
     } else {
-      handle?.remove()
-      handle = undefined
+      // TODO
     }
   })
 
-  tryOnUnmounted(() => stopWatch())
-
-  return { watchReactive, startWatch, stopWatch, watchStatus }
+  return { watchReactive, watchStatus, ...others }
 }
 
 

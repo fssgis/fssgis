@@ -1,13 +1,8 @@
 import { FssgEsri } from '@fssgis/fssg-esri';
-import { getCurrentInstance, onUnmounted, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide } from 'vue';
+import { getCurrentInstance, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide } from 'vue';
 import { whenRightReturn } from '@fssgis/utils';
 
 /* eslint-disable @typescript-eslint/ban-types */
-function tryOnUnmounted(callback) {
-  if (getCurrentInstance()) {
-    onUnmounted(() => callback());
-  }
-}
 function tryOnBeforeUnmounted(callback) {
   if (getCurrentInstance()) {
     onBeforeUnmount(() => callback());
@@ -39,7 +34,7 @@ function controllableWatch(...args) {
   };
 }
 
-function useEsriWatch(accessor, property, callback, options) {
+function useEsriWatch(accessor, p, callback, options) {
   let handle;
   const watchStatus = ref(!!(options !== null && options !== void 0 && options.defaultStop));
 
@@ -53,7 +48,7 @@ function useEsriWatch(accessor, property, callback, options) {
       var _handle;
 
       (_handle = handle) === null || _handle === void 0 ? void 0 : _handle.remove();
-      handle = accessor.watch(property, callback, options === null || options === void 0 ? void 0 : options.sync); // eslint-disable-line
+      handle = accessor.watch(p, callback, options === null || options === void 0 ? void 0 : options.sync); // eslint-disable-line
     } else {
       var _handle2;
 
@@ -138,41 +133,31 @@ function useWatchShallowRef(accessor, property) {
   };
 }
 function useWatchShallowReactive(accessor, properties) {
-  let handle;
   const watchReactive = shallowReactive({});
-  const watchStatus = ref(true);
-
-  const stopWatch = () => watchStatus.value = false;
-
-  const startWatch = () => watchStatus.value = true;
-
+  const {
+    watchStatus,
+    ...others
+  } = useEsriWatch(accessor, properties, (val, _, prop) => {
+    if (watchReactive[prop] !== val) {
+      watchReactive[prop] = val;
+    }
+  }, {
+    defaultStop: true
+  });
   properties.forEach(prop => {
     watchReactive[prop] = accessor[prop];
   });
   watchEffect(() => {
     if (watchStatus.value) {
-      var _handle3;
-
-      (_handle3 = handle) === null || _handle3 === void 0 ? void 0 : _handle3.remove();
       properties.forEach(prop => {
         watchReactive[prop] = accessor[prop];
-      });
-      handle = accessor.watch(properties, (val, _, prop) => {
-        watchReactive[prop] = val;
-      });
-    } else {
-      var _handle4;
-
-      (_handle4 = handle) === null || _handle4 === void 0 ? void 0 : _handle4.remove();
-      handle = undefined;
+      }); // TODO
     }
   });
-  tryOnUnmounted(() => stopWatch());
   return {
     watchReactive,
-    startWatch,
-    stopWatch,
-    watchStatus
+    watchStatus,
+    ...others
   };
 }
 function useZoom(fssgEsri) {

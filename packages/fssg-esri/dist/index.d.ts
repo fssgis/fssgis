@@ -60,24 +60,49 @@ interface IBasemapEvents extends IFssgEsriPluginEvents {
         visible: boolean;
     };
 }
-interface IBasemapItem {
-    layers: __esri.Layer[];
-    options: NonNullable<IBasemapOptions['items']>[0];
-}
 /**
  * 底图控制插件
  */
 declare class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
     static readonly BASEMAP_TIAN_DI_TU_3857: Record<string, string>;
     static readonly BASEMAP_TIAN_DI_TU_4326: Record<string, string>;
+    /**
+     * 当前底图选中项
+     */
     private _selectedKey;
+    /**
+     * 底图可见性
+     */
     private _visible;
+    /**
+     * 底图项容器池
+     */
     private _itemPool;
+    /**
+     * 底图可见性
+     */
     get visible(): boolean;
+    /**
+     * 底图可见性
+     */
     set visible(v: boolean);
-    constructor(options?: IBasemapOptions);
+    /**
+     * 当前底图选中项
+     */
     get selectedKey(): string;
+    /**
+     * 当前底图选中项
+     */
     set selectedKey(key: string);
+    /**
+     * 构造底图控制插件
+     * @param options 配置项
+     */
+    constructor(options?: IBasemapOptions);
+    /**
+     * 初始化
+     * @returns this
+     */
     private _init;
     /**
      * 创建天地图底图项
@@ -97,6 +122,13 @@ declare class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
      * @param layers 底图图层数组
      */
     createBasemapItem(key: string, layers: __esri.Layer[]): this;
+    /**
+     * 创建底图项
+     * @param key 底图项
+     * @param arg1 底图图层 or 底图图层数组
+     * @returns this
+     */
+    createBasemapItem(key: string, arg1: __esri.Layer | __esri.Layer[]): this;
 }
 
 /**
@@ -171,4 +203,4 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     mount(): this;
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, IBasemapEvents, IBasemapItem, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IMap, IOwner, IView };
+export { Basemap, FssgEsri, FssgEsriPlugin, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IMap, IOwner, IView };

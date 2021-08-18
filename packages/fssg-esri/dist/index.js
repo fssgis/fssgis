@@ -192,9 +192,28 @@ class FssgEsriPlugin extends FssgMapPlugin {
  */
 
 class Basemap extends FssgEsriPlugin {
+  /**
+   * 当前底图选中项
+   */
+
+  /**
+   * 底图可见性
+   */
+
+  /**
+   * 底图项容器池
+   */
+
+  /**
+   * 底图可见性
+   */
   get visible() {
     return this._visible;
   }
+  /**
+   * 底图可见性
+   */
+
 
   set visible(v) {
     if (v === this._visible) {
@@ -209,28 +228,18 @@ class Basemap extends FssgEsriPlugin {
       visible: v
     });
   }
+  /**
+   * 当前底图选中项
+   */
 
-  constructor(options) {
-    var _options$items;
-
-    super(options, {
-      items: [],
-      selectedKey: options === null || options === void 0 ? void 0 : (_options$items = options.items) === null || _options$items === void 0 ? void 0 : _options$items[0].key,
-      visible: true
-    });
-
-    _defineProperty(this, "_selectedKey", void 0);
-
-    _defineProperty(this, "_visible", void 0);
-
-    _defineProperty(this, "_itemPool", void 0);
-
-    this._itemPool = new Map();
-  }
 
   get selectedKey() {
     return this._selectedKey;
   }
+  /**
+   * 当前底图选中项
+   */
+
 
   set selectedKey(key) {
     if (key === this._selectedKey) {
@@ -252,6 +261,34 @@ class Basemap extends FssgEsriPlugin {
       selectedKey: key
     });
   }
+  /**
+   * 构造底图控制插件
+   * @param options 配置项
+   */
+
+
+  constructor(options) {
+    var _options$items;
+
+    super(options, {
+      items: [],
+      selectedKey: options === null || options === void 0 ? void 0 : (_options$items = options.items) === null || _options$items === void 0 ? void 0 : _options$items[0].key,
+      visible: true
+    });
+
+    _defineProperty(this, "_selectedKey", void 0);
+
+    _defineProperty(this, "_visible", void 0);
+
+    _defineProperty(this, "_itemPool", void 0);
+
+    this._itemPool = new Map();
+  }
+  /**
+   * 初始化
+   * @returns this
+   */
+
 
   _init() {
     var _this$options_$items;

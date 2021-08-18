@@ -31,11 +31,6 @@ export interface IBasemapEvents extends IFssgEsriPluginEvents { // eslint-disabl
   'changed:visible': { visible: boolean }
 }
 
-export interface IBasemapItem {
-  layers: __esri.Layer[]
-  options: NonNullable<IBasemapOptions['items']>[0]
-}
-
 /**
  * 底图控制插件
  */
@@ -44,16 +39,31 @@ export class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
   public static readonly BASEMAP_TIAN_DI_TU_3857 = BASEMAP_TIAN_DI_TU_3857
   public static readonly BASEMAP_TIAN_DI_TU_4326 = BASEMAP_TIAN_DI_TU_4326
 
+  /**
+   * 当前底图选中项
+   */
   private _selectedKey : string
 
+  /**
+   * 底图可见性
+   */
   private _visible : boolean
 
+  /**
+   * 底图项容器池
+   */
   private _itemPool : Map<string, __esri.Layer[]>
 
+  /**
+   * 底图可见性
+   */
   public get visible () : boolean {
     return this._visible
   }
 
+  /**
+   * 底图可见性
+   */
   public set visible (v: boolean) {
     if (v === this._visible) {
       return
@@ -65,19 +75,16 @@ export class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
     this.fire('changed:visible', { visible: v })
   }
 
-  constructor (options?: IBasemapOptions) {
-    super(options, {
-      items: [],
-      selectedKey: options?.items?.[0].key,
-      visible: true,
-    })
-    this._itemPool = new Map()
-  }
-
+  /**
+   * 当前底图选中项
+   */
   public get selectedKey () : string {
     return this._selectedKey
   }
 
+  /**
+   * 当前底图选中项
+   */
   public set selectedKey (key: string) {
     if (key === this._selectedKey) {
       return
@@ -94,6 +101,23 @@ export class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
     this.fire('changed:selected-key', { selectedKey: key })
   }
 
+  /**
+   * 构造底图控制插件
+   * @param options 配置项
+   */
+  constructor (options?: IBasemapOptions) {
+    super(options, {
+      items: [],
+      selectedKey: options?.items?.[0].key,
+      visible: true,
+    })
+    this._itemPool = new Map()
+  }
+
+  /**
+   * 初始化
+   * @returns this
+   */
   private _init () : this {
     if (!this.map_.basemap) {
       this.map_.basemap = new EsriBasemap()
@@ -163,6 +187,13 @@ export class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
     * @param layers 底图图层数组
     */
    public createBasemapItem (key: string, layers: __esri.Layer[]) : this
+   /**
+    * 创建底图项
+    * @param key 底图项
+    * @param arg1 底图图层 or 底图图层数组
+    * @returns this
+    */
+   public createBasemapItem (key: string, arg1: __esri.Layer | __esri.Layer[]) : this
    /**
     * 创建底图项
     * @param key 底图项

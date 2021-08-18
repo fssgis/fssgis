@@ -1,4 +1,6 @@
-import { ref, watchEffect, getCurrentInstance, onUnmounted, shallowRef, shallowReactive } from 'vue';
+import { FssgEsri } from '@fssgis/fssg-esri';
+import { ref, watchEffect, getCurrentInstance, onUnmounted, shallowRef, shallowReactive, inject, provide } from 'vue';
+import { whenRightReturn } from '@fssgis/utils';
 
 function useWatchRef(accessor, property) {
   let handle;
@@ -94,6 +96,10 @@ function useWatchShallowReactive(accessor, properties) {
   };
 }
 function useZoom(fssgEsri) {
+  if (!fssgEsri) {
+    fssgEsri = useFssgEsri();
+  }
+
   const {
     watchRef: zoom,
     ...others
@@ -104,6 +110,10 @@ function useZoom(fssgEsri) {
   };
 }
 function useCenter(fssgEsri) {
+  if (!fssgEsri) {
+    fssgEsri = useFssgEsri();
+  }
+
   const {
     watchRef: center,
     ...others
@@ -117,4 +127,26 @@ function useCenter(fssgEsri) {
 //   return { state, others }
 // }
 
-export { useCenter, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+const SYMBOL_FSSG_ESRI = Symbol('fssgEsri');
+function createFssgEsri(container, options) {
+  const fssgEsri = new FssgEsri(container, options);
+  provide(SYMBOL_FSSG_ESRI, fssgEsri);
+  whenRightReturn(500, () => document.getElementById(container)).then(() => {
+    fssgEsri.mount();
+  });
+  return fssgEsri;
+}
+function useFssgEsri() {
+  return inject(SYMBOL_FSSG_ESRI);
+}
+function useFssgEsriLoaded(fssgEsri) {
+  if (!fssgEsri) {
+    fssgEsri = useFssgEsri();
+  }
+
+  const loaded = ref(false);
+  fssgEsri.when().then(() => loaded.value = true);
+  return loaded;
+}
+
+export { createFssgEsri, useCenter, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

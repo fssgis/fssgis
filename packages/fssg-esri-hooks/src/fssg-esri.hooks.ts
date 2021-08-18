@@ -1,5 +1,6 @@
-import { FssgEsri } from '@fssgis/fssg-esri'
-import { getCurrentInstance, onUnmounted, ref, Ref, shallowReactive, shallowRef, watchEffect } from 'vue'
+import { FssgEsri, IFssgEsriOptions } from '@fssgis/fssg-esri'
+import { getCurrentInstance, inject, InjectionKey, onUnmounted, provide, ref, Ref, shallowReactive, shallowRef, watchEffect } from 'vue'
+import { whenRightReturn } from '@fssgis/utils'
 
 interface IWatchRef {
   watchStatus: Ref<boolean>
@@ -82,12 +83,18 @@ export function useWatchShallowReactive<T extends __esri.Accessor, K extends key
 }
 
 
-export function useZoom (fssgEsri: FssgEsri) : { zoom: Ref<number> } & IWatchRef {
+export function useZoom (fssgEsri?: FssgEsri) : { zoom: Ref<number> } & IWatchRef {
+  if (!fssgEsri) {
+    fssgEsri = useFssgEsri()
+  }
   const { watchRef: zoom, ...others } = useWatchRef(fssgEsri.view, 'zoom')
   return { zoom, ...others }
 }
 
-export function useCenter (fssgEsri: FssgEsri) : { center: Ref<__esri.Point> } & IWatchRef {
+export function useCenter (fssgEsri?: FssgEsri) : { center: Ref<__esri.Point> } & IWatchRef {
+  if (!fssgEsri) {
+    fssgEsri = useFssgEsri()
+  }
   const { watchRef: center, ...others } = useWatchShallowRef(fssgEsri.view, 'center')
   return { center, ...others }
 }
@@ -96,4 +103,30 @@ export function useCenter (fssgEsri: FssgEsri) : { center: Ref<__esri.Point> } &
 //   const { watchReactive: state, ...others } = useWatchShallowReactive(fssgEsri.view, ['center', 'zoom'])
 //   return { state, others }
 // }
+
+const SYMBOL_FSSG_ESRI : InjectionKey<FssgEsri> = Symbol('fssgEsri')
+
+export function createFssgEsri (container: string, options?: IFssgEsriOptions) : FssgEsri {
+  const fssgEsri = new FssgEsri(container, options)
+  provide(SYMBOL_FSSG_ESRI, fssgEsri)
+
+  whenRightReturn(500, () => document.getElementById(container)).then(() => {
+    fssgEsri.mount()
+  })
+
+  return fssgEsri
+}
+
+export function useFssgEsri () : FssgEsri {
+  return inject(SYMBOL_FSSG_ESRI) as FssgEsri
+}
+
+export function useFssgEsriLoaded (fssgEsri?: FssgEsri) : Ref<boolean> {
+  if (!fssgEsri) {
+    fssgEsri = useFssgEsri()
+  }
+  const loaded = ref(false)
+  fssgEsri.when().then(() => loaded.value = true)
+  return loaded
+}
 

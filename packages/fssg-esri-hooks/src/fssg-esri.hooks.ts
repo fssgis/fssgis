@@ -3,7 +3,9 @@ import { inject, InjectionKey, provide, ref, Ref, shallowReactive, shallowRef, w
 import { whenRightReturn } from '@fssgis/utils'
 import { controllableWatch, tryOnBeforeUnmounted, tryOnUnmounted } from './base.hooks'
 
-export function useEsriWatch<T extends __esri.Accessor, K extends keyof T> (accessor: T, property: K, callback: (val: T[K]) => void, options?: { defaultStop?: boolean, sync?: boolean }): {
+export type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void
+
+export function useEsriWatch<T extends __esri.Accessor, K extends keyof T> (accessor: T, property: K, callback: EsriWatchCallback<T, K>, options?: { defaultStop?: boolean, sync?: boolean }): {
   startWatch() : void
   stopWatch() : void
   watchStatus: Ref<boolean>
@@ -17,7 +19,7 @@ export function useEsriWatch<T extends __esri.Accessor, K extends keyof T> (acce
   watchEffect(() => {
     if (watchStatus.value) {
       handle?.remove()
-      handle = accessor.watch(property as string, callback, options?.sync)
+      handle = accessor.watch(property as string, callback as any, options?.sync) // eslint-disable-line
     } else {
       handle?.remove()
       handle = undefined

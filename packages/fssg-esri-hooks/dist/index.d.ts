@@ -1,7 +1,8 @@
 import { FssgEsri, IFssgEsriOptions } from '@fssgis/fssg-esri';
 import { Ref } from 'vue';
 
-declare function useEsriWatch<T extends __esri.Accessor, K extends keyof T>(accessor: T, property: K, callback: (val: T[K]) => void, options?: {
+declare type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void;
+declare function useEsriWatch<T extends __esri.Accessor, K extends keyof T>(accessor: T, property: K, callback: EsriWatchCallback<T, K>, options?: {
     defaultStop?: boolean;
     sync?: boolean;
 }): {
@@ -44,4 +45,4 @@ declare function createFssgEsri(container: string, options?: IFssgEsriOptions): 
 declare function useFssgEsri(): FssgEsri;
 declare function useFssgEsriLoaded(fssgEsri?: FssgEsri): Ref<boolean>;
 
-export { createFssgEsri, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { EsriWatchCallback, createFssgEsri, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

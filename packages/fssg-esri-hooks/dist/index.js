@@ -53,7 +53,7 @@ function useEsriWatch(accessor, property, callback, options) {
       var _handle;
 
       (_handle = handle) === null || _handle === void 0 ? void 0 : _handle.remove();
-      handle = accessor.watch(property, callback, options === null || options === void 0 ? void 0 : options.sync);
+      handle = accessor.watch(property, callback, options === null || options === void 0 ? void 0 : options.sync); // eslint-disable-line
     } else {
       var _handle2;
 

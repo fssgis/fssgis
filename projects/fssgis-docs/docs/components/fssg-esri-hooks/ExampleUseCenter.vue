@@ -10,16 +10,14 @@
 </template>
 
 <script lang="ts">
-import { FssgEsri } from '@fssgis/fssg-esri'
 import { useCenter } from '@fssgis/fssg-esri-hooks'
-import { computed, defineComponent, inject } from 'vue'
+import { computed, defineComponent } from 'vue'
 
 export default defineComponent({
   components: {
   },
   setup () {
-    const fssgEsri = inject('fssgEsri') as FssgEsri
-    const { center, stopWatch, startWatch, watchStatus } = useCenter(fssgEsri)
+    const { center, stopWatch, startWatch, watchStatus } = useCenter()
 
     const centerStr = computed(() => {
       const pt = center.value

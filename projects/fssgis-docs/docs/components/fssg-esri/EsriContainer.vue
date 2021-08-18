@@ -7,15 +7,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, provide, ref } from 'vue'
-import { FssgEsri } from '@fssgis/fssg-esri'
+import { defineComponent } from 'vue'
+import { createFssgEsri, useFssgEsriLoaded } from '@fssgis/fssg-esri-hooks'
 import { createGuid } from '@fssgis/utils'
 
 export default defineComponent({
   setup () {
     const id = createGuid()
 
-    const fssgEsri = new FssgEsri(id, {
+    const fssgEsri = createFssgEsri(id, {
       mapOptions: {
         basemap: 'arcgis-topographic',
       },
@@ -25,11 +25,8 @@ export default defineComponent({
       },
       debug: true,
     })
-    provide('fssgEsri', fssgEsri)
-    onMounted(() => fssgEsri.mount())
 
-    const loaded = ref(false)
-    fssgEsri.when(() => loaded.value = true)
+    const loaded = useFssgEsriLoaded(fssgEsri)
 
     return {
       loaded,

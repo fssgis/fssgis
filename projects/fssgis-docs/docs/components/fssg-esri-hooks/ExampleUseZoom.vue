@@ -10,16 +10,14 @@
 </template>
 
 <script lang="ts">
-import { FssgEsri } from '@fssgis/fssg-esri'
 import { useZoom } from '@fssgis/fssg-esri-hooks'
-import { defineComponent, inject } from 'vue'
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   components: {
   },
   setup () {
-    const fssgEsri = inject('fssgEsri') as FssgEsri
-    const { zoom, stopWatch, startWatch, watchStatus } = useZoom(fssgEsri)
+    const { zoom, stopWatch, startWatch, watchStatus } = useZoom()
 
     return {
       zoom,

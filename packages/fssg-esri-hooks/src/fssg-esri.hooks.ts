@@ -1,7 +1,7 @@
 import { FssgEsri, IFssgEsriOptions } from '@fssgis/fssg-esri'
 import { inject, InjectionKey, provide, ref, Ref, shallowReactive, shallowRef, watch, watchEffect } from 'vue'
 import { whenRightReturn } from '@fssgis/utils'
-import { controllableWatch, tryOnBeforeUnmounted, tryOnUnmounted } from './base.hooks'
+import { controllableWatch, tryOnBeforeUnmounted } from './base.hooks'
 
 export type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void
 

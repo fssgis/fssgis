@@ -1,51 +1,108 @@
-// import { Basemap, FssgEsri } from "@fssgis/fssg-esri";
-// import { getCurrentInstance, onUnmounted, ref, Ref, watchEffect } from "vue";
-// import { useFssgEsri } from "./fssg-esri.hooks";
+import { Basemap, FssgEsri, IBasemapOptions } from '@fssgis/fssg-esri'
+import { inject, InjectionKey, provide, ref, Ref } from 'vue'
+import { controllableWatch, useObservableOn } from './base.hooks'
+import { useFssgEsri } from './fssg-esri.hooks'
 
-// interface IBasemapHook {
-//   selectedKey: Ref<string>
-//   visible: Ref<boolean>
-//   startWatch () : void
-//   stopWatch () : void
-// }
+function _getBasemap () : Basemap
+function _getBasemap (fssgMap: FssgEsri) : Basemap
+function _getBasemap (basemap: Basemap) : Basemap
+function _getBasemap (arg0?: FssgEsri | Basemap) : Basemap
+function _getBasemap (arg0?: FssgEsri | Basemap) : Basemap {
+  let basemap: Basemap
+  if (!arg0) {
+    const fssgEsri = useFssgEsri()
+    basemap = fssgEsri.basemap
+    if (!basemap) {
+      // TODO
+    }
+  } else {
+    if (arg0 instanceof FssgEsri) {
+      basemap = arg0.basemap
+    } else {
+      basemap = arg0
+    }
+  }
+  return basemap
+}
 
-// export function useBasemap () : IBasemapHook
-// export function useBasemap (fssgMap: FssgEsri) : IBasemapHook
-// export function useBasemap (basemap: Basemap) : IBasemapHook
-// export function useBasemap (arg0?: FssgEsri | Basemap) : IBasemapHook
-// export function useBasemap (arg0?: FssgEsri | Basemap) : IBasemapHook {
-//   let basemap: Basemap
-//   if (!arg0) {
-//     const fssgEsri = useFssgEsri()
-//     basemap = fssgEsri.basemap
-//   } else {
-//     if (arg0 instanceof FssgEsri) {
-//       basemap = arg0.basemap
-//     } else {
-//       basemap = arg0
-//     }
-//   }
-//   const selectedKey = ref(basemap.selectedKey)
-//   const visible = ref(basemap.visible)
-//   const watchStatus = ref(true)
-//   const stopWatch = () => watchStatus.value = false
-//   const startWatch = () => watchStatus.value = true
+export function useBasemapSelectedKey () : Ref<string>
+export function useBasemapSelectedKey (fssgMap: FssgEsri) : Ref<string>
+export function useBasemapSelectedKey (basemap: Basemap) : Ref<string>
+export function useBasemapSelectedKey (arg0?: FssgEsri | Basemap) : Ref<string>
+export function useBasemapSelectedKey (arg0?: FssgEsri | Basemap) : Ref<string> {
+  const basemap = _getBasemap(arg0)
+  const selectedKey = ref(basemap.selectedKey)
 
-//   let handleSelectedKeyChanged : __esri.WatchHandle | undefined,
-//       handleVisibleChanged : __esri.WatchHandle | undefined
-//   watchEffect(() => {
-//     if (watchStatus.value) {
+  controllableWatch(selectedKey, key => {
+    if (basemap.selectedKey !== key) {
+      basemap.selectedKey = key
+    }
+  })
 
-//     } else {
-//       handleSelectedKeyChanged?.remove()
-//       handleSelectedKeyChanged = undefined
-//       handleVisibleChanged?.remove()
-//       handleVisibleChanged = undefined
-//     }
-//   })
+  useObservableOn(basemap.on('changed:selected-key', e => {
+    if (e.selectedKey !== selectedKey.value) {
+      selectedKey.value = e.selectedKey
+    }
+  }))
 
-//   if (getCurrentInstance()) {
-//     onUnmounted(() => stopWatch())
-//   }
+  return selectedKey
+}
 
-// }
+export function useBasemapVisible () : Ref<boolean>
+export function useBasemapVisible (fssgMap: FssgEsri) : Ref<boolean>
+export function useBasemapVisible (basemap: Basemap) : Ref<boolean>
+export function useBasemapVisible (arg0?: FssgEsri | Basemap) : Ref<boolean>
+export function useBasemapVisible (arg0?: FssgEsri | Basemap) : Ref<boolean> {
+  const basemap = _getBasemap(arg0)
+  const visible = ref(basemap.visible)
+
+  controllableWatch(visible, v => {
+    if (basemap.visible !== v) {
+      basemap.visible = v
+    }
+  })
+
+  useObservableOn(basemap.on('changed:visible', e => {
+    if (e.visible !== visible.value) {
+      visible.value = e.visible
+    }
+  }))
+
+  return visible
+}
+
+interface IBasemapHook {
+  selectedKey: Ref<string>
+  visible: Ref<boolean>
+  basemap: Basemap
+}
+
+export function useBasemapState () : IBasemapHook
+export function useBasemapState (fssgMap: FssgEsri) : IBasemapHook
+export function useBasemapState (basemap: Basemap) : IBasemapHook
+export function useBasemapState (arg0?: FssgEsri | Basemap) : IBasemapHook
+export function useBasemapState (arg0?: FssgEsri | Basemap) : IBasemapHook {
+  const basemap = _getBasemap(arg0)
+  const selectedKey = useBasemapSelectedKey(basemap)
+  const visible = useBasemapVisible(basemap)
+  return { basemap, selectedKey, visible }
+}
+
+const SYMBOL_BASEMAP : InjectionKey<Basemap> = Symbol('FssgEsri.Basemap')
+export function createBasemap (options: IBasemapOptions) : Basemap
+export function createBasemap (options: IBasemapOptions, fssgMap: FssgEsri) : Basemap
+export function createBasemap (options: IBasemapOptions, fssgMap?: FssgEsri) : Basemap {
+  const basemap = new Basemap(options)
+  fssgMap = fssgMap ?? useFssgEsri()
+  fssgMap.use(basemap)
+  provide(SYMBOL_BASEMAP, basemap)
+  return basemap
+}
+
+export function useBasemap () : Basemap
+export function useBasemap (fssgEsri: FssgEsri) : Basemap
+export function useBasemap (fssgEsri?: FssgEsri) : Basemap
+export function useBasemap (fssgEsri?: FssgEsri) : Basemap {
+  return fssgEsri?.basemap ?? inject(SYMBOL_BASEMAP) as Basemap
+}
+

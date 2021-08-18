@@ -13,7 +13,9 @@ declare function useWatchShallowRef<T extends __esri.Accessor, K extends keyof T
     watchRef: Ref<T[K]>;
 } & IWatchRef;
 declare function useWatchShallowReactive<T extends __esri.Accessor, K extends keyof T>(accessor: T, properties: K[]): {
-    watchReactive: Record<K, T[K]>;
+    watchReactive: Pick<{
+        [K in keyof T]: T[K];
+    }, K>;
 } & IWatchRef;
 declare function useZoom(fssgEsri?: FssgEsri): {
     zoom: Ref<number>;
@@ -21,8 +23,14 @@ declare function useZoom(fssgEsri?: FssgEsri): {
 declare function useCenter(fssgEsri?: FssgEsri): {
     center: Ref<__esri.Point>;
 } & IWatchRef;
+declare function useCenterZoom(fssgEsri?: FssgEsri): {
+    state: {
+        center: __esri.Point;
+        zoom: number;
+    };
+} & IWatchRef;
 declare function createFssgEsri(container: string, options?: IFssgEsriOptions): FssgEsri;
 declare function useFssgEsri(): FssgEsri;
 declare function useFssgEsriLoaded(fssgEsri?: FssgEsri): Ref<boolean>;
 
-export { createFssgEsri, useCenter, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { createFssgEsri, useCenter, useCenterZoom, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

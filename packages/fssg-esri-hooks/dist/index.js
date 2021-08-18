@@ -73,6 +73,7 @@ function useWatchShallowRef(accessor, property) {
   };
 }
 function useWatchShallowReactive(accessor, properties) {
+  let handle;
   const watchReactive = shallowReactive({});
   const watchStatus = ref(true);
 
@@ -82,6 +83,24 @@ function useWatchShallowReactive(accessor, properties) {
 
   properties.forEach(prop => {
     watchReactive[prop] = accessor[prop];
+  });
+  watchEffect(() => {
+    if (watchStatus.value) {
+      var _handle5;
+
+      (_handle5 = handle) === null || _handle5 === void 0 ? void 0 : _handle5.remove();
+      properties.forEach(prop => {
+        watchReactive[prop] = accessor[prop];
+      });
+      handle = accessor.watch(properties, (val, _, prop) => {
+        watchReactive[prop] = val;
+      });
+    } else {
+      var _handle6;
+
+      (_handle6 = handle) === null || _handle6 === void 0 ? void 0 : _handle6.remove();
+      handle = undefined;
+    }
   });
 
   if (getCurrentInstance()) {
@@ -122,11 +141,21 @@ function useCenter(fssgEsri) {
     center,
     ...others
   };
-} // export function useCenterZoom (fssgEsri: FssgEsri) : { state: { center: __esri.Point, zoom: number } } & IWatchRef {
-//   const { watchReactive: state, ...others } = useWatchShallowReactive(fssgEsri.view, ['center', 'zoom'])
-//   return { state, others }
-// }
+}
+function useCenterZoom(fssgEsri) {
+  if (!fssgEsri) {
+    fssgEsri = useFssgEsri();
+  }
 
+  const {
+    watchReactive: state,
+    ...others
+  } = useWatchShallowReactive(fssgEsri.view, ['center', 'zoom']);
+  return {
+    state,
+    ...others
+  };
+}
 const SYMBOL_FSSG_ESRI = Symbol('fssgEsri');
 function createFssgEsri(container, options) {
   const fssgEsri = new FssgEsri(container, options);
@@ -149,4 +178,4 @@ function useFssgEsriLoaded(fssgEsri) {
   return loaded;
 }
 
-export { createFssgEsri, useCenter, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { createFssgEsri, useCenter, useCenterZoom, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

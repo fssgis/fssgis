@@ -51,3 +51,6 @@ export default defineComponent({
 </script>
 ```
 
+## useCenterZoom 响应式地图中心点与缩放等级
+
+<EsriContainer><ExampleUseCenterZoom /></EsriContainer>

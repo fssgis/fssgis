@@ -65,15 +65,36 @@ export function useWatchShallowRef<T extends __esri.Accessor, K extends keyof T>
 }
 
 export function useWatchShallowReactive<T extends __esri.Accessor, K extends keyof T> (accessor: T, properties: K[]) : {
-  watchReactive: Record<K, T[K]>
+  watchReactive: Pick<{
+    [K in keyof T]: T[K]
+  }, K>
 } & IWatchRef {
-  const watchReactive = shallowReactive({} as Record<K, T[K]>)
+  let handle : __esri.WatchHandle | undefined
+
+  const watchReactive = shallowReactive({} as Pick<{
+    [K in keyof T]: T[K]
+  }, K>)
   const watchStatus = ref(true)
   const stopWatch = () => watchStatus.value = false
   const startWatch = () => watchStatus.value = true
 
   properties.forEach(prop => {
     watchReactive[prop] = accessor[prop]
+  })
+
+  watchEffect(() => {
+    if (watchStatus.value) {
+      handle?.remove()
+      properties.forEach(prop => {
+        watchReactive[prop] = accessor[prop]
+      })
+      handle = accessor.watch(properties as string[], (val, _, prop) => {
+        watchReactive[prop] = val
+      })
+    } else {
+      handle?.remove()
+      handle = undefined
+    }
   })
 
   if (getCurrentInstance()) {
@@ -99,10 +120,13 @@ export function useCenter (fssgEsri?: FssgEsri) : { center: Ref<__esri.Point> } 
   return { center, ...others }
 }
 
-// export function useCenterZoom (fssgEsri: FssgEsri) : { state: { center: __esri.Point, zoom: number } } & IWatchRef {
-//   const { watchReactive: state, ...others } = useWatchShallowReactive(fssgEsri.view, ['center', 'zoom'])
-//   return { state, others }
-// }
+export function useCenterZoom (fssgEsri?: FssgEsri) : { state: { center: __esri.Point, zoom: number } } & IWatchRef {
+  if (!fssgEsri) {
+    fssgEsri = useFssgEsri()
+  }
+  const { watchReactive: state, ...others } = useWatchShallowReactive(fssgEsri.view, ['center', 'zoom'])
+  return { state, ...others }
+}
 
 const SYMBOL_FSSG_ESRI : InjectionKey<FssgEsri> = Symbol('fssgEsri')
 

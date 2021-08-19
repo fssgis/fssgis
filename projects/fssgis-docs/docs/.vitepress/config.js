@@ -51,6 +51,7 @@ function getGuideSidebar() {
       children: [
         { text: '介绍及基础使用', link: '/guide/esri/base' },
         { text: 'Basemap底图控制插件', link: '/guide/esri/basemap' },
+        { text: 'MapElement图元控制插件', link: '/guide/esri/map-element' },
       ]
     },
     {

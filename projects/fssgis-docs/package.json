@@ -4,6 +4,7 @@
   "private": true,
   "description": "🎉fssgis文档",
   "dependencies": {
+    "@arcgis/core": "^4.20.2",
     "@fssgis/fssg-esri": "^1.0.1",
     "@fssgis/fssg-esri-hooks": "^1.0.1",
     "@fssgis/fssg-leaflet": "^1.0.10",

@@ -5,7 +5,7 @@ import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer'
 import GroupLayer from '@arcgis/core/layers/GroupLayer'
 import Graphic from '@arcgis/core/Graphic'
 import Geometry from '@arcgis/core/geometry/Geometry'
-import { deepCopyJSON } from '@fssgis/utils'
+import { deepCopyJSON, $extend } from '@fssgis/utils'
 
 /**
  * 图元样式接口
@@ -66,7 +66,7 @@ export class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementEv
           type: 'simple-marker',
           color: [255, 0, 0, .6],
           style: 'circle',
-          size: '24px',
+          size: '14px',
           outline: { color: [255, 0, 0], width: 1 }
         },
         line: {
@@ -87,7 +87,7 @@ export class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementEv
           type: 'simple-marker',
           color: [0, 255, 255, .8],
           style: 'circle',
-          size: '12px',
+          size: '14px',
           outline: { color: [0, 255, 255], width: 1 }
         },
         line: {
@@ -162,20 +162,21 @@ export class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementEv
       ._init()
   }
 
-  public add (geometry: __esri.Geometry, symbol: __esri.SymbolProperties) : __esri.Graphic
-  public add (geometries: __esri.Geometry[], symbol: __esri.SymbolProperties) : __esri.Graphic[]
-  public add (arg0: __esri.Geometry[] | __esri.Geometry, symbol: __esri.SymbolProperties) : __esri.Graphic[] | __esri.Graphic
+  public add (geometry: __esri.Geometry, symbol?: __esri.SymbolProperties) : __esri.Graphic
+  public add (geometries: __esri.Geometry[], symbol?: __esri.SymbolProperties) : __esri.Graphic[]
+  public add (arg0: __esri.Geometry[] | __esri.Geometry, symbol?: __esri.SymbolProperties) : __esri.Graphic[] | __esri.Graphic
   public add (graphic: __esri.Graphic) : this
   public add (graphics: __esri.Graphic[]) : this
   public add (arg0: __esri.Graphic[] | __esri.Graphic) : this
   public add (arg0: __esri.Graphic | __esri.Graphic[] | __esri.Geometry | __esri.Geometry[], arg1?: __esri.SymbolProperties) : __esri.Graphic | __esri.Graphic[] | this
   public add (arg0: __esri.Graphic | __esri.Graphic[] | __esri.Geometry | __esri.Geometry[], arg1?: __esri.SymbolProperties) : __esri.Graphic | __esri.Graphic[] | this {
-    if (arg1) {
+    if (arg0 instanceof Geometry || arg0?.[0] instanceof Geometry) {
       const graphics : __esri.Graphic[] = []
       arg0 = arg0 as __esri.Geometry | __esri.Geometry[]
       arg0 = Array.isArray(arg0) ? arg0 : [arg0] as __esri.Geometry[]
       arg0.forEach(geometry => {
-        const graphic = new Graphic({ geometry, symbol: this._getSymbol(geometry.type) })
+        arg1 = $extend(true, {}, this._getSymbol(geometry.type), arg1)
+        const graphic = new Graphic({ geometry, symbol: arg1 })
         graphics.push(graphic)
       })
       this._addGraphics(graphics)
@@ -215,20 +216,21 @@ export class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementEv
       .add(arg0, arg1)
   }
 
-  public addHighlight (geometry: __esri.Geometry, symbol: __esri.SymbolProperties) : __esri.Graphic
-  public addHighlight (geometries: __esri.Geometry[], symbol: __esri.SymbolProperties) : __esri.Graphic[]
-  public addHighlight (arg0: __esri.Geometry[] | __esri.Geometry, symbol: __esri.SymbolProperties) : __esri.Graphic[] | __esri.Graphic
+  public addHighlight (geometry: __esri.Geometry, symbol?: __esri.SymbolProperties) : __esri.Graphic
+  public addHighlight (geometries: __esri.Geometry[], symbol?: __esri.SymbolProperties) : __esri.Graphic[]
+  public addHighlight (arg0: __esri.Geometry[] | __esri.Geometry, symbol?: __esri.SymbolProperties) : __esri.Graphic[] | __esri.Graphic
   public addHighlight (graphic: __esri.Graphic) : this
   public addHighlight (graphics: __esri.Graphic[]) : this
   public addHighlight (arg0: __esri.Graphic[] | __esri.Graphic) : this
   public addHighlight (arg0: __esri.Graphic | __esri.Graphic[] | __esri.Geometry | __esri.Geometry[], arg1?: __esri.SymbolProperties) : __esri.Graphic | __esri.Graphic[] | this
   public addHighlight (arg0: __esri.Graphic | __esri.Graphic[] | __esri.Geometry | __esri.Geometry[], arg1?: __esri.SymbolProperties) : __esri.Graphic | __esri.Graphic[] | this {
-    if (arg1) {
+    if (arg0 instanceof Geometry || arg0?.[0] instanceof Geometry) {
       const graphics : __esri.Graphic[] = []
       arg0 = arg0 as __esri.Geometry | __esri.Geometry[]
       arg0 = Array.isArray(arg0) ? arg0 : [arg0] as __esri.Geometry[]
       arg0.forEach(geometry => {
-        const graphic = new Graphic({ geometry, symbol: this._getSymbol(geometry.type) })
+        arg1 = $extend(true, {}, this._getSymbol(geometry.type, true), arg1)
+        const graphic = new Graphic({ geometry, symbol: arg1 })
         graphics.push(graphic)
       })
       this._addHighlight(graphics)

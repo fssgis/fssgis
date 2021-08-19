@@ -176,9 +176,9 @@ declare class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementE
     private _addGraphics;
     private _addHighlight;
     installPlugin(fssgEsri: FssgEsri): this;
-    add(geometry: __esri.Geometry, symbol: __esri.SymbolProperties): __esri.Graphic;
-    add(geometries: __esri.Geometry[], symbol: __esri.SymbolProperties): __esri.Graphic[];
-    add(arg0: __esri.Geometry[] | __esri.Geometry, symbol: __esri.SymbolProperties): __esri.Graphic[] | __esri.Graphic;
+    add(geometry: __esri.Geometry, symbol?: __esri.SymbolProperties): __esri.Graphic;
+    add(geometries: __esri.Geometry[], symbol?: __esri.SymbolProperties): __esri.Graphic[];
+    add(arg0: __esri.Geometry[] | __esri.Geometry, symbol?: __esri.SymbolProperties): __esri.Graphic[] | __esri.Graphic;
     add(graphic: __esri.Graphic): this;
     add(graphics: __esri.Graphic[]): this;
     add(arg0: __esri.Graphic[] | __esri.Graphic): this;
@@ -194,9 +194,9 @@ declare class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementE
     set(graphics: __esri.Graphic[]): this;
     set(arg0: __esri.Graphic[] | __esri.Graphic): this;
     set(arg0: __esri.Graphic | __esri.Graphic[] | __esri.Geometry | __esri.Geometry[], arg1?: __esri.SymbolProperties): __esri.Graphic | __esri.Graphic[] | this;
-    addHighlight(geometry: __esri.Geometry, symbol: __esri.SymbolProperties): __esri.Graphic;
-    addHighlight(geometries: __esri.Geometry[], symbol: __esri.SymbolProperties): __esri.Graphic[];
-    addHighlight(arg0: __esri.Geometry[] | __esri.Geometry, symbol: __esri.SymbolProperties): __esri.Graphic[] | __esri.Graphic;
+    addHighlight(geometry: __esri.Geometry, symbol?: __esri.SymbolProperties): __esri.Graphic;
+    addHighlight(geometries: __esri.Geometry[], symbol?: __esri.SymbolProperties): __esri.Graphic[];
+    addHighlight(arg0: __esri.Geometry[] | __esri.Geometry, symbol?: __esri.SymbolProperties): __esri.Graphic[] | __esri.Graphic;
     addHighlight(graphic: __esri.Graphic): this;
     addHighlight(graphics: __esri.Graphic[]): this;
     addHighlight(arg0: __esri.Graphic[] | __esri.Graphic): this;

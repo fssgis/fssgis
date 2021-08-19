@@ -7,7 +7,8 @@ import EsriBasemap from '@arcgis/core/Basemap';
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
 import GroupLayer from '@arcgis/core/layers/GroupLayer';
 import Graphic from '@arcgis/core/Graphic';
-import { deepCopyJSON } from '@fssgis/utils';
+import Geometry from '@arcgis/core/geometry/Geometry';
+import { deepCopyJSON, $extend } from '@fssgis/utils';
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -411,7 +412,7 @@ class MapElement extends FssgEsriPlugin {
           type: 'simple-marker',
           color: [255, 0, 0, .6],
           style: 'circle',
-          size: '24px',
+          size: '14px',
           outline: {
             color: [255, 0, 0],
             width: 1
@@ -438,7 +439,7 @@ class MapElement extends FssgEsriPlugin {
           type: 'simple-marker',
           color: [0, 255, 255, .8],
           style: 'circle',
-          size: '12px',
+          size: '14px',
           outline: {
             color: [0, 255, 255],
             width: 1
@@ -533,14 +534,17 @@ class MapElement extends FssgEsriPlugin {
   }
 
   add(arg0, arg1) {
-    if (arg1) {
+    var _arg;
+
+    if (arg0 instanceof Geometry || ((_arg = arg0) === null || _arg === void 0 ? void 0 : _arg[0]) instanceof Geometry) {
       const graphics = [];
       arg0 = arg0;
       arg0 = Array.isArray(arg0) ? arg0 : [arg0];
       arg0.forEach(geometry => {
+        arg1 = $extend(true, {}, this._getSymbol(geometry.type), arg1);
         const graphic = new Graphic({
           geometry,
-          symbol: this._getSymbol(geometry.type)
+          symbol: arg1
         });
         graphics.push(graphic);
       });
@@ -576,14 +580,17 @@ class MapElement extends FssgEsriPlugin {
   }
 
   addHighlight(arg0, arg1) {
-    if (arg1) {
+    var _arg2;
+
+    if (arg0 instanceof Geometry || ((_arg2 = arg0) === null || _arg2 === void 0 ? void 0 : _arg2[0]) instanceof Geometry) {
       const graphics = [];
       arg0 = arg0;
       arg0 = Array.isArray(arg0) ? arg0 : [arg0];
       arg0.forEach(geometry => {
+        arg1 = $extend(true, {}, this._getSymbol(geometry.type, true), arg1);
         const graphic = new Graphic({
           geometry,
-          symbol: this._getSymbol(geometry.type)
+          symbol: arg1
         });
         graphics.push(graphic);
       });

@@ -57,6 +57,7 @@ function getGuideSidebar() {
       text: '@fssgis/fssg-esri-hooks钩子库',
       children: [
         { text: 'FssgEsri响应式钩子', link: '/guide/esri-hooks/fssg-esri-hooks' },
+        { text: 'Basemap响应式钩子', link: '/guide/esri-hooks/basemap-hooks' },
       ]
     }
   ]

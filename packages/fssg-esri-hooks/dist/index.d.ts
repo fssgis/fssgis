@@ -1,4 +1,4 @@
-import { FssgEsri, IFssgEsriOptions } from '@fssgis/fssg-esri';
+import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions } from '@fssgis/fssg-esri';
 import { Ref } from 'vue';
 
 declare type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void;
@@ -45,4 +45,27 @@ declare function createFssgEsri(container: string, options?: IFssgEsriOptions): 
 declare function useFssgEsri(): FssgEsri;
 declare function useFssgEsriLoaded(fssgEsri?: FssgEsri): Ref<boolean>;
 
-export { EsriWatchCallback, createFssgEsri, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+declare function useBasemapSelectedKey(): Ref<string>;
+declare function useBasemapSelectedKey(fssgMap: FssgEsri): Ref<string>;
+declare function useBasemapSelectedKey(basemap: Basemap): Ref<string>;
+declare function useBasemapSelectedKey(arg0?: FssgEsri | Basemap): Ref<string>;
+declare function useBasemapVisible(): Ref<boolean>;
+declare function useBasemapVisible(fssgMap: FssgEsri): Ref<boolean>;
+declare function useBasemapVisible(basemap: Basemap): Ref<boolean>;
+declare function useBasemapVisible(arg0?: FssgEsri | Basemap): Ref<boolean>;
+interface IBasemapHook {
+    selectedKey: Ref<string>;
+    visible: Ref<boolean>;
+    basemap: Basemap;
+}
+declare function useBasemapState(): IBasemapHook;
+declare function useBasemapState(fssgMap: FssgEsri): IBasemapHook;
+declare function useBasemapState(basemap: Basemap): IBasemapHook;
+declare function useBasemapState(arg0?: FssgEsri | Basemap): IBasemapHook;
+declare function createBasemap(options: IBasemapOptions): Basemap;
+declare function createBasemap(options: IBasemapOptions, fssgMap: FssgEsri): Basemap;
+declare function useBasemap(): Basemap;
+declare function useBasemap(fssgEsri: FssgEsri): Basemap;
+declare function useBasemap(fssgEsri?: FssgEsri): Basemap;
+
+export { EsriWatchCallback, createBasemap, createFssgEsri, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

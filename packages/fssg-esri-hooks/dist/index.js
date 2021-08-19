@@ -1,4 +1,4 @@
-import { FssgEsri } from '@fssgis/fssg-esri';
+import { FssgEsri, Basemap } from '@fssgis/fssg-esri';
 import { getCurrentInstance, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide } from 'vue';
 import { whenRightReturn } from '@fssgis/utils';
 
@@ -32,6 +32,9 @@ function controllableWatch(...args) {
     start,
     stop
   };
+}
+function useObservableOn(handle) {
+  tryOnBeforeUnmounted(() => handle.remove());
 }
 
 function useEsriWatch(accessor, p, callback, options) {
@@ -238,4 +241,76 @@ function useFssgEsriLoaded(fssgEsri) {
   return loaded;
 }
 
-export { createFssgEsri, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+function _getBasemap(arg0) {
+  let basemap;
+
+  if (!arg0) {
+    const fssgEsri = useFssgEsri();
+    basemap = fssgEsri.basemap;
+  } else {
+    if (arg0 instanceof FssgEsri) {
+      basemap = arg0.basemap;
+    } else {
+      basemap = arg0;
+    }
+  }
+
+  return basemap;
+}
+
+function useBasemapSelectedKey(arg0) {
+  const basemap = _getBasemap(arg0);
+
+  const selectedKey = ref(basemap.selectedKey);
+  controllableWatch(selectedKey, key => {
+    if (basemap.selectedKey !== key) {
+      basemap.selectedKey = key;
+    }
+  });
+  useObservableOn(basemap.on('changed:selected-key', e => {
+    if (e.selectedKey !== selectedKey.value) {
+      selectedKey.value = e.selectedKey;
+    }
+  }));
+  return selectedKey;
+}
+function useBasemapVisible(arg0) {
+  const basemap = _getBasemap(arg0);
+
+  const visible = ref(basemap.visible);
+  controllableWatch(visible, v => {
+    if (basemap.visible !== v) {
+      basemap.visible = v;
+    }
+  });
+  useObservableOn(basemap.on('changed:visible', e => {
+    if (e.visible !== visible.value) {
+      visible.value = e.visible;
+    }
+  }));
+  return visible;
+}
+function useBasemapState(arg0) {
+  const basemap = _getBasemap(arg0);
+
+  const selectedKey = useBasemapSelectedKey(basemap);
+  const visible = useBasemapVisible(basemap);
+  return {
+    basemap,
+    selectedKey,
+    visible
+  };
+}
+const SYMBOL_BASEMAP = Symbol('FssgEsri.Basemap');
+function createBasemap(options, fssgMap) {
+  const basemap = new Basemap(options);
+  fssgMap = fssgMap ?? useFssgEsri();
+  fssgMap.use(basemap);
+  provide(SYMBOL_BASEMAP, basemap);
+  return basemap;
+}
+function useBasemap(fssgEsri) {
+  return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.basemap) ?? inject(SYMBOL_BASEMAP);
+}
+
+export { createBasemap, createFssgEsri, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

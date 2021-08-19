@@ -5,6 +5,7 @@ import { resolve } from 'path'
 import dts from 'rollup-plugin-dts'
 import json from '@rollup/plugin-json'
 import babel from '@rollup/plugin-babel'
+// import { terser } from "rollup-plugin-terser"
 
 export default [
   {
@@ -44,7 +45,11 @@ export default [
             "chrome": "81"
           }}]
         ]
-      })
+      }),
+      // terser({
+      //   // keep_classnames: true,
+      //   // keep_fnames: true,
+      // })
     ]
   },
   {

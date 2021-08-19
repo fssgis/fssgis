@@ -637,7 +637,8 @@ class MapElement extends FssgEsriPlugin {
 }
 
 function createGeometryFactory(fssgEsri) {
-  const spatialReference = fssgEsri.sr;
+  let spatialReference;
+  fssgEsri.when(() => spatialReference = fssgEsri.sr);
   const factory = {
     createPoint(options) {
       return new Point({

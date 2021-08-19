@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { createBasemap, createFssgEsri, useFssgEsriLoaded } from '@fssgis/fssg-esri-hooks'
+import { createBasemap, createFssgEsri, createGeoFactory, useFssgEsriLoaded } from '@fssgis/fssg-esri-hooks'
 import { createGuid } from '@fssgis/utils'
 
 export default defineComponent({
@@ -21,6 +21,7 @@ export default defineComponent({
     })
 
     createBasemap({}, fssgEsri)
+    createGeoFactory(fssgEsri)
 
     const loaded = useFssgEsriLoaded(fssgEsri)
 

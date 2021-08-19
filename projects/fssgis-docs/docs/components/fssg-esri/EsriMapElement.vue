@@ -24,11 +24,17 @@
     <button @click="setHighlightPoints()">
       设置高亮点图元
     </button><br>
+    <button @click="addPolyline()">
+      添加线
+    </button>
+    <button @click="addPolygon()">
+      添加面
+    </button>
   </div>
 </template>
 
 <script lang="ts">
-import { useFssgEsri } from '@fssgis/fssg-esri-hooks'
+import { useFssgEsri, useGeoFactory } from '@fssgis/fssg-esri-hooks'
 import { MapElement } from '@fssgis/fssg-esri'
 import { defineComponent } from 'vue'
 import Point from '@arcgis/core/geometry/Point'
@@ -38,6 +44,7 @@ export default defineComponent({
   setup () {
 
     const fssgMap = useFssgEsri()
+    const geoFactory = useGeoFactory()
 
     const mapElement = new MapElement()
     fssgMap.use(mapElement)
@@ -46,6 +53,8 @@ export default defineComponent({
       clearAll()
       addPoints()
       addHighlightPoints()
+      addPolyline()
+      addPolygon()
     })
 
     function createLongitude () : number {
@@ -58,14 +67,14 @@ export default defineComponent({
 
     function addPoints () {
       mapElement.add(
-        new Point({ longitude: createLongitude(), latitude: createLatitude() }),
+        geoFactory.createPoint({ longitude: createLongitude(), latitude: createLatitude() }),
         { color: '#ffff00' }
       )
       mapElement.add(
-        new Point({ longitude: createLongitude(), latitude: createLatitude() })
+        geoFactory.createPointFromLonLat({ longitude: createLongitude(), latitude: createLatitude() }),
       )
       mapElement.add(
-        new Point({ longitude: createLongitude(), latitude: createLatitude() }),
+        geoFactory.createPointFromLonLat({ lon: createLongitude(), lat: createLatitude() }),
         { type: 'picture-marker', url: 'https://leafletjs.com/docs/images/github-round.png', width: 24, height: 24 } as __esri.PictureMarkerSymbol
       )
     }
@@ -73,8 +82,8 @@ export default defineComponent({
     function setPoints () {
       mapElement.set(
         [
-          new Point({ longitude: createLongitude(), latitude: createLatitude() }),
-          new Point({ longitude: createLongitude(), latitude: createLatitude() }),
+          geoFactory.createPointFromLonLat({ lng: createLongitude(), lat: createLatitude() }),
+          geoFactory.createPointFromLonLat(createLongitude(), createLatitude()),
           new Point({ longitude: createLongitude(), latitude: createLatitude() }),
         ],
         { type: 'picture-marker', url: 'https://leafletjs.com/docs/images/github-round.png', width: 24, height: 24 } as __esri.PictureMarkerSymbol
@@ -113,6 +122,22 @@ export default defineComponent({
       mapElement.clearHighlight()
     }
 
+    function addPolyline () {
+      mapElement.add(geoFactory.createPolylineFromPoints([
+        geoFactory.createPointFromLonLat({ lng: createLongitude(), lat: createLatitude() }),
+        geoFactory.createPointFromLonLat(createLongitude(), createLatitude()),
+        new Point({ longitude: createLongitude(), latitude: createLatitude() }),
+      ]))
+    }
+
+    function addPolygon () {
+      mapElement.add(geoFactory.createPolygonFromPoints([
+        geoFactory.createPointFromLonLat({ lng: createLongitude(), lat: createLatitude() }),
+        geoFactory.createPointFromLonLat(createLongitude(), createLatitude()),
+        new Point({ longitude: createLongitude(), latitude: createLatitude() }),
+      ]))
+    }
+
     return {
       addPoints,
       addHighlightPoints,
@@ -121,6 +146,8 @@ export default defineComponent({
       clearHighlight,
       setHighlightPoints,
       setPoints,
+      addPolyline,
+      addPolygon,
     }
   },
 })

@@ -36,7 +36,8 @@ export interface IGeometryFactory {
 }
 
 export function createGeometryFactory (fssgEsri: FssgEsri) : IGeometryFactory {
-  const spatialReference = fssgEsri.sr
+  let spatialReference: __esri.SpatialReference
+  fssgEsri.when(() => spatialReference = fssgEsri.sr)
 
   const factory : IGeometryFactory = {
     createPoint (options) {

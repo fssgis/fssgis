@@ -33,6 +33,10 @@ export interface IGeometryFactory {
   createPolygonFromLonLats (lonLats: LonLat[]) : __esri.Polygon
 
   createExtent (options: __esri.ExtentProperties) : __esri.Extent
+
+  // TODO: createPointsFromPolygon
+  // TODO: createPolylineFromPolygon
+  // TODO: createPolylinesFromPolygon
 }
 
 export function createGeometryFactory (fssgEsri: FssgEsri) : IGeometryFactory {

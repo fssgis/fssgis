@@ -255,6 +255,10 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
       */
     get view(): IView;
     /**
+     * 空间坐标系
+     */
+    get sr(): __esri.SpatialReference;
+    /**
      * 构造地图应用实例
      * @param container 地图容器
      * @param options 配置项
@@ -287,4 +291,38 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     mount(): this;
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IMap, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IOwner, IView, MapElement };
+declare type XY = {
+    x: number;
+    y: number;
+} | [number, number] | number[];
+declare type LonLat = [number, number] | number[] | {
+    lon: number;
+    lat: number;
+} | {
+    lng: number;
+    lat: number;
+} | {
+    longitude: number;
+    latitude: number;
+};
+interface IGeometryFactory {
+    createPoint(options: __esri.PointProperties): __esri.Point;
+    createPointFromXY(x: number, y: number): __esri.Point;
+    createPointFromXY(xy: XY): __esri.Point;
+    createPointFromLonLat(lon: number, lat: number): __esri.Point;
+    createPointFromLonLat(lonlat: LonLat): __esri.Point;
+    createPointsFromPolyline(polyline: __esri.Polyline, pathIndex?: number): __esri.Point[];
+    createPolyline(options: __esri.PolylineProperties): __esri.Polyline;
+    createPolylineFromPoints(points: __esri.Point[]): __esri.Polyline;
+    createPolylineFromXYs(XYs: XY[]): __esri.Polyline;
+    createPolylineFromLonLats(lonLats: LonLat[]): __esri.Polyline;
+    createPolygon(options: __esri.PolygonProperties): __esri.Polygon;
+    createPolygonFromPoints(points: __esri.Point[]): __esri.Polygon;
+    createPolygonFromPolyline(polyline: __esri.Polyline): __esri.Polygon;
+    createPolygonFromXYs(xys: XY[]): __esri.Polygon;
+    createPolygonFromLonLats(lonLats: LonLat[]): __esri.Polygon;
+    createExtent(options: __esri.ExtentProperties): __esri.Extent;
+}
+declare function createGeometryFactory(fssgEsri: FssgEsri): IGeometryFactory;
+
+export { Basemap, FssgEsri, FssgEsriPlugin, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IMap, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IOwner, IView, LonLat, MapElement, XY, createGeometryFactory };

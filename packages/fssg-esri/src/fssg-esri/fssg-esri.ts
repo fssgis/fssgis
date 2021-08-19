@@ -64,6 +64,13 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     return this._view
   }
 
+  /**
+   * 空间坐标系
+   */
+  public get sr () : __esri.SpatialReference {
+    return this._view.spatialReference
+  }
+
   //#endregion
 
   //#region 构造函数

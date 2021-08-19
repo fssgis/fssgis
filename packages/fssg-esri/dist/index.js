@@ -9,6 +9,10 @@ import GroupLayer from '@arcgis/core/layers/GroupLayer';
 import Graphic from '@arcgis/core/Graphic';
 import Geometry from '@arcgis/core/geometry/Geometry';
 import { deepCopyJSON, $extend } from '@fssgis/utils';
+import Point from '@arcgis/core/geometry/Point';
+import Polyline from '@arcgis/core/geometry/Polyline';
+import Polygon from '@arcgis/core/geometry/Polygon';
+import Extent from '@arcgis/core/geometry/Extent';
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -52,6 +56,14 @@ class FssgEsri extends FssgMap {
 
   get view() {
     return this._view;
+  }
+  /**
+   * 空间坐标系
+   */
+
+
+  get sr() {
+    return this._view.spatialReference;
   } //#endregion
   //#region 构造函数
 
@@ -624,4 +636,134 @@ class MapElement extends FssgEsriPlugin {
 
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, MapElement };
+function createGeometryFactory(fssgEsri) {
+  const spatialReference = fssgEsri.sr;
+  const factory = {
+    createPoint(options) {
+      return new Point({
+        spatialReference,
+        ...options
+      });
+    },
+
+    createPolyline(options) {
+      return new Polyline({
+        spatialReference,
+        ...options
+      });
+    },
+
+    createPolygon(options) {
+      return new Polygon({
+        spatialReference,
+        ...options
+      });
+    },
+
+    createExtent(options) {
+      return new Extent({
+        spatialReference,
+        ...options
+      });
+    },
+
+    createPointFromXY(...args) {
+      if (args.length === 2) {
+        const [x, y] = args;
+        return factory.createPoint({
+          x,
+          y
+        });
+      } else {
+        const xy = args[0];
+        const x = Array.isArray(xy) ? xy[0] : xy.x;
+        const y = Array.isArray(xy) ? xy[1] : xy.y;
+        return factory.createPoint({
+          x,
+          y
+        });
+      }
+    },
+
+    createPointFromLonLat(...args) {
+      if (args.length === 2) {
+        const [longitude, latitude] = args;
+        return factory.createPoint({
+          longitude,
+          latitude
+        });
+      } else {
+        const lonlat = args[0]; // eslint-disable-next-line
+        // @ts-ignore
+
+        const longitude = Array.isArray(lonlat) ? lonlat[0] : lonlat.lon ?? lonlat.lng ?? lonlat.longitude; // eslint-disable-next-line
+        // @ts-ignore
+
+        const latitude = Array.isArray(lonlat) ? lonlat[1] : lonlat.lat ?? lonlat.latitude;
+        return factory.createPoint({
+          longitude,
+          latitude
+        });
+      }
+    },
+
+    createPolylineFromPoints(points) {
+      const polyline = factory.createPolyline({
+        paths: []
+      });
+      polyline.addPath(points);
+      return polyline;
+    },
+
+    createPolylineFromXYs(xys) {
+      const points = xys.map(xy => factory.createPointFromXY(xy));
+      return factory.createPolylineFromPoints(points);
+    },
+
+    createPolylineFromLonLats(lonLats) {
+      const points = lonLats.map(lonLat => factory.createPointFromLonLat(lonLat));
+      return factory.createPolylineFromPoints(points);
+    },
+
+    createPolygonFromPoints(points) {
+      const polygon = factory.createPolygon({
+        rings: []
+      });
+      polygon.addRing(points);
+      return polygon;
+    },
+
+    createPointsFromPolyline(polyline, pathIndex = 0) {
+      const count = polyline.paths[pathIndex];
+      const points = Array(count).map((_, i) => polyline.getPoint(pathIndex, i));
+      return points;
+    },
+
+    createPolygonFromPolyline(polyline) {
+      const polygon = factory.createPolygon({
+        rings: []
+      });
+      polyline.paths.forEach((_, i) => {
+        const points = factory.createPointsFromPolyline(polyline, i);
+        polygon.addRing(points);
+      });
+      return polygon;
+    },
+
+    createPolygonFromXYs(xys) {
+      const points = xys.map(xy => factory.createPointFromXY(xy));
+      const polygon = factory.createPolygonFromPoints(points);
+      return polygon;
+    },
+
+    createPolygonFromLonLats(lonLats) {
+      const points = lonLats.map(lonLat => factory.createPointFromLonLat(lonLat));
+      const polygon = factory.createPolygonFromPoints(points);
+      return polygon;
+    }
+
+  };
+  return factory;
+}
+
+export { Basemap, FssgEsri, FssgEsriPlugin, MapElement, createGeometryFactory };

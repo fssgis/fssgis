@@ -1,4 +1,4 @@
-import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions } from '@fssgis/fssg-esri';
+import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, IGeometryFactory } from '@fssgis/fssg-esri';
 import { Ref } from 'vue';
 
 declare type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void;
@@ -68,4 +68,7 @@ declare function useBasemap(): Basemap;
 declare function useBasemap(fssgEsri: FssgEsri): Basemap;
 declare function useBasemap(fssgEsri?: FssgEsri): Basemap;
 
-export { EsriWatchCallback, createBasemap, createFssgEsri, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+declare function createGeoFactory(fssgEsri?: FssgEsri): IGeometryFactory;
+declare function useGeoFactory(): IGeometryFactory;
+
+export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

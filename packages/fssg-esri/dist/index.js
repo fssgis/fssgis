@@ -4,6 +4,10 @@ import MapView from '@arcgis/core/views/MapView';
 import esriConfig from '@arcgis/core/config';
 import WebTileLayer from '@arcgis/core/layers/WebTileLayer';
 import EsriBasemap from '@arcgis/core/Basemap';
+import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
+import GroupLayer from '@arcgis/core/layers/GroupLayer';
+import Graphic from '@arcgis/core/Graphic';
+import { deepCopyJSON } from '@fssgis/utils';
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -72,6 +76,8 @@ class FssgEsri extends FssgMap {
     });
 
     _defineProperty(this, "basemap", void 0);
+
+    _defineProperty(this, "mapElement", void 0);
 
     _defineProperty(this, "_map", void 0);
 
@@ -376,4 +382,239 @@ _defineProperty(Basemap, "BASEMAP_TIAN_DI_TU_3857", BASEMAP_TIAN_DI_TU_3857);
 
 _defineProperty(Basemap, "BASEMAP_TIAN_DI_TU_4326", BASEMAP_TIAN_DI_TU_4326);
 
-export { Basemap, FssgEsri, FssgEsriPlugin };
+/**
+ * 图元控制插件
+ */
+
+class MapElement extends FssgEsriPlugin {
+  //#region 私有属性
+
+  /** 基础图元样式 */
+
+  /** 高亮图元样式 */
+
+  /** 基础图元存储图层 */
+
+  /** 高亮图元存储图层 */
+
+  /** 图元图层存储图层组 */
+  //#endregion
+
+  /**
+   * 构造图元控制插件对象
+   * @param options 配置项
+   */
+  constructor(options) {
+    super(options, {
+      graphicsSymbol: {
+        marker: {
+          type: 'simple-marker',
+          color: [255, 0, 0, .6],
+          style: 'circle',
+          size: '24px',
+          outline: {
+            color: [255, 0, 0],
+            width: 1
+          }
+        },
+        line: {
+          type: 'simple-line',
+          color: [255, 0, 0, .8],
+          width: '2px',
+          style: 'solid'
+        },
+        fill: {
+          type: 'simple-fill',
+          color: [255, 0, 0, .4],
+          style: 'solid',
+          outline: {
+            color: [255, 0, 0],
+            width: 1
+          }
+        }
+      },
+      highlightSymbol: {
+        marker: {
+          type: 'simple-marker',
+          color: [0, 255, 255, .8],
+          style: 'circle',
+          size: '12px',
+          outline: {
+            color: [0, 255, 255],
+            width: 1
+          }
+        },
+        line: {
+          type: 'simple-line',
+          color: [0, 255, 255, .8],
+          width: '4px',
+          style: 'solid'
+        },
+        fill: {
+          type: 'simple-fill',
+          color: [0, 255, 255, .4],
+          style: 'solid',
+          outline: {
+            color: [0, 255, 255],
+            width: 4
+          }
+        }
+      }
+    });
+
+    _defineProperty(this, "_graphicsSymbol", void 0);
+
+    _defineProperty(this, "_highlightSymbol", void 0);
+
+    _defineProperty(this, "_graphicsLayer", void 0);
+
+    _defineProperty(this, "_highlightLayer", void 0);
+
+    _defineProperty(this, "_groupLayer", void 0);
+  }
+
+  _init() {
+    this._graphicsSymbol = this.options_.graphicsSymbol ?? {};
+    this._highlightSymbol = this.options_.highlightSymbol ?? {};
+    this._graphicsLayer = new GraphicsLayer();
+    this._highlightLayer = new GraphicsLayer();
+    this._groupLayer = new GroupLayer({
+      layers: [this._graphicsLayer, this._highlightLayer]
+    });
+    this.map_.layers.add(this._groupLayer);
+    this.map_.layers.on('after-changes', () => {
+      const index = this.map_.layers.indexOf(this._groupLayer);
+
+      if (index !== this.map_.layers.length - 1) {
+        this.map_.layers.reorder(this._groupLayer, this.map_.layers.length - 1);
+      }
+    });
+    return this;
+  }
+
+  _getSymbol(type, isHighlight) {
+    const _symbol = isHighlight ? this._highlightSymbol : this._graphicsSymbol;
+
+    let symbol;
+
+    switch (type) {
+      case 'point':
+      case 'multipoint':
+        symbol = deepCopyJSON(_symbol.marker);
+        break;
+
+      case 'polyline':
+        symbol = deepCopyJSON(_symbol.line);
+        break;
+
+      case 'polygon':
+      case 'extent':
+        symbol = deepCopyJSON(_symbol.fill);
+        break;
+    }
+
+    return symbol ?? {};
+  }
+
+  _addGraphics(graphics) {
+    this._graphicsLayer.graphics.addMany(graphics);
+
+    return this;
+  }
+
+  _addHighlight(graphics) {
+    this._highlightLayer.graphics.addMany(graphics);
+
+    return this;
+  }
+
+  installPlugin(fssgEsri) {
+    return super.installPlugin(fssgEsri)._init();
+  }
+
+  add(arg0, arg1) {
+    if (arg1) {
+      const graphics = [];
+      arg0 = arg0;
+      arg0 = Array.isArray(arg0) ? arg0 : [arg0];
+      arg0.forEach(geometry => {
+        const graphic = new Graphic({
+          geometry,
+          symbol: this._getSymbol(geometry.type)
+        });
+        graphics.push(graphic);
+      });
+
+      this._addGraphics(graphics);
+
+      return Array.isArray(arg0) ? graphics : graphics[0];
+    } else {
+      arg0 = Array.isArray(arg0) ? arg0 : [arg0];
+      return this._addGraphics(arg0);
+    }
+  }
+
+  remove(arg0) {
+    arg0 = Array.isArray(arg0) ? arg0 : [arg0];
+
+    this._graphicsLayer.graphics.removeMany(arg0);
+
+    this._highlightLayer.graphics.removeMany(arg0);
+
+    return this;
+  }
+
+  clear(withHighlight) {
+    this._graphicsLayer.graphics.removeAll();
+
+    withHighlight && this._highlightLayer.graphics.removeAll();
+    return this;
+  }
+
+  set(arg0, arg1) {
+    return this.clear().add(arg0, arg1);
+  }
+
+  addHighlight(arg0, arg1) {
+    if (arg1) {
+      const graphics = [];
+      arg0 = arg0;
+      arg0 = Array.isArray(arg0) ? arg0 : [arg0];
+      arg0.forEach(geometry => {
+        const graphic = new Graphic({
+          geometry,
+          symbol: this._getSymbol(geometry.type)
+        });
+        graphics.push(graphic);
+      });
+
+      this._addHighlight(graphics);
+
+      return Array.isArray(arg0) ? graphics : graphics[0];
+    } else {
+      arg0 = Array.isArray(arg0) ? arg0 : [arg0];
+      return this._addHighlight(arg0);
+    }
+  }
+
+  removeHighlight(arg0) {
+    arg0 = Array.isArray(arg0) ? arg0 : [arg0];
+
+    this._highlightLayer.graphics.removeMany(arg0);
+
+    return this;
+  }
+
+  clearHighlight() {
+    this._highlightLayer.graphics.removeAll();
+
+    return this;
+  }
+
+  setHighlight(arg0, arg1) {
+    return this.clearHighlight().addHighlight(arg0, arg1);
+  }
+
+}
+
+export { Basemap, FssgEsri, FssgEsriPlugin, MapElement };

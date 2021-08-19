@@ -22,6 +22,10 @@ export default [
       '@arcgis/core/geometry/Point',
       '@arcgis/core/layers/WebTileLayer',
       '@arcgis/core/Basemap',
+      '@arcgis/core/layers/GraphicsLayer',
+      '@arcgis/core/layers/GroupLayer',
+      '@arcgis/core/Graphic',
+      '@arcgis/core/geometry/Geometry',
     ],
     plugins: [
       typescript(),

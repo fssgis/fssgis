@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.1.0",
+  "version": "1.1.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "description": "🎉基于业务功能型的地图API二次开发标准与基础库",
@@ -14,7 +14,7 @@
     "base"
   ],
   "dependencies": {
-    "@fssgis/observable": "^1.1.0",
-    "@fssgis/utils": "^1.1.0"
+    "@fssgis/observable": "^1.1.2",
+    "@fssgis/utils": "^1.1.2"
   }
 }

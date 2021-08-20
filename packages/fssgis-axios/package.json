@@ -1,6 +1,6 @@
 {
   "name": "@fssgis/axios",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "description": "🎉JavaScript Axios工具集",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",

@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.1.0",
+  "version": "1.1.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "description": "🎉@fssgis/fssg-esri的钩子函数",
@@ -15,9 +15,9 @@
   ],
   "dependencies": {
     "@arcgis/core": "^4.20.2",
-    "@fssgis/fssg-esri": "^1.1.0",
-    "@fssgis/observable": "^1.1.0",
-    "@fssgis/utils": "^1.1.0",
+    "@fssgis/fssg-esri": "^1.1.2",
+    "@fssgis/observable": "^1.1.2",
+    "@fssgis/utils": "^1.1.2",
     "vue": "^3.2.3"
   }
 }

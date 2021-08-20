@@ -3,6 +3,7 @@ import ArcGISMap from '@arcgis/core/Map'
 import MapView from '@arcgis/core/views/MapView'
 import esriConfig from '@arcgis/core/config'
 import { Basemap, MapElement } from '../plugins'
+import { error } from '@fssgis/fssg-map'
 
 esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S'
 
@@ -68,7 +69,11 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
    * 空间坐标系
    */
   public get sr () : __esri.SpatialReference {
-    return this._view.spatialReference
+    const sr = this?._view?.spatialReference
+    if (!sr) {
+      error(this, `_view未实例无法获取spatialReference属性`)
+    }
+    return {} as __esri.SpatialReference
   }
 
   //#endregion

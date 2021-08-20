@@ -1,4 +1,4 @@
-import { FssgMap, FssgMapPlugin, BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326 } from '@fssgis/fssg-map';
+import { FssgMap, error, FssgMapPlugin, warn, BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326 } from '@fssgis/fssg-map';
 import ArcGISMap from '@arcgis/core/Map';
 import MapView from '@arcgis/core/views/MapView';
 import esriConfig from '@arcgis/core/config';
@@ -63,7 +63,15 @@ class FssgEsri extends FssgMap {
 
 
   get sr() {
-    return this._view.spatialReference;
+    var _this$_view;
+
+    const sr = this === null || this === void 0 ? void 0 : (_this$_view = this._view) === null || _this$_view === void 0 ? void 0 : _this$_view.spatialReference;
+
+    if (!sr) {
+      error(this, `_view未实例无法获取spatialReference属性`);
+    }
+
+    return {};
   } //#endregion
   //#region 构造函数
 
@@ -450,7 +458,7 @@ class Basemap extends FssgEsriPlugin {
     const item = this._itemPool.get(key);
 
     if (!item) {
-      // TODO msg
+      warn(this, `无底图项${key}`);
       return;
     } // eslint-disable-next-line
     // @ts-ignore
@@ -705,6 +713,12 @@ class MapElement extends FssgEsriPlugin {
       case 'polygon':
       case 'extent':
         symbol = deepCopyJSON(_symbol.fill);
+        break;
+      // case 'mesh': // TODO
+      //   break
+
+      default:
+        warn(this, `类型${type}无法匹配符号`);
         break;
     }
 

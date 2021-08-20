@@ -5,6 +5,7 @@ import Graphic from '@arcgis/core/Graphic'
 import Geometry from '@arcgis/core/geometry/Geometry'
 import { deepCopyJSON, $extend } from '@fssgis/utils'
 import { createLayerFactory } from '../../factories'
+import { warn } from '@fssgis/fssg-map'
 
 /**
  * 图元样式接口
@@ -141,6 +142,7 @@ export class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementEv
       // case 'mesh': // TODO
       //   break
       default:
+        warn(this, `类型${type}无法匹配符号`)
         break
     }
     return symbol ?? {}

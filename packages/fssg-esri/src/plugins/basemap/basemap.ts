@@ -1,7 +1,7 @@
 import FssgEsri from '../../fssg-esri'
 import FssgEsriPlugin, { IFssgEsriPluginOptions, IFssgEsriPluginEvents } from '../../fssg-esri-plugin'
 import { createLayerFactory } from '../../factories'
-import { BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326 } from '@fssgis/fssg-map'
+import { BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, warn } from '@fssgis/fssg-map'
 import EsriBasemap from '@arcgis/core/Basemap'
 
 /**
@@ -91,7 +91,7 @@ export class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
     }
     const item = this._itemPool.get(key)
     if (!item) {
-      // TODO msg
+      warn(this, `无底图项${key}`)
       return
     }
     // eslint-disable-next-line

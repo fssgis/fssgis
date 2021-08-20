@@ -65,13 +65,12 @@ class FssgEsri extends FssgMap {
   get sr() {
     var _this$_view;
 
-    const sr = this === null || this === void 0 ? void 0 : (_this$_view = this._view) === null || _this$_view === void 0 ? void 0 : _this$_view.spatialReference;
-
-    if (!sr) {
+    if (!this._view) {
       error(this, `_view未实例无法获取spatialReference属性`);
     }
 
-    return {};
+    const sr = this === null || this === void 0 ? void 0 : (_this$_view = this._view) === null || _this$_view === void 0 ? void 0 : _this$_view.spatialReference;
+    return sr ?? null; // eslint-disable-line
   } //#endregion
   //#region 构造函数
 

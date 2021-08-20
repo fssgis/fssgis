@@ -69,11 +69,11 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
    * 空间坐标系
    */
   public get sr () : __esri.SpatialReference {
-    const sr = this?._view?.spatialReference
-    if (!sr) {
+    if (!this._view) {
       error(this, `_view未实例无法获取spatialReference属性`)
     }
-    return {} as __esri.SpatialReference
+    const sr = this?._view?.spatialReference
+    return sr ?? null as any // eslint-disable-line
   }
 
   //#endregion

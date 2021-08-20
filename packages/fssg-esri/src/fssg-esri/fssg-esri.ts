@@ -30,6 +30,9 @@ export type IMap = __esri.Map & IOwner
 export type IView = __esri.MapView & IOwner
 
 
+/**
+ * 地图应用
+ */
 export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
 
   public basemap: Basemap
@@ -104,7 +107,6 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
 
   /**
    * 初始化地图
-   * @returns this
    */
   private _initMap () : this {
     const { mapOptions } = this.options_
@@ -115,7 +117,6 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
 
   /**
    * 初始化视图
-   * @returns this
    */
   private _initView () : this {
     const { viewOptions } = this.options_
@@ -130,7 +131,6 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
 
   /**
    * 初始化静态资源
-   * @returns this
    */
   private _initAssetsPath () : this {
     const { assetsPath } = this.options_
@@ -140,7 +140,6 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
 
   /**
    * 初始化地图容器样式（移除focus时的边框样式）
-   * @returns this
    */
   private _initRemoveOnlineStyle () : this {
     document.styleSheets[0].addRule('.esri-view', 'outline: none !important')
@@ -155,7 +154,6 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
 
   /**
    * 安装
-   * @returns this
    */
    public mount () : this {
     this

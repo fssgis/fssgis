@@ -15,7 +15,10 @@ export interface IFssgEsriPluginEvents extends IFssgMapPluginEvents { // eslint-
 
 }
 
-export class FssgEsriPlugin<
+/**
+ * 地图应用插件抽象类
+ */
+export abstract class FssgEsriPlugin<
   T_OPTIONS extends IFssgEsriPluginOptions = IFssgEsriPluginOptions,
   T_EVENTS extends IFssgEsriPluginEvents = IFssgEsriPluginEvents
 > extends FssgMapPlugin<
@@ -47,7 +50,6 @@ export class FssgEsriPlugin<
   /**
    * 安装插件
    * @param FssgEsri 地图应用实例
-   * @returns this
    */
   public installPlugin (fssgEsri: FssgEsri) : this {
     this.map_ = fssgEsri.map

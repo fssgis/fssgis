@@ -10,7 +10,10 @@ interface IFssgEsriPluginOptions extends IFssgMapPluginOptions {
  */
 interface IFssgEsriPluginEvents extends IFssgMapPluginEvents {
 }
-declare class FssgEsriPlugin<T_OPTIONS extends IFssgEsriPluginOptions = IFssgEsriPluginOptions, T_EVENTS extends IFssgEsriPluginEvents = IFssgEsriPluginEvents> extends FssgMapPlugin<T_OPTIONS & IFssgEsriPluginOptions, T_EVENTS & IFssgEsriPluginEvents> {
+/**
+ * 地图应用插件抽象类
+ */
+declare abstract class FssgEsriPlugin<T_OPTIONS extends IFssgEsriPluginOptions = IFssgEsriPluginOptions, T_EVENTS extends IFssgEsriPluginEvents = IFssgEsriPluginEvents> extends FssgMapPlugin<T_OPTIONS & IFssgEsriPluginOptions, T_EVENTS & IFssgEsriPluginEvents> {
     /**
      * 地图对象
      */
@@ -26,7 +29,6 @@ declare class FssgEsriPlugin<T_OPTIONS extends IFssgEsriPluginOptions = IFssgEsr
     /**
      * 安装插件
      * @param FssgEsri 地图应用实例
-     * @returns this
      */
     installPlugin(fssgEsri: FssgEsri): this;
 }
@@ -235,6 +237,9 @@ interface IOwner {
 }
 declare type IMap = __esri.Map & IOwner;
 declare type IView = __esri.MapView & IOwner;
+/**
+ * 地图应用
+ */
 declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     basemap: Basemap;
     mapElement: MapElement;
@@ -266,35 +271,36 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     constructor(container: string, options?: IFssgEsriOptions);
     /**
      * 初始化地图
-     * @returns this
      */
     private _initMap;
     /**
      * 初始化视图
-     * @returns this
      */
     private _initView;
     /**
      * 初始化静态资源
-     * @returns this
      */
     private _initAssetsPath;
     /**
      * 初始化地图容器样式（移除focus时的边框样式）
-     * @returns this
      */
     private _initRemoveOnlineStyle;
     /**
      * 安装
-     * @returns this
      */
     mount(): this;
 }
 
+/**
+ * 坐标XY
+ */
 declare type XY = {
     x: number;
     y: number;
 } | [number, number] | number[];
+/**
+ * 经纬度
+ */
 declare type LonLat = [number, number] | number[] | {
     lon: number;
     lat: number;
@@ -305,6 +311,10 @@ declare type LonLat = [number, number] | number[] | {
     longitude: number;
     latitude: number;
 };
+/**
+ * 几何工厂接口
+ * TODO: createPointsFromPolygon createPolylineFromPolygon createPolylinesFromPolygon
+ */
 interface IGeometryFactory {
     createPoint(options: __esri.PointProperties): __esri.Point;
     createPointFromXY(x: number, y: number): __esri.Point;
@@ -323,20 +333,203 @@ interface IGeometryFactory {
     createPolygonFromLonLats(lonLats: LonLat[]): __esri.Polygon;
     createExtent(options: __esri.ExtentProperties): __esri.Extent;
 }
-declare function createGeometryFactory(fssgEsri: FssgEsri): IGeometryFactory;
+/**
+ * 几何工厂类（条件单例模式）
+ * @private
+ */
+declare class GeometryFacory implements IGeometryFactory {
+    /**
+     * 实例容器
+     */
+    private static _instanceMap;
+    /**
+     * 地图应用
+     */
+    private _fssgEsri;
+    /**
+     * 实例容器绑定的地图应用空间坐标系
+     */
+    private get _spatialReference();
+    /**
+     * 构造几何工厂实例
+     * @param fssgEsri 地图应用
+     */
+    constructor(fssgEsri: FssgEsri);
+    /**
+     * 创建Esri点
+     * @param options 配置项
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Point.html
+     * @example
+     * ```ts
+     * createGeometryFactory().createPoint({ \/* xxx *\/ })
+     * ```
+     */
+    createPoint(options: __esri.PointProperties): __esri.Point;
+    /**
+     * 创建Esri线
+     * @param options 配置项
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Polyline.html
+     * @example
+     * ```ts
+     * createGeometryFactory().createPolyline({ \/* xxx *\/ })
+     * ```
+     */
+    createPolyline(options: __esri.PolylineProperties): __esri.Polyline;
+    /**
+     * 创建Esri面
+     * @param options 配置项
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Polygon.html
+     * @example
+     * ```ts
+     * createGeometryFactory().createPolygon({ \/* xxx *\/ })
+     * ```
+     */
+    createPolygon(options: __esri.PolygonProperties): __esri.Polygon;
+    /**
+     * 创建Esri范围
+     * @param options 配置项
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Extent.html
+     * @example
+     * ```ts
+     * createGeometryFactory().createExtent({ \/* xxx *\/ })
+     * ```
+     */
+    createExtent(options: __esri.ExtentProperties): __esri.Extent;
+    /**
+     * 根据XY坐标创建Esri点
+     * @param args XY坐标
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Point.html
+     * @example
+     * ```ts
+     * createGeometryFactory().createPointFromXY({ x: 0, y: 0 })
+     * createGeometryFactory().createPointFromXY(0, 0)
+     * ```
+     */
+    createPointFromXY(...args: [XY] | [number, number]): __esri.Point;
+    /**
+     * 根据经纬度创建Esri点
+     * @param args 经纬度
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Point.html
+     * @example
+     * ```ts
+     * createGeometryFactory().createPointFromLonLat({ lon: 113, lat: 23 })
+     * createGeometryFactory().createPointFromLonLat({ lng: 113, lat: 23 })
+     * createGeometryFactory().createPointFromLonLat({ longitude: 113, latitude: 23 })
+     * createGeometryFactory().createPointFromLonLat(113, 23)
+     * ```
+     */
+    createPointFromLonLat(...args: [LonLat] | [number, number]): __esri.Point;
+    /**
+     * 根据Esri点集创建Esri线
+     * @param points Esri点集
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Polyline.html
+     */
+    createPolylineFromPoints(points: __esri.Point[]): __esri.Polyline;
+    /**
+     * 根据XY坐标集创建Esri线
+     * @param xys XY坐标集
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Polyline.html
+     */
+    createPolylineFromXYs(xys: XY[]): __esri.Polyline;
+    /**
+     * 根据经纬度集创建Esri线
+     * @param lonLats 经纬度集
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Polyline.html
+     */
+    createPolylineFromLonLats(lonLats: LonLat[]): __esri.Polyline;
+    /**
+     * 根据Esri点集创建Esri面
+     * @param points Esri点集
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Polygon.html
+     */
+    createPolygonFromPoints(points: __esri.Point[]): __esri.Polygon;
+    /**
+     * 根据Esri线创建Esri点集
+     * @param polyline Esri线
+     * @param pathIndex 线的路径索引，默认值为0
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Point.html
+     */
+    createPointsFromPolyline(polyline: __esri.Polyline, pathIndex?: number): __esri.Point[];
+    /**
+     * 根据Esri线创建Esri面
+     * @param polyline Esri线
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Polygon.html
+     */
+    createPolygonFromPolyline(polyline: __esri.Polyline): __esri.Polygon;
+    /**
+     * 根据XY坐标集创建Esri面
+     * @param xys Esri线
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Polygon.html
+     */
+    createPolygonFromXYs(xys: XY[]): __esri.Polygon;
+    /**
+     * 根据经纬度集创建Esri面
+     * @param lonLats 经纬度集
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Polygon.html
+     */
+    createPolygonFromLonLats(lonLats: LonLat[]): __esri.Polygon;
+}
+/**
+ * 创建几何工厂
+ * @param fssgEsri 地图应用
+ */
+declare function createGeometryFactory(fssgEsri: FssgEsri): GeometryFacory;
 
+/**
+ * 图层工厂接口
+ */
 interface ILayerFactory {
     createGraphicsLayer(options: __esri.GraphicsLayerProperties): __esri.GraphicsLayer;
     createGroupLayer(options: __esri.GroupLayerProperties): __esri.GroupLayer;
     createWebTileLayer(options: __esri.WebTileLayerProperties): __esri.WebTileLayer;
 }
+/**
+ * 图层工厂（单例模式）
+ * @private
+ */
 declare class LayerFactory implements ILayerFactory {
+    /**
+     * 实例
+     */
     private static _instance;
+    /**
+     * 构造图层工厂实例
+     */
     constructor();
+    /**
+     * 创建GraphicsLayer
+     * @param options 配置项
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-GraphicsLayer.html
+     * @example
+     * ```ts
+     * createLayerFactory().createGraphicsLayer({ \/* xxx *\/ })
+     * ```
+     */
     createGraphicsLayer(options?: __esri.GraphicsLayerProperties): __esri.GraphicsLayer;
+    /**
+     * 创建GroupLayer
+     * @param options 配置项
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-GroupLayer.html
+     * @example
+     * ```ts
+     * createLayerFactory().createGroupLayer({ \/* xxx *\/ })
+     * ```
+     */
     createGroupLayer(options?: __esri.GroupLayerProperties): __esri.GroupLayer;
+    /**
+     * 创建WebTileLayer
+     * @param options 配置项
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-WebTileLayer.html
+     * @example
+     * ```ts
+     * createLayerFactory().createWebTileLayer({ \/* xxx *\/ })
+     * ```
+     */
     createWebTileLayer(options?: __esri.WebTileLayerProperties): __esri.WebTileLayer;
 }
+/**
+ * 创建图层工厂
+ */
 declare function createLayerFactory(): LayerFactory;
 
-export { Basemap, FssgEsri, FssgEsriPlugin, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, ILayerFactory, IMap, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IOwner, IView, LonLat, MapElement, XY, createGeometryFactory, createLayerFactory };
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, ILayerFactory, IMap, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IOwner, IView, LonLat, MapElement, XY, createGeometryFactory, createLayerFactory };

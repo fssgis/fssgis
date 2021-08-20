@@ -306,4 +306,11 @@ class BaseTool extends BaseClass {
 
 }
 
-export { BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseClass, BaseTool, FssgMap, FssgMapPlugin };
+function warn(target, msg, ...others) {
+  console.warn(`[FssgMap]: ${msg}`, ...others, target);
+}
+function error(target, msg, ...others) {
+  console.error(`[FssgMap]: ${msg}`, ...others, target);
+}
+
+export { BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseClass, BaseTool, FssgMap, FssgMapPlugin, error, warn };

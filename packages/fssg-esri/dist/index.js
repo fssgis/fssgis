@@ -788,4 +788,34 @@ function createGeometryFactory(fssgEsri) {
   return new GeometryFacory(fssgEsri);
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, MapElement, createGeometryFactory };
+class LayerFactory {
+  constructor() {
+    if (LayerFactory._instance) {
+      return LayerFactory._instance;
+    }
+
+    LayerFactory._instance = this;
+    return this;
+  }
+
+  createGraphicsLayer(options) {
+    return new GraphicsLayer(options);
+  }
+
+  createGroupLayer(options) {
+    return new GroupLayer(options);
+  }
+
+  createWebTileLayer(options) {
+    return new WebTileLayer(options);
+  }
+
+}
+
+_defineProperty(LayerFactory, "_instance", void 0);
+
+function createLayerFactory() {
+  return new LayerFactory();
+}
+
+export { Basemap, FssgEsri, FssgEsriPlugin, MapElement, createGeometryFactory, createLayerFactory };

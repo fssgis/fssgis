@@ -325,4 +325,18 @@ interface IGeometryFactory {
 }
 declare function createGeometryFactory(fssgEsri: FssgEsri): IGeometryFactory;
 
-export { Basemap, FssgEsri, FssgEsriPlugin, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IMap, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IOwner, IView, LonLat, MapElement, XY, createGeometryFactory };
+interface ILayerFactory {
+    createGraphicsLayer(options: __esri.GraphicsLayerProperties): __esri.GraphicsLayer;
+    createGroupLayer(options: __esri.GroupLayerProperties): __esri.GroupLayer;
+    createWebTileLayer(options: __esri.WebTileLayerProperties): __esri.WebTileLayer;
+}
+declare class LayerFactory implements ILayerFactory {
+    private static _instance;
+    constructor();
+    createGraphicsLayer(options: __esri.GraphicsLayerProperties): __esri.GraphicsLayer;
+    createGroupLayer(options: __esri.GroupLayerProperties): __esri.GroupLayer;
+    createWebTileLayer(options: __esri.WebTileLayerProperties): __esri.WebTileLayer;
+}
+declare function createLayerFactory(): LayerFactory;
+
+export { Basemap, FssgEsri, FssgEsriPlugin, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, ILayerFactory, IMap, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IOwner, IView, LonLat, MapElement, XY, createGeometryFactory, createLayerFactory };

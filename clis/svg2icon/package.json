@@ -1,0 +1,20 @@
+{
+  "name": "@fssgis/svg2icon",
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "0.0.0",
+  "description": "脚骨架工具",
+  "bin": {
+    "svg2icon": "./index.js"
+  },
+  "keywords": [
+    "cli"
+  ],
+  "author": "wu xizhe",
+  "license": "ISC",
+  "devDependencies": {
+    "svg2ttf": "^6.0.2",
+    "svgicons2svgfont": "^10.0.3"
+  }
+}

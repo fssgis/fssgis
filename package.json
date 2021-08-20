@@ -5,6 +5,7 @@
     "access": "public"
   },
   "workspaces": [
+    "clis/*",
     "packages/*",
     "projects/*"
   ],

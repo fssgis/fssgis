@@ -1,11 +1,12 @@
 interface IArrayExtension<T> {
-    insert(index: number, value: T): IArrayExtension<T>;
-    removeIndex(index: number): IArrayExtension<T>;
-    removeIndex(index: number, returnRemoveValue: true): T;
-    clear(): IArrayExtension<T>;
-    reset(...item: T[]): IArrayExtension<T>;
-    removeValue(value: T, removeMany?: boolean): IArrayExtension<T>;
-    unique(): IArrayExtension<T>;
+    get $(): T[];
+    insert(index: number, value: T): this;
+    removeIndex(index: number): this;
+    removeIndex(index: number, returnRemoveItem?: true): T;
+    clear(): this;
+    reset(...item: T[]): this;
+    removeValue(value: T, removeMany?: boolean): this;
+    unique(): this;
     getUnique(): T[];
     equal<K>(arr: K[]): boolean;
     findItem(propName: keyof T, propValue: T[keyof T]): T | undefined;
@@ -13,7 +14,7 @@ interface IArrayExtension<T> {
     propToArr(propName: keyof T): T[keyof T][];
     last(): T;
 }
-declare function extArray<T>(arr: T[]): IArrayExtension<T>;
+declare function extArray<T>(target: T[]): IArrayExtension<T>;
 
 interface IDateExtension {
     format(fmt: string): string;

@@ -89,3 +89,9 @@ test('last() can run', () => {
   const last = ext(arr).last()
   expect(last).toBe(2)
 })
+
+test('$ can run', () => {
+  const arr = [1, 0, 2, 0, 2]
+  const arr$ = ext(arr).$
+  expect(arr === arr$).toBe(true)
+})

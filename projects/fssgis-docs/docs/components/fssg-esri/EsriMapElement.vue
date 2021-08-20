@@ -84,7 +84,7 @@ export default defineComponent({
         [
           geoFactory.createPointFromLonLat({ lng: createLongitude(), lat: createLatitude() }),
           geoFactory.createPointFromLonLat(createLongitude(), createLatitude()),
-          new Point({ longitude: createLongitude(), latitude: createLatitude() }),
+          geoFactory.createPointFromLonLat(createLongitude(), createLatitude()),
         ],
         { type: 'picture-marker', url: 'https://leafletjs.com/docs/images/github-round.png', width: 24, height: 24 } as __esri.PictureMarkerSymbol
       )
@@ -126,7 +126,7 @@ export default defineComponent({
       mapElement.add(geoFactory.createPolylineFromPoints([
         geoFactory.createPointFromLonLat({ lng: createLongitude(), lat: createLatitude() }),
         geoFactory.createPointFromLonLat(createLongitude(), createLatitude()),
-        new Point({ longitude: createLongitude(), latitude: createLatitude() }),
+        geoFactory.createPointFromLonLat(createLongitude(), createLatitude()),
       ]))
     }
 
@@ -134,7 +134,7 @@ export default defineComponent({
       mapElement.add(geoFactory.createPolygonFromPoints([
         geoFactory.createPointFromLonLat({ lng: createLongitude(), lat: createLatitude() }),
         geoFactory.createPointFromLonLat(createLongitude(), createLatitude()),
-        new Point({ longitude: createLongitude(), latitude: createLatitude() }),
+        geoFactory.createPointFromLonLat(createLongitude(), createLatitude()),
       ]))
     }
 

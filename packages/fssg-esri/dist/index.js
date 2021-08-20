@@ -636,135 +636,156 @@ class MapElement extends FssgEsriPlugin {
 
 }
 
-function createGeometryFactory(fssgEsri) {
-  let spatialReference;
-  fssgEsri.when(() => spatialReference = fssgEsri.sr);
-  const factory = {
-    createPoint(options) {
-      return new Point({
-        spatialReference,
-        ...options
-      });
-    },
+class GeometryFacory {
+  get _spatialReference() {
+    return this._fssgEsri.sr;
+  }
 
-    createPolyline(options) {
-      return new Polyline({
-        spatialReference,
-        ...options
-      });
-    },
+  constructor(fssgEsri) {
+    _defineProperty(this, "_fssgEsri", void 0);
 
-    createPolygon(options) {
-      return new Polygon({
-        spatialReference,
-        ...options
-      });
-    },
+    const instance = GeometryFacory._instanceMap.get(fssgEsri);
 
-    createExtent(options) {
-      return new Extent({
-        spatialReference,
-        ...options
-      });
-    },
-
-    createPointFromXY(...args) {
-      if (args.length === 2) {
-        const [x, y] = args;
-        return factory.createPoint({
-          x,
-          y
-        });
-      } else {
-        const xy = args[0];
-        const x = Array.isArray(xy) ? xy[0] : xy.x;
-        const y = Array.isArray(xy) ? xy[1] : xy.y;
-        return factory.createPoint({
-          x,
-          y
-        });
-      }
-    },
-
-    createPointFromLonLat(...args) {
-      if (args.length === 2) {
-        const [longitude, latitude] = args;
-        return factory.createPoint({
-          longitude,
-          latitude
-        });
-      } else {
-        const lonlat = args[0]; // eslint-disable-next-line
-        // @ts-ignore
-
-        const longitude = Array.isArray(lonlat) ? lonlat[0] : lonlat.lon ?? lonlat.lng ?? lonlat.longitude; // eslint-disable-next-line
-        // @ts-ignore
-
-        const latitude = Array.isArray(lonlat) ? lonlat[1] : lonlat.lat ?? lonlat.latitude;
-        return factory.createPoint({
-          longitude,
-          latitude
-        });
-      }
-    },
-
-    createPolylineFromPoints(points) {
-      const polyline = factory.createPolyline({
-        paths: []
-      });
-      polyline.addPath(points);
-      return polyline;
-    },
-
-    createPolylineFromXYs(xys) {
-      const points = xys.map(xy => factory.createPointFromXY(xy));
-      return factory.createPolylineFromPoints(points);
-    },
-
-    createPolylineFromLonLats(lonLats) {
-      const points = lonLats.map(lonLat => factory.createPointFromLonLat(lonLat));
-      return factory.createPolylineFromPoints(points);
-    },
-
-    createPolygonFromPoints(points) {
-      const polygon = factory.createPolygon({
-        rings: []
-      });
-      polygon.addRing(points);
-      return polygon;
-    },
-
-    createPointsFromPolyline(polyline, pathIndex = 0) {
-      const count = polyline.paths[pathIndex];
-      const points = Array(count).map((_, i) => polyline.getPoint(pathIndex, i));
-      return points;
-    },
-
-    createPolygonFromPolyline(polyline) {
-      const polygon = factory.createPolygon({
-        rings: []
-      });
-      polyline.paths.forEach((_, i) => {
-        const points = factory.createPointsFromPolyline(polyline, i);
-        polygon.addRing(points);
-      });
-      return polygon;
-    },
-
-    createPolygonFromXYs(xys) {
-      const points = xys.map(xy => factory.createPointFromXY(xy));
-      const polygon = factory.createPolygonFromPoints(points);
-      return polygon;
-    },
-
-    createPolygonFromLonLats(lonLats) {
-      const points = lonLats.map(lonLat => factory.createPointFromLonLat(lonLat));
-      const polygon = factory.createPolygonFromPoints(points);
-      return polygon;
+    if (instance) {
+      return instance;
     }
 
-  };
-  return factory;
+    this._fssgEsri = fssgEsri;
+
+    GeometryFacory._instanceMap.set(fssgEsri, this);
+
+    return this;
+  }
+
+  createPoint(options) {
+    return new Point({
+      spatialReference: this._spatialReference,
+      ...options
+    });
+  }
+
+  createPolyline(options) {
+    return new Polyline({
+      spatialReference: this._spatialReference,
+      ...options
+    });
+  }
+
+  createPolygon(options) {
+    return new Polygon({
+      spatialReference: this._spatialReference,
+      ...options
+    });
+  }
+
+  createExtent(options) {
+    return new Extent({
+      spatialReference: this._spatialReference,
+      ...options
+    });
+  }
+
+  createPointFromXY(...args) {
+    if (args.length === 2) {
+      const [x, y] = args;
+      return this.createPoint({
+        x,
+        y
+      });
+    } else {
+      const xy = args[0];
+      const x = Array.isArray(xy) ? xy[0] : xy.x;
+      const y = Array.isArray(xy) ? xy[1] : xy.y;
+      return this.createPoint({
+        x,
+        y
+      });
+    }
+  }
+
+  createPointFromLonLat(...args) {
+    if (args.length === 2) {
+      const [longitude, latitude] = args;
+      return this.createPoint({
+        longitude,
+        latitude
+      });
+    } else {
+      const lonlat = args[0]; // eslint-disable-next-line
+      // @ts-ignore
+
+      const longitude = Array.isArray(lonlat) ? lonlat[0] : lonlat.lon ?? lonlat.lng ?? lonlat.longitude; // eslint-disable-next-line
+      // @ts-ignore
+
+      const latitude = Array.isArray(lonlat) ? lonlat[1] : lonlat.lat ?? lonlat.latitude;
+      return this.createPoint({
+        longitude,
+        latitude
+      });
+    }
+  }
+
+  createPolylineFromPoints(points) {
+    const polyline = this.createPolyline({
+      paths: []
+    });
+    polyline.addPath(points);
+    return polyline;
+  }
+
+  createPolylineFromXYs(xys) {
+    const points = xys.map(xy => this.createPointFromXY(xy));
+    return this.createPolylineFromPoints(points);
+  }
+
+  createPolylineFromLonLats(lonLats) {
+    const points = lonLats.map(lonLat => this.createPointFromLonLat(lonLat));
+    return this.createPolylineFromPoints(points);
+  }
+
+  createPolygonFromPoints(points) {
+    const polygon = this.createPolygon({
+      rings: []
+    });
+    polygon.addRing(points);
+    return polygon;
+  }
+
+  createPointsFromPolyline(polyline, pathIndex = 0) {
+    const count = polyline.paths[pathIndex];
+    const points = Array(count).map((_, i) => polyline.getPoint(pathIndex, i));
+    return points;
+  }
+
+  createPolygonFromPolyline(polyline) {
+    const polygon = this.createPolygon({
+      rings: []
+    });
+    polyline.paths.forEach((_, i) => {
+      const points = this.createPointsFromPolyline(polyline, i);
+      polygon.addRing(points);
+    });
+    return polygon;
+  }
+
+  createPolygonFromXYs(xys) {
+    const points = xys.map(xy => this.createPointFromXY(xy));
+    const polygon = this.createPolygonFromPoints(points);
+    return polygon;
+  }
+
+  createPolygonFromLonLats(lonLats) {
+    const points = lonLats.map(lonLat => this.createPointFromLonLat(lonLat));
+    const polygon = this.createPolygonFromPoints(points);
+    return polygon;
+  }
+
+}
+
+_defineProperty(GeometryFacory, "_instanceMap", new Map());
+
+function createGeometryFactory(fssgEsri) {
+  return new GeometryFacory(fssgEsri);
 }
 
 export { Basemap, FssgEsri, FssgEsriPlugin, MapElement, createGeometryFactory };

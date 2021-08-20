@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.0",
+  "version": "1.1.0",
   "description": "脚骨架工具",
   "bin": {
     "svg2icon": "./index.js"

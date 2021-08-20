@@ -1,6 +1,6 @@
 {
   "name": "@fssgis/generic",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "🎉JavaScript泛型接口",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

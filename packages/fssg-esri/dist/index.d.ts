@@ -333,9 +333,9 @@ interface ILayerFactory {
 declare class LayerFactory implements ILayerFactory {
     private static _instance;
     constructor();
-    createGraphicsLayer(options: __esri.GraphicsLayerProperties): __esri.GraphicsLayer;
-    createGroupLayer(options: __esri.GroupLayerProperties): __esri.GroupLayer;
-    createWebTileLayer(options: __esri.WebTileLayerProperties): __esri.WebTileLayer;
+    createGraphicsLayer(options?: __esri.GraphicsLayerProperties): __esri.GraphicsLayer;
+    createGroupLayer(options?: __esri.GroupLayerProperties): __esri.GroupLayer;
+    createWebTileLayer(options?: __esri.WebTileLayerProperties): __esri.WebTileLayer;
 }
 declare function createLayerFactory(): LayerFactory;
 

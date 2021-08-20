@@ -1,6 +1,6 @@
 import FssgEsri from '../../fssg-esri'
 import FssgEsriPlugin, { IFssgEsriPluginOptions, IFssgEsriPluginEvents } from '../../fssg-esri-plugin'
-import WebTileLayer from '@arcgis/core/layers/WebTileLayer'
+import { createLayerFactory } from '../../factories'
 import { BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326 } from '@fssgis/fssg-map'
 import EsriBasemap from '@arcgis/core/Basemap'
 
@@ -127,10 +127,12 @@ export class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
         const layers: __esri.Layer[] = []
         item.lyrs.forEach(o => {
           if (o.type === 'webtilelayer') {
-            layers.push(new WebTileLayer({
-              urlTemplate: o.url,
-              ...o.props
-            }))
+            layers.push(
+              createLayerFactory().createWebTileLayer({
+                urlTemplate: o.url,
+                ...o.props
+              })
+            )
           }
         })
         this._itemPool.set(item.key, layers)
@@ -138,7 +140,7 @@ export class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
       }
       let layer: __esri.Layer | undefined
       if (item.type === 'webtilelayer') {
-        layer = new WebTileLayer({
+        layer = createLayerFactory().createWebTileLayer({
           urlTemplate: item.url,
           ...item.props
         })
@@ -159,10 +161,10 @@ export class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
    */
    private _createTianDiTu () : this {
     const createTianDiTuItem = (name: string, proj: string) => {
-      this.createBasemapItem(`天地图${name}${proj}`, new WebTileLayer(Basemap[`BASEMAP_TIAN_DI_TU_${proj}`][`${name}底图`]))
+      this.createBasemapItem(`天地图${name}${proj}`, createLayerFactory().createWebTileLayer(Basemap[`BASEMAP_TIAN_DI_TU_${proj}`][`${name}底图`]))
       this.createBasemapItem(`天地图${name}含注记${proj}`, [
-        new WebTileLayer(Basemap[`BASEMAP_TIAN_DI_TU_${proj}`][`${name}底图`]),
-        new WebTileLayer(Basemap[`BASEMAP_TIAN_DI_TU_${proj}`][`${name}注记`]),
+        createLayerFactory().createWebTileLayer(Basemap[`BASEMAP_TIAN_DI_TU_${proj}`][`${name}底图`]),
+        createLayerFactory().createWebTileLayer(Basemap[`BASEMAP_TIAN_DI_TU_${proj}`][`${name}注记`]),
       ])
       return createTianDiTuItem
     }

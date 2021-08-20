@@ -19,15 +19,15 @@ class LayerFactory implements ILayerFactory {
     return this
   }
 
-  public createGraphicsLayer (options: __esri.GraphicsLayerProperties) : __esri.GraphicsLayer {
+  public createGraphicsLayer (options?: __esri.GraphicsLayerProperties) : __esri.GraphicsLayer {
     return new GraphicsLayer(options)
   }
 
-  public createGroupLayer (options: __esri.GroupLayerProperties) : __esri.GroupLayer {
+  public createGroupLayer (options?: __esri.GroupLayerProperties) : __esri.GroupLayer {
     return new GroupLayer(options)
   }
 
-  public createWebTileLayer (options: __esri.WebTileLayerProperties) : __esri.WebTileLayer {
+  public createWebTileLayer (options?: __esri.WebTileLayerProperties) : __esri.WebTileLayer {
     return new WebTileLayer(options)
   }
 

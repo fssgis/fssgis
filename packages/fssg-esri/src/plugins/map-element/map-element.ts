@@ -1,11 +1,10 @@
 import { IFssgEsriPluginEvents, IFssgEsriPluginOptions } from '../../fssg-esri-plugin'
 import FssgEsriPlugin from '../../fssg-esri-plugin'
 import FssgEsri from '../../fssg-esri'
-import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer'
-import GroupLayer from '@arcgis/core/layers/GroupLayer'
 import Graphic from '@arcgis/core/Graphic'
 import Geometry from '@arcgis/core/geometry/Geometry'
 import { deepCopyJSON, $extend } from '@fssgis/utils'
+import { createLayerFactory } from '../../factories'
 
 /**
  * 图元样式接口
@@ -109,9 +108,9 @@ export class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementEv
   private _init () : this {
     this._graphicsSymbol = this.options_.graphicsSymbol ?? {}
     this._highlightSymbol = this.options_.highlightSymbol ?? {}
-    this._graphicsLayer = new GraphicsLayer()
-    this._highlightLayer = new GraphicsLayer()
-    this._groupLayer = new GroupLayer({
+    this._graphicsLayer = createLayerFactory().createGraphicsLayer()
+    this._highlightLayer = createLayerFactory().createGraphicsLayer()
+    this._groupLayer = createLayerFactory().createGroupLayer({
       layers: [this._graphicsLayer, this._highlightLayer]
     })
     this.map_.layers.add(this._groupLayer)

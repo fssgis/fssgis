@@ -224,4 +224,86 @@ const BASEMAP_TIAN_DI_TU_4326 = {
   '地形注记': `http://t0.tianditu.gov.cn/cta_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cta&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${TIAN_DI_TU_KEY}`
 };
 
-export { BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseClass, FssgMap, FssgMapPlugin };
+class BaseTool extends BaseClass {
+  get isOnceTool() {
+    return this._isOnceTool;
+  }
+
+  get actived() {
+    return this._actived;
+  }
+
+  constructor(options, defaultOptions) {
+    super(options, {
+      isOnceTool: true,
+      ...defaultOptions
+    });
+
+    _defineProperty(this, "_isOnceTool", void 0);
+
+    _defineProperty(this, "_actived", void 0);
+
+    this._isOnceTool = !!this.options_.isOnceTool;
+    this.on('tool-actived', e => this.onToolActived_(e));
+    this.on('tool-deactived', e => this.onToolDeactived_(e));
+  } //#region 保护方法
+
+  /**
+   * 工具激化处理事件
+   */
+
+
+  onToolActived_(e) {
+    if (!this._actived) {
+      return false;
+    }
+
+    return true;
+  }
+  /**
+   * 工具失活处理事件
+   */
+
+
+  onToolDeactived_(e) {
+    if (!this._actived) {
+      return false;
+    }
+
+    this._actived = false;
+    return true;
+  } //#endregion
+  //#region 公有方法
+
+  /** 激活工具 */
+
+
+  active() {
+    if (this._actived) {
+      return this;
+    }
+
+    this._actived = true;
+    this.fire('tool-actived');
+
+    if (this._isOnceTool) {
+      this.deactive();
+    }
+
+    return this;
+  }
+  /** 接触工具激活状态 */
+
+
+  deactive() {
+    if (!this._actived) {
+      return this;
+    }
+
+    this.fire('tool-deactived');
+    return this;
+  }
+
+}
+
+export { BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseClass, BaseTool, FssgMap, FssgMapPlugin };

@@ -1,4 +1,4 @@
-import { Observable } from '@fssgis/observable';
+import { Observable, ICallbackParams } from '@fssgis/observable';
 
 /**
  * 基类事件集接口
@@ -138,4 +138,35 @@ declare const BASEMAP_TIAN_DI_TU_3857: Record<string, string>;
 /** 天地图经纬度投影路径集合 */
 declare const BASEMAP_TIAN_DI_TU_4326: Record<string, string>;
 
-export { BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseClass, FssgMap, FssgMapPlugin, IBaseClassEvents, IBaseClassOptions, IFssgMapContainer, IFssgMapEvents, IFssgMapOptions, IFssgMapPluginEvents, IFssgMapPluginOptions };
+interface IBaseToolOptions {
+    isOnceTool?: boolean;
+}
+interface IBaseToolEvents extends IBaseClassEvents {
+    'tool-actived': void;
+    'tool-deactived': void;
+}
+declare type OnToolActivedParams<THIS> = ICallbackParams<'tool-actived', THIS>;
+declare type OnToolDeactivedParams<THIS> = ICallbackParams<'tool-deactived', THIS>;
+declare type OnToolActivedReture = boolean;
+declare type OnToolDeactivedReture = boolean;
+declare abstract class BaseTool<T_OPTIONS extends IBaseToolOptions = IBaseToolOptions, T_EVENTS extends IBaseToolEvents = IBaseToolEvents> extends BaseClass<T_OPTIONS & IBaseToolOptions, T_EVENTS & IBaseToolEvents> {
+    private _isOnceTool;
+    private _actived;
+    get isOnceTool(): boolean;
+    get actived(): boolean;
+    constructor(options?: T_OPTIONS, defaultOptions?: T_OPTIONS);
+    /**
+     * 工具激化处理事件
+     */
+    protected onToolActived_(e: OnToolActivedParams<this>): OnToolActivedReture;
+    /**
+     * 工具失活处理事件
+     */
+    protected onToolDeactived_(e: OnToolDeactivedParams<this>): OnToolDeactivedReture;
+    /** 激活工具 */
+    active(): this;
+    /** 接触工具激活状态 */
+    deactive(): this;
+}
+
+export { BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseClass, BaseTool, FssgMap, FssgMapPlugin, IBaseClassEvents, IBaseClassOptions, IBaseToolEvents, IBaseToolOptions, IFssgMapContainer, IFssgMapEvents, IFssgMapOptions, IFssgMapPluginEvents, IFssgMapPluginOptions, OnToolActivedParams, OnToolActivedReture, OnToolDeactivedParams, OnToolDeactivedReture };

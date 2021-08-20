@@ -1,4 +1,4 @@
-import { FssgEsri, Basemap, createGeometryFactory } from '@fssgis/fssg-esri';
+import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory } from '@fssgis/fssg-esri';
 import { getCurrentInstance, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide } from 'vue';
 import { whenRightReturn } from '@fssgis/utils';
 
@@ -314,6 +314,7 @@ function useBasemap(fssgEsri) {
 }
 
 const SYMBOL_GEO_FACTORY = Symbol('FssgEsri.GeoFactory');
+const SYMBOL_LYR_FACTORY = Symbol('FssgEsri.LyrFactory');
 function createGeoFactory(fssgEsri) {
   fssgEsri = fssgEsri || useFssgEsri();
   const factory = createGeometryFactory(fssgEsri);
@@ -323,5 +324,13 @@ function createGeoFactory(fssgEsri) {
 function useGeoFactory() {
   return inject(SYMBOL_GEO_FACTORY);
 }
+function createLyrFactory() {
+  const factory = createLayerFactory();
+  provide(SYMBOL_LYR_FACTORY, factory);
+  return factory;
+}
+function useLyrFactory() {
+  return inject(SYMBOL_LYR_FACTORY);
+}
 
-export { createBasemap, createFssgEsri, createGeoFactory, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

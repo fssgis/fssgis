@@ -1,4 +1,4 @@
-# 图标组件 @fssgis/icon
+# 图标组件 Icon from @fssgis/ui
 
 ## 介绍
 
@@ -7,13 +7,13 @@
 ## 安装
 
 ```shell
-npm install --save @fssgis/icon
+npm install --save @fssgis/ui
 ```
 
 ## 使用
 
 ```js
-import FssgIcon from '@fssgis/icon'
+import { FssgIcon } from '@fssgis/ui'
 ```
 
 ```html
@@ -87,7 +87,7 @@ export default defineComponent({
 字体大小（尺寸）、颜色控制
 
 ```js
-import "@fssgis/icon/dist/iconfont.css" // or import a online css url
+import "@fssgis/ui/dist/iconfont.css" // or import a online css url
 ```
 
 ```vue
@@ -103,7 +103,7 @@ import "@fssgis/icon/dist/iconfont.css" // or import a online css url
   <FssgIconFont name="mouse" size="24px" color="#43286775" />
 </template>
 <script setup>
-import { FssgIconFont } from '@fssgis/icon'
+import { FssgIconFont } from '@fssgis/ui'
 </script>
 ```
 

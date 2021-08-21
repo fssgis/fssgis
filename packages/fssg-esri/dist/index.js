@@ -1,4 +1,4 @@
-import { FssgMap, error, FssgMapPlugin, warn, BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326 } from '@fssgis/fssg-map';
+import { FssgMap, error, FssgMapPlugin, warn, BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseTool } from '@fssgis/fssg-map';
 import ArcGISMap from '@arcgis/core/Map';
 import MapView from '@arcgis/core/views/MapView';
 import esriConfig from '@arcgis/core/config';
@@ -102,6 +102,8 @@ class FssgEsri extends FssgMap {
     _defineProperty(this, "basemap", void 0);
 
     _defineProperty(this, "mapElement", void 0);
+
+    _defineProperty(this, "mapTools", void 0);
 
     _defineProperty(this, "_map", void 0);
 
@@ -1017,4 +1019,197 @@ class MapElement extends FssgEsriPlugin {
 
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, MapElement, createGeometryFactory, createLayerFactory };
+/**
+ * 基础地图工具类
+ */
+
+class FssgEsriBaseTool extends BaseTool {
+  //#region 保护属性
+
+  /**
+   * 地图对象
+   */
+
+  /**
+   * 视图对象
+   */
+  //#endregion
+  get $() {
+    return this.map_.$owner;
+  } //#region 构造函数
+
+  /**
+   * 实例化地图地图工具类
+   * @param map 地图对象
+   * @param view 视图对象
+   */
+
+
+  constructor(map, view, options, defaultOptions) {
+    super(options, defaultOptions);
+
+    _defineProperty(this, "map_", void 0);
+
+    _defineProperty(this, "view_", void 0);
+
+    this.map_ = map;
+    this.view_ = view;
+  }
+
+}
+
+/**
+ * 地图工具链
+ */
+
+class MapTools extends FssgEsriPlugin {
+  /**
+   * 工具池
+   */
+
+  /**
+   * 当前激活工具的Key
+   */
+
+  /**
+   * 当前激活工具的Key
+   */
+  get activedKey() {
+    return this._activedKey;
+  }
+  /**
+   * 当前激活工具的Key
+   */
+
+
+  set activedKey(key) {
+    this._activeTool(key);
+  }
+  /**
+   * 构造地图工具链
+   * @param options 配置项
+   */
+
+
+  constructor(options) {
+    super(options, {});
+
+    _defineProperty(this, "_toolPool", new Map());
+
+    _defineProperty(this, "_activedKey", 'default');
+  }
+  /**
+   * 初始化
+   */
+
+
+  _init() {
+    this._toolPool.set('default', new FssgEsriBaseTool(this.map_, this.view_, {
+      isOnceTool: false
+    }));
+
+    return this;
+  }
+  /**
+   * 安装插件
+   */
+
+
+  installPlugin(fssgEsri) {
+    return super.installPlugin(fssgEsri)._init();
+  }
+  /**
+   * 设置工具
+   * @param toolKey 工具Key
+   */
+
+
+  _activeTool(toolKey) {
+    const tool = this._toolPool.get(toolKey);
+
+    if (!tool) {
+      warn(this, `无工具项${toolKey}`);
+      return this;
+    }
+
+    if (tool.isOnceTool) {
+      this.fire('change', {
+        previousKey: this._activedKey,
+        currentKey: this._activedKey,
+        executeKey: toolKey
+      });
+      tool.active();
+      return this;
+    }
+
+    [...this._toolPool.values()].map(t => {
+      if (t !== tool) {
+        t.deactive();
+      }
+    });
+    this.fire('change', {
+      previousKey: this._activedKey,
+      currentKey: toolKey,
+      executeKey: toolKey
+    });
+    this._activedKey = toolKey;
+    tool.active();
+    return this;
+  }
+  /**
+   * 创建自定义工具
+   * @param key 工具Key
+   * @param tool 工具对象
+   */
+
+
+  createTool(key, tool) {
+    if (this.hasTool(key)) {
+      warn(this, `工具项${key}已存在，将会被覆盖`);
+    }
+
+    this._toolPool.set(key, tool);
+
+    return this;
+  }
+  /**
+   * 检查是否存在工具
+   * @param key 工具Key
+   */
+
+
+  hasTool(key) {
+    return this._toolPool.has(key);
+  }
+  /**
+   * 移除工具
+   * @param key 工具Key
+   */
+
+
+  deleteTool(key) {
+    this._toolPool.has(key) && this._toolPool.delete(key);
+
+    if (this._activedKey === key) {
+      this._activeTool('default');
+    }
+
+    return this;
+  }
+  /**
+   * 获取工具
+   * @param key 工具Key
+   */
+
+
+  getTool(key) {
+    const tool = this._toolPool.get(key);
+
+    if (tool) {
+      return tool;
+    }
+  }
+
+}
+
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, MapElement, MapTools, createGeometryFactory, createLayerFactory };

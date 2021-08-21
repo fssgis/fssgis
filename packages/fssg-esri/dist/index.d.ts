@@ -1,4 +1,4 @@
-import { IFssgMapPluginOptions, IFssgMapPluginEvents, FssgMapPlugin, IFssgMapOptions, IFssgMapEvents, FssgMap } from '@fssgis/fssg-map';
+import { IFssgMapPluginOptions, IFssgMapPluginEvents, FssgMapPlugin, BaseTool, IBaseToolOptions, IBaseToolEvents, IFssgMapOptions, IFssgMapEvents, FssgMap } from '@fssgis/fssg-map';
 
 /**
  * 地图应用插件配置项
@@ -216,6 +216,105 @@ declare class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementE
     setHighlight(arg0: __esri.Graphic | __esri.Graphic[] | __esri.Geometry | __esri.Geometry[], arg1?: __esri.SymbolProperties): __esri.Graphic | __esri.Graphic[] | this;
 }
 
+declare type IFssgEsriBaseToolOptions = IBaseToolOptions;
+declare type IFssgEsriBaseToolEvents = IBaseToolEvents;
+/**
+ * 基础地图工具类
+ */
+declare class FssgEsriBaseTool<T_OPTIONS extends IFssgEsriBaseToolOptions = IFssgEsriBaseToolOptions, T_EVENTS extends IFssgEsriBaseToolEvents = IFssgEsriBaseToolEvents> extends BaseTool<T_OPTIONS & IFssgEsriBaseToolOptions, T_EVENTS & IFssgEsriBaseToolEvents> {
+    /**
+     * 地图对象
+     */
+    protected map_: IMap;
+    /**
+     * 视图对象
+     */
+    protected view_: IView;
+    protected get $(): FssgEsri;
+    /**
+     * 实例化地图地图工具类
+     * @param map 地图对象
+     * @param view 视图对象
+     */
+    constructor(map: IMap, view: IView, options?: T_OPTIONS, defaultOptions?: T_OPTIONS);
+}
+
+/**
+ * 地图工具链配置项
+ */
+interface IMapToolsOptions extends IFssgEsriPluginOptions {
+}
+/**
+ * 地图工具链事件集
+ */
+interface IMapToolsEvents extends IFssgEsriPluginEvents {
+    'change': {
+        previousKey: string;
+        executeKey: string;
+        currentKey: string;
+    };
+}
+/**
+ * 地图工具链
+ */
+declare class MapTools extends FssgEsriPlugin<IMapToolsOptions, IMapToolsEvents> {
+    /**
+     * 工具池
+     */
+    private _toolPool;
+    /**
+     * 当前激活工具的Key
+     */
+    private _activedKey;
+    /**
+     * 当前激活工具的Key
+     */
+    get activedKey(): string;
+    /**
+     * 当前激活工具的Key
+     */
+    set activedKey(key: string);
+    /**
+     * 构造地图工具链
+     * @param options 配置项
+     */
+    constructor(options?: IMapToolsOptions);
+    /**
+     * 初始化
+     */
+    private _init;
+    /**
+     * 安装插件
+     */
+    installPlugin(fssgEsri: FssgEsri): this;
+    /**
+     * 设置工具
+     * @param toolKey 工具Key
+     */
+    _activeTool(toolKey: string): this;
+    /**
+     * 创建自定义工具
+     * @param key 工具Key
+     * @param tool 工具对象
+     */
+    createTool(key: string, tool: FssgEsriBaseTool): this;
+    /**
+     * 检查是否存在工具
+     * @param key 工具Key
+     */
+    hasTool(key: string): boolean;
+    /**
+     * 移除工具
+     * @param key 工具Key
+     */
+    deleteTool(key: string): this;
+    /**
+     * 获取工具
+     * @param key 工具Key
+     */
+    getTool<T extends FssgEsriBaseTool>(key: string): T | undefined;
+}
+
 /**
  * 地图应用配置项
  */
@@ -243,6 +342,7 @@ declare type IView = __esri.MapView & IOwner;
 declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     basemap: Basemap;
     mapElement: MapElement;
+    mapTools: MapTools;
     /**
      * 地图对象
      */
@@ -532,4 +632,4 @@ declare class LayerFactory implements ILayerFactory {
  */
 declare function createLayerFactory(): LayerFactory;
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, ILayerFactory, IMap, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IOwner, IView, LonLat, MapElement, XY, createGeometryFactory, createLayerFactory };
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, ILayerFactory, IMap, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapToolsEvents, IMapToolsOptions, IOwner, IView, LonLat, MapElement, MapTools, XY, createGeometryFactory, createLayerFactory };

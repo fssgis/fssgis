@@ -2,7 +2,7 @@ import { FssgMap, IFssgMapEvents, IFssgMapOptions } from '@fssgis/fssg-map'
 import ArcGISMap from '@arcgis/core/Map'
 import MapView from '@arcgis/core/views/MapView'
 import esriConfig from '@arcgis/core/config'
-import { Basemap, MapElement } from '../plugins'
+import { Basemap, MapElement, MapTools } from '../plugins'
 import { error } from '@fssgis/fssg-map'
 
 esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S'
@@ -37,6 +37,7 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
 
   public basemap: Basemap
   public mapElement: MapElement
+  public mapTools: MapTools
 
   //#region 私有属性
 

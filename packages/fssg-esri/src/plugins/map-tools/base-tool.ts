@@ -7,7 +7,7 @@ export type IFssgEsriBaseToolEvents = IBaseToolEvents
 /**
  * 基础地图工具类
  */
-export abstract class FssgEsriBaseTool<
+export class FssgEsriBaseTool<
   T_OPTIONS extends IFssgEsriBaseToolOptions = IFssgEsriBaseToolOptions,
   T_EVENTS extends IFssgEsriBaseToolEvents = IFssgEsriBaseToolEvents,
 > extends BaseTool<T_OPTIONS & IFssgEsriBaseToolOptions, T_EVENTS & IFssgEsriBaseToolEvents> { // eslint-disable-line

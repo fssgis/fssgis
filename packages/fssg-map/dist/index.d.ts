@@ -169,7 +169,9 @@ declare abstract class BaseTool<T_OPTIONS extends IBaseToolOptions = IBaseToolOp
     deactive(): this;
 }
 
+declare const MAP_CURSOR_DIC: Record<string, string>;
+
 declare function warn(target: unknown, msg: string, ...others: unknown[]): void;
 declare function error(target: unknown, msg: string, ...others: unknown[]): void;
 
-export { BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseClass, BaseTool, FssgMap, FssgMapPlugin, IBaseClassEvents, IBaseClassOptions, IBaseToolEvents, IBaseToolOptions, IFssgMapContainer, IFssgMapEvents, IFssgMapOptions, IFssgMapPluginEvents, IFssgMapPluginOptions, OnToolActivedParams, OnToolActivedReture, OnToolDeactivedParams, OnToolDeactivedReture, error, warn };
+export { BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseClass, BaseTool, FssgMap, FssgMapPlugin, IBaseClassEvents, IBaseClassOptions, IBaseToolEvents, IBaseToolOptions, IFssgMapContainer, IFssgMapEvents, IFssgMapOptions, IFssgMapPluginEvents, IFssgMapPluginOptions, MAP_CURSOR_DIC, OnToolActivedParams, OnToolActivedReture, OnToolDeactivedParams, OnToolDeactivedReture, error, warn };

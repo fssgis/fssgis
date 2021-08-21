@@ -1,4 +1,4 @@
-import { FssgMap, error, FssgMapPlugin, warn, BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseTool } from '@fssgis/fssg-map';
+import { FssgMap, error, FssgMapPlugin, warn, BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseTool, MAP_CURSOR_DIC } from '@fssgis/fssg-map';
 import ArcGISMap from '@arcgis/core/Map';
 import MapView from '@arcgis/core/views/MapView';
 import esriConfig from '@arcgis/core/config';
@@ -104,6 +104,8 @@ class FssgEsri extends FssgMap {
     _defineProperty(this, "mapElement", void 0);
 
     _defineProperty(this, "mapTools", void 0);
+
+    _defineProperty(this, "mapCursor", void 0);
 
     _defineProperty(this, "_map", void 0);
 
@@ -1212,4 +1214,87 @@ class MapTools extends FssgEsriPlugin {
 
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, MapElement, MapTools, createGeometryFactory, createLayerFactory };
+/**
+ * 地图鼠标控制插件
+ */
+
+class MapCursor extends FssgEsriPlugin {
+  /**
+   * 鼠标样式
+   */
+
+  /**
+   * 样式容器池
+   */
+
+  /**
+   * 鼠标样式
+   */
+  get cursorType() {
+    return this._cursorType;
+  }
+  /**
+   * 鼠标样式
+   */
+
+
+  set cursorType(t) {
+    this._setCursor(t);
+  }
+  /**
+   * 构造地图鼠标控制器
+   * @param options 配置项
+   */
+
+
+  constructor(options) {
+    super(options, {
+      items: {}
+    });
+
+    _defineProperty(this, "_cursorType", void 0);
+
+    _defineProperty(this, "_typePool", void 0);
+  }
+  /**
+   * 初始化
+   */
+
+
+  _init() {
+    this._typePool = new Map();
+    Object.entries(MAP_CURSOR_DIC).forEach(([cType, cData]) => this._typePool.set(cType, cData));
+    Object.entries(this.options_.items ?? {}).forEach(([cType, cData]) => this._typePool.set(cType, cData));
+    return this;
+  }
+  /**
+   * 设置鼠标样式
+   * @param cursorType 鼠标样式
+   */
+
+
+  _setCursor(cursorType) {
+    const cursor = this._typePool.get(cursorType);
+
+    if (!cursor) {
+      warn(this, `无鼠标样式项${cursorType}`);
+    } else {
+      this.fire('change', {
+        cursorType
+      });
+    }
+
+    this.view_.container.style.cursor = cursor ?? 'default';
+  }
+  /**
+   * 安装插件
+   */
+
+
+  installPlugin(fssgEsri) {
+    return super.installPlugin(fssgEsri)._init();
+  }
+
+}
+
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, MapCursor, MapElement, MapTools, createGeometryFactory, createLayerFactory };

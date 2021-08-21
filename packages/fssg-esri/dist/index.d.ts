@@ -316,6 +316,60 @@ declare class MapTools extends FssgEsriPlugin<IMapToolsOptions, IMapToolsEvents>
 }
 
 /**
+ * 地图鼠标控制插件配置项
+ */
+interface IMapCursorOptions extends IFssgEsriPluginOptions {
+    items?: Record<string, string>;
+}
+/**
+ * 地图鼠标控制插件事件集
+ */
+interface IMapCursorEvents extends IFssgEsriPluginEvents {
+    'change': {
+        cursorType: string;
+    };
+}
+/**
+ * 地图鼠标控制插件
+ */
+declare class MapCursor extends FssgEsriPlugin<IMapCursorOptions, IMapCursorEvents> {
+    /**
+     * 鼠标样式
+     */
+    private _cursorType;
+    /**
+     * 样式容器池
+     */
+    private _typePool;
+    /**
+     * 鼠标样式
+     */
+    get cursorType(): string;
+    /**
+     * 鼠标样式
+     */
+    set cursorType(t: string);
+    /**
+     * 构造地图鼠标控制器
+     * @param options 配置项
+     */
+    constructor(options?: IMapCursorOptions);
+    /**
+     * 初始化
+     */
+    private _init;
+    /**
+     * 设置鼠标样式
+     * @param cursorType 鼠标样式
+     */
+    private _setCursor;
+    /**
+     * 安装插件
+     */
+    installPlugin(fssgEsri: FssgEsri): this;
+}
+
+/**
  * 地图应用配置项
  */
 interface IFssgEsriOptions extends IFssgMapOptions {
@@ -343,6 +397,7 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     basemap: Basemap;
     mapElement: MapElement;
     mapTools: MapTools;
+    mapCursor: MapCursor;
     /**
      * 地图对象
      */
@@ -632,4 +687,4 @@ declare class LayerFactory implements ILayerFactory {
  */
 declare function createLayerFactory(): LayerFactory;
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, ILayerFactory, IMap, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapToolsEvents, IMapToolsOptions, IOwner, IView, LonLat, MapElement, MapTools, XY, createGeometryFactory, createLayerFactory };
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, ILayerFactory, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapToolsEvents, IMapToolsOptions, IOwner, IView, LonLat, MapCursor, MapElement, MapTools, XY, createGeometryFactory, createLayerFactory };

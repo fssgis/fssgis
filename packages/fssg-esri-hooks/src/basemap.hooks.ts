@@ -2,6 +2,7 @@ import { Basemap, FssgEsri, IBasemapOptions } from '@fssgis/fssg-esri'
 import { inject, InjectionKey, provide, ref, Ref } from 'vue'
 import { controllableWatch, useObservableOn } from './base.hooks'
 import { useFssgEsri } from './fssg-esri.hooks'
+import { warn } from '@fssgis/fssg-map'
 
 function _getBasemap () : Basemap
 function _getBasemap (fssgMap: FssgEsri) : Basemap
@@ -13,7 +14,7 @@ function _getBasemap (arg0?: FssgEsri | Basemap) : Basemap {
     const fssgEsri = useFssgEsri()
     basemap = fssgEsri.basemap
     if (!basemap) {
-      // TODO
+      warn(this, 'Basemap实例未挂载到FssgMap实例')
     }
   } else {
     if (arg0 instanceof FssgEsri) {

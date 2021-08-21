@@ -1,12 +1,12 @@
 {
   "name": "@fssgis/docs",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "private": true,
   "description": "🎉fssgis文档",
   "dependencies": {
     "@arcgis/core": "^4.20.2",
-    "@fssgis/fssg-esri": "^1.2.0",
-    "@fssgis/fssg-esri-hooks": "^1.1.3",
+    "@fssgis/fssg-esri": "^1.3.0",
+    "@fssgis/fssg-esri-hooks": "^1.2.0",
     "@fssgis/fssg-leaflet": "^1.1.3",
     "@fssgis/grid": "^1.0.10-alpha.0",
     "@fssgis/icon": "^1.0.3",

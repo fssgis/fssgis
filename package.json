@@ -10,7 +10,7 @@
     "projects/*"
   ],
   "scripts": {
-    "publish": "lerna publish --no-push",
+    "publish": "lerna publish --amend --conventional-commits --no-push",
     "dev:docs": "npx vitepress dev ./projects/fssgis-docs/docs --host=0.0.0.0",
     "build": "npx rollup --config",
     "build:all": "npx rollup --config ./build/index.js",

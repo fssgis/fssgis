@@ -733,6 +733,10 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     locateToLonlat(lonLat: LonLat, zoom?: number, options?: __esri.GoToOptions2D & {
         isZoomAdd?: boolean;
     }): this;
+    /**
+     * 重置地图应用
+     */
+    reset(): Promise<this>;
 }
 
 export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, ILayerFactory, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapToolsEvents, IMapToolsOptions, IOwner, IView, LonLat, MapCursor, MapElement, MapTools, XY, createGeometryFactory, createLayerFactory };

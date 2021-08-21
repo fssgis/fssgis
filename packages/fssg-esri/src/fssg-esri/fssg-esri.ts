@@ -5,6 +5,7 @@ import esriConfig from '@arcgis/core/config'
 import { Basemap, MapCursor, MapElement, MapTools } from '../plugins'
 import { error } from '@fssgis/fssg-map'
 import { createGeometryFactory, LonLat, XY } from '../factories'
+import FssgEsriPlugin from '../fssg-esri-plugin'
 
 esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S'
 
@@ -264,6 +265,22 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     }
     this._view.goTo({ center }, options)
     return this
+  }
+
+  /**
+   * 重置地图应用
+   */
+  public reset () : Promise<this> {
+    return new Promise(resolve => {
+      this._view.destroy()
+      this.mount()
+      for (const prop in this) {
+        if (this[prop] instanceof FssgEsriPlugin) {
+          (this[prop] as any).installPlugin(this) // eslint-disable-line
+        }
+      }
+      resolve(this)
+    })
   }
 
   //#endregion

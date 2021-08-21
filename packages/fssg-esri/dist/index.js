@@ -1,4 +1,4 @@
-import { FssgMap, error, FssgMapPlugin, warn, BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseTool, MAP_CURSOR_DIC } from '@fssgis/fssg-map';
+import { FssgMapPlugin, FssgMap, error, warn, BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseTool, MAP_CURSOR_DIC } from '@fssgis/fssg-map';
 import ArcGISMap from '@arcgis/core/Map';
 import MapView from '@arcgis/core/views/MapView';
 import esriConfig from '@arcgis/core/config';
@@ -395,6 +395,41 @@ function createLayerFactory() {
   return new LayerFactory();
 }
 
+/**
+ * 地图应用插件抽象类
+ */
+
+class FssgEsriPlugin extends FssgMapPlugin {
+  constructor(...args) {
+    super(...args);
+
+    _defineProperty(this, "map_", void 0);
+
+    _defineProperty(this, "view_", void 0);
+  }
+
+  //#endregion
+
+  /**
+   * 绑定的地图应用实例
+   */
+  get $() {
+    return this.map_.$owner;
+  }
+  /**
+   * 安装插件
+   * @param FssgEsri 地图应用实例
+   */
+
+
+  installPlugin(fssgEsri) {
+    this.map_ = fssgEsri.map;
+    this.view_ = fssgEsri.view;
+    return this;
+  }
+
+}
+
 esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S';
 /**
  * 地图应用
@@ -684,40 +719,25 @@ class FssgEsri extends FssgMap {
 
     return this;
   }
-
-}
-
-/**
- * 地图应用插件抽象类
- */
-
-class FssgEsriPlugin extends FssgMapPlugin {
-  constructor(...args) {
-    super(...args);
-
-    _defineProperty(this, "map_", void 0);
-
-    _defineProperty(this, "view_", void 0);
-  }
-
-  //#endregion
-
   /**
-   * 绑定的地图应用实例
-   */
-  get $() {
-    return this.map_.$owner;
-  }
-  /**
-   * 安装插件
-   * @param FssgEsri 地图应用实例
+   * 重置地图应用
    */
 
 
-  installPlugin(fssgEsri) {
-    this.map_ = fssgEsri.map;
-    this.view_ = fssgEsri.view;
-    return this;
+  reset() {
+    return new Promise(resolve => {
+      this._view.destroy();
+
+      this.mount();
+
+      for (const prop in this) {
+        if (this[prop] instanceof FssgEsriPlugin) {
+          this[prop].installPlugin(this); // eslint-disable-line
+        }
+      }
+
+      resolve(this);
+    });
   }
 
 }

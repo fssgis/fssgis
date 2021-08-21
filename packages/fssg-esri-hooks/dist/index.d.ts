@@ -1,4 +1,4 @@
-import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory } from '@fssgis/fssg-esri';
+import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions } from '@fssgis/fssg-esri';
 import { Ref } from 'vue';
 
 declare type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void;
@@ -73,4 +73,22 @@ declare function useGeoFactory(): GeometryFacory;
 declare function createLyrFactory(): ILayerFactory;
 declare function useLyrFactory(): ILayerFactory;
 
-export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+interface IMapCursorHook {
+    cursorType: Ref<string>;
+    mapCursor: MapCursor;
+}
+declare function useMapCursorType(): Ref<string>;
+declare function useMapCursorType(fssgMap: FssgEsri): Ref<string>;
+declare function useMapCursorType(mapCursor: MapCursor): Ref<string>;
+declare function useMapCursorType(arg0?: FssgEsri | MapCursor): Ref<string>;
+declare function useMapCursorState(): IMapCursorHook;
+declare function useMapCursorState(fssgMap: FssgEsri): IMapCursorHook;
+declare function useMapCursorState(mapCursor: MapCursor): IMapCursorHook;
+declare function useMapCursorState(arg0?: FssgEsri | MapCursor): IMapCursorHook;
+declare function createMapCursor(options: IMapCursorOptions): MapCursor;
+declare function createMapCursor(options: IMapCursorOptions, fssgEsri: FssgEsri): MapCursor;
+declare function useMapCursor(): MapCursor;
+declare function useMapCursor(fssgEsri: FssgEsri): MapCursor;
+declare function useMapCursor(fssgEsri?: FssgEsri): MapCursor;
+
+export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

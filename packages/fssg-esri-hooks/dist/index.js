@@ -1,6 +1,7 @@
-import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory } from '@fssgis/fssg-esri';
+import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor } from '@fssgis/fssg-esri';
 import { getCurrentInstance, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide } from 'vue';
 import { whenRightReturn } from '@fssgis/utils';
+import '@fssgis/observable';
 
 /* eslint-disable @typescript-eslint/ban-types */
 function tryOnBeforeUnmounted(callback) {
@@ -241,12 +242,20 @@ function useFssgEsriLoaded(fssgEsri) {
   return loaded;
 }
 
+function warn(target, msg, ...others) {
+  console.warn(`[FssgMap]: ${msg}`, ...others, target);
+}
+
 function _getBasemap(arg0) {
   let basemap;
 
   if (!arg0) {
     const fssgEsri = useFssgEsri();
     basemap = fssgEsri.basemap;
+
+    if (!basemap) {
+      warn(this, 'Basemap实例未挂载到FssgMap实例');
+    }
   } else {
     if (arg0 instanceof FssgEsri) {
       basemap = arg0.basemap;
@@ -333,4 +342,62 @@ function useLyrFactory() {
   return inject(SYMBOL_LYR_FACTORY);
 }
 
-export { createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+function _getMapCursor(arg0) {
+  let mapCursor;
+
+  if (!arg0) {
+    const fssgEsri = useFssgEsri();
+    mapCursor = fssgEsri.mapCursor;
+
+    if (!mapCursor) {
+      warn(this, 'MapCursor实例未挂载到FssgMap实例');
+    }
+  } else {
+    if (arg0 instanceof FssgEsri) {
+      mapCursor = arg0.mapCursor;
+    } else {
+      mapCursor = arg0;
+    }
+  }
+
+  return mapCursor;
+}
+
+function useMapCursorType(arg0) {
+  const mapCursor = _getMapCursor(arg0);
+
+  const cursorType = ref(mapCursor.cursorType);
+  controllableWatch(cursorType, v => {
+    if (mapCursor.cursorType !== v) {
+      mapCursor.cursorType = v;
+    }
+  });
+  useObservableOn(mapCursor.on('change', e => {
+    if (e.cursorType !== cursorType.value) {
+      cursorType.value = e.cursorType;
+    }
+  }));
+  return cursorType;
+}
+function useMapCursorState(arg0) {
+  const mapCursor = _getMapCursor(arg0);
+
+  const cursorType = useMapCursorType(arg0);
+  return {
+    mapCursor,
+    cursorType
+  };
+}
+const SYMBOL_MAPCURSOR = Symbol('FssgEsri.MapCursor');
+function createMapCursor(options, fssgEsri) {
+  const mapCursor = new MapCursor(options);
+  fssgEsri = fssgEsri ?? useFssgEsri();
+  fssgEsri.use(mapCursor);
+  provide(SYMBOL_MAPCURSOR, mapCursor);
+  return mapCursor;
+}
+function useMapCursor(fssgEsri) {
+  return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapCursor) ?? inject(SYMBOL_MAPCURSOR);
+}
+
+export { createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

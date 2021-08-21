@@ -4,6 +4,7 @@ import MapView from '@arcgis/core/views/MapView'
 import esriConfig from '@arcgis/core/config'
 import { Basemap, MapCursor, MapElement, MapTools } from '../plugins'
 import { error } from '@fssgis/fssg-map'
+import { createGeometryFactory, LonLat, XY } from '../factories'
 
 esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S'
 
@@ -78,7 +79,40 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
       error(this, `_view未实例无法获取spatialReference属性`)
     }
     const sr = this?._view?.spatialReference
-    return sr ?? null as any // eslint-disable-line
+    return sr as __esri.SpatialReference
+  }
+
+  /**
+   * 视图中心点
+   */
+  public get center () : __esri.Point {
+    if (!this._view) {
+      error(this, `_view未实例无法获取center属性`)
+    }
+    const center = this?._view?.center
+    return center as __esri.Point
+  }
+
+  /**
+   * 视图范围
+   */
+  public get extent () : __esri.Extent {
+    if (!this._view) {
+      error(this, `_view未实例无法获取extent属性`)
+    }
+    const extent = this?._view?.extent
+    return extent as __esri.Extent
+  }
+
+  /**
+   * 缩放等级
+   */
+  public get zoom () : number {
+    if (!this._view) {
+      error(this, `_view未实例无法获取zoom属性`)
+    }
+    const zoom = this?._view?.zoom
+    return zoom as number
   }
 
   //#endregion
@@ -95,7 +129,10 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
       viewOptions: {
         center: [0, 0],
         zoom: 1,
-        ui: { components: [] }
+        ui: { components: [] },
+        constraints: {
+          rotationEnabled: false,
+        }
       },
       mapOptions: {},
       debug: false,
@@ -164,6 +201,68 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
       ._initView()
       ._initRemoveOnlineStyle()
       .fire('loaded')
+    return this
+  }
+
+  /**
+   * 缩放
+   * @param num 缩放值
+   * @param options 配置项
+   */
+  public zoomIn (num = 1, options?: __esri.GoToOptions2D) : this {
+    const zoom = this.zoom
+    this._view.goTo({ zoom: zoom + Math.round(num) }, options)
+    return this
+  }
+
+  /**
+   * 缩放
+   * @param num 缩放值
+   * @param options 配置项
+   */
+  public zoomOut (num = 1, options?: __esri.GoToOptions2D) : this {
+    const zoom = this.zoom
+    this._view.goTo({ zoom: zoom - Math.round(num) }, options)
+    return this
+  }
+
+  /**
+   * 缩放至
+   * @param num 缩放等级
+   * @param options 配置项
+   */
+  public zoomTo (zoom: number, options?: __esri.GoToOptions2D) : this {
+    this._view.goTo({ zoom }, options)
+    return this
+  }
+
+  /**
+   * 定位
+   * @param xy XY坐标
+   * @param zoom 缩放等级
+   * @param options 配置项
+   */
+  public locateToXY (xy: XY, zoom?: number, options?: __esri.GoToOptions2D & { isZoomAdd?: boolean }) : this {
+    const center = createGeometryFactory(this).createPointFromXY(xy)
+    if (options?.isZoomAdd && zoom) {
+      zoom = this.zoom + zoom
+    }
+    this._view.goTo({ center, zoom }, options)
+    return this
+  }
+
+  /**
+   * 定位
+   * @param lonLat 经纬度
+   * @param zoom 缩放等级
+   * @param options 配置项
+   */
+  public locateToLonlat (lonLat: LonLat, zoom?: number, options?: __esri.GoToOptions2D & { isZoomAdd?: boolean }) : this {
+    const center = createGeometryFactory(this).createPointFromLonLat(lonLat)
+    if (options?.isZoomAdd && zoom) {
+      zoom = this.zoom + zoom
+    }
+    this._view.goTo({ center }, options)
     return this
   }
 

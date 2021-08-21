@@ -370,83 +370,6 @@ declare class MapCursor extends FssgEsriPlugin<IMapCursorOptions, IMapCursorEven
 }
 
 /**
- * 地图应用配置项
- */
-interface IFssgEsriOptions extends IFssgMapOptions {
-    mapOptions?: __esri.MapProperties;
-    viewOptions?: __esri.MapViewProperties;
-    assetsPath?: string;
-}
-/**
- * 地图应用事件集
- */
-interface IFssgEsriEvents extends IFssgMapEvents {
-    'center-ready': {
-        center: __esri.Point;
-    };
-}
-interface IOwner {
-    $owner: FssgEsri;
-}
-declare type IMap = __esri.Map & IOwner;
-declare type IView = __esri.MapView & IOwner;
-/**
- * 地图应用
- */
-declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
-    basemap: Basemap;
-    mapElement: MapElement;
-    mapTools: MapTools;
-    mapCursor: MapCursor;
-    /**
-     * 地图对象
-     */
-    private _map;
-    /**
-      * 视图对象
-      */
-    private _view;
-    /**
-      * 地图对象
-      */
-    get map(): IMap;
-    /**
-      * 视图对象
-      */
-    get view(): IView;
-    /**
-     * 空间坐标系
-     */
-    get sr(): __esri.SpatialReference;
-    /**
-     * 构造地图应用实例
-     * @param container 地图容器
-     * @param options 配置项
-     */
-    constructor(container: string, options?: IFssgEsriOptions);
-    /**
-     * 初始化地图
-     */
-    private _initMap;
-    /**
-     * 初始化视图
-     */
-    private _initView;
-    /**
-     * 初始化静态资源
-     */
-    private _initAssetsPath;
-    /**
-     * 初始化地图容器样式（移除focus时的边框样式）
-     */
-    private _initRemoveOnlineStyle;
-    /**
-     * 安装
-     */
-    mount(): this;
-}
-
-/**
  * 坐标XY
  */
 declare type XY = {
@@ -686,5 +609,130 @@ declare class LayerFactory implements ILayerFactory {
  * 创建图层工厂
  */
 declare function createLayerFactory(): LayerFactory;
+
+/**
+ * 地图应用配置项
+ */
+interface IFssgEsriOptions extends IFssgMapOptions {
+    mapOptions?: __esri.MapProperties;
+    viewOptions?: __esri.MapViewProperties;
+    assetsPath?: string;
+}
+/**
+ * 地图应用事件集
+ */
+interface IFssgEsriEvents extends IFssgMapEvents {
+    'center-ready': {
+        center: __esri.Point;
+    };
+}
+interface IOwner {
+    $owner: FssgEsri;
+}
+declare type IMap = __esri.Map & IOwner;
+declare type IView = __esri.MapView & IOwner;
+/**
+ * 地图应用
+ */
+declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
+    basemap: Basemap;
+    mapElement: MapElement;
+    mapTools: MapTools;
+    mapCursor: MapCursor;
+    /**
+     * 地图对象
+     */
+    private _map;
+    /**
+      * 视图对象
+      */
+    private _view;
+    /**
+      * 地图对象
+      */
+    get map(): IMap;
+    /**
+      * 视图对象
+      */
+    get view(): IView;
+    /**
+     * 空间坐标系
+     */
+    get sr(): __esri.SpatialReference;
+    /**
+     * 视图中心点
+     */
+    get center(): __esri.Point;
+    /**
+     * 视图范围
+     */
+    get extent(): __esri.Extent;
+    /**
+     * 缩放等级
+     */
+    get zoom(): number;
+    /**
+     * 构造地图应用实例
+     * @param container 地图容器
+     * @param options 配置项
+     */
+    constructor(container: string, options?: IFssgEsriOptions);
+    /**
+     * 初始化地图
+     */
+    private _initMap;
+    /**
+     * 初始化视图
+     */
+    private _initView;
+    /**
+     * 初始化静态资源
+     */
+    private _initAssetsPath;
+    /**
+     * 初始化地图容器样式（移除focus时的边框样式）
+     */
+    private _initRemoveOnlineStyle;
+    /**
+     * 安装
+     */
+    mount(): this;
+    /**
+     * 缩放
+     * @param num 缩放值
+     * @param options 配置项
+     */
+    zoomIn(num?: number, options?: __esri.GoToOptions2D): this;
+    /**
+     * 缩放
+     * @param num 缩放值
+     * @param options 配置项
+     */
+    zoomOut(num?: number, options?: __esri.GoToOptions2D): this;
+    /**
+     * 缩放至
+     * @param num 缩放等级
+     * @param options 配置项
+     */
+    zoomTo(zoom: number, options?: __esri.GoToOptions2D): this;
+    /**
+     * 定位
+     * @param xy XY坐标
+     * @param zoom 缩放等级
+     * @param options 配置项
+     */
+    locateToXY(xy: XY, zoom?: number, options?: __esri.GoToOptions2D & {
+        isZoomAdd?: boolean;
+    }): this;
+    /**
+     * 定位
+     * @param lonLat 经纬度
+     * @param zoom 缩放等级
+     * @param options 配置项
+     */
+    locateToLonlat(lonLat: LonLat, zoom?: number, options?: __esri.GoToOptions2D & {
+        isZoomAdd?: boolean;
+    }): this;
+}
 
 export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, ILayerFactory, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapToolsEvents, IMapToolsOptions, IOwner, IView, LonLat, MapCursor, MapElement, MapTools, XY, createGeometryFactory, createLayerFactory };

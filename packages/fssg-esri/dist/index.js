@@ -29,196 +29,6 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
-esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S';
-/**
- * 地图应用
- */
-
-class FssgEsri extends FssgMap {
-  //#region 私有属性
-
-  /**
-   * 地图对象
-   */
-
-  /**
-    * 视图对象
-    */
-  //#endregion
-  //#region getter setter
-
-  /**
-    * 地图对象
-    */
-  get map() {
-    return this._map;
-  }
-  /**
-    * 视图对象
-    */
-
-
-  get view() {
-    return this._view;
-  }
-  /**
-   * 空间坐标系
-   */
-
-
-  get sr() {
-    var _this$_view;
-
-    if (!this._view) {
-      error(this, `_view未实例无法获取spatialReference属性`);
-    }
-
-    const sr = this === null || this === void 0 ? void 0 : (_this$_view = this._view) === null || _this$_view === void 0 ? void 0 : _this$_view.spatialReference;
-    return sr ?? null; // eslint-disable-line
-  } //#endregion
-  //#region 构造函数
-
-  /**
-   * 构造地图应用实例
-   * @param container 地图容器
-   * @param options 配置项
-   */
-
-
-  constructor(container, options) {
-    super(container, options, {
-      viewOptions: {
-        center: [0, 0],
-        zoom: 1,
-        ui: {
-          components: []
-        }
-      },
-      mapOptions: {},
-      debug: false,
-      debugName: 'fssgEsri'
-    });
-
-    _defineProperty(this, "basemap", void 0);
-
-    _defineProperty(this, "mapElement", void 0);
-
-    _defineProperty(this, "mapTools", void 0);
-
-    _defineProperty(this, "mapCursor", void 0);
-
-    _defineProperty(this, "_map", void 0);
-
-    _defineProperty(this, "_view", void 0);
-  } //#endregion
-  //#region 私有方法
-
-  /**
-   * 初始化地图
-   */
-
-
-  _initMap() {
-    const {
-      mapOptions
-    } = this.options_;
-    const map = new ArcGISMap(mapOptions);
-    this._map = Object.assign(map, {
-      $owner: this
-    });
-    return this;
-  }
-  /**
-   * 初始化视图
-   */
-
-
-  _initView() {
-    const {
-      viewOptions
-    } = this.options_;
-    const view = new MapView({ ...viewOptions,
-      map: this._map,
-      container: this.container
-    });
-    this._view = Object.assign(view, {
-      $owner: this
-    });
-    return this;
-  }
-  /**
-   * 初始化静态资源
-   */
-
-
-  _initAssetsPath() {
-    const {
-      assetsPath
-    } = this.options_;
-    assetsPath && (esriConfig.assetsPath = assetsPath);
-    return this;
-  }
-  /**
-   * 初始化地图容器样式（移除focus时的边框样式）
-   */
-
-
-  _initRemoveOnlineStyle() {
-    document.styleSheets[0].addRule('.esri-view', 'outline: none !important');
-    document.styleSheets[0].addRule('.esri-view .esri-view-surface', 'outline: none !important');
-    document.styleSheets[0].addRule('.esri-view .esri-view-surface--inset-outline:focus::after', 'outline: none !important');
-    return this;
-  } //#endregion
-  //#region 公有方法
-
-  /**
-   * 安装
-   */
-
-
-  mount() {
-    this._initAssetsPath()._initMap()._initView()._initRemoveOnlineStyle().fire('loaded');
-
-    return this;
-  }
-
-}
-
-/**
- * 地图应用插件抽象类
- */
-
-class FssgEsriPlugin extends FssgMapPlugin {
-  constructor(...args) {
-    super(...args);
-
-    _defineProperty(this, "map_", void 0);
-
-    _defineProperty(this, "view_", void 0);
-  }
-
-  //#endregion
-
-  /**
-   * 绑定的地图应用实例
-   */
-  get $() {
-    return this.map_.$owner;
-  }
-  /**
-   * 安装插件
-   * @param FssgEsri 地图应用实例
-   */
-
-
-  installPlugin(fssgEsri) {
-    this.map_ = fssgEsri.map;
-    this.view_ = fssgEsri.view;
-    return this;
-  }
-
-}
-
 /**
  * 几何工厂类（条件单例模式）
  * @private
@@ -583,6 +393,333 @@ _defineProperty(LayerFactory, "_instance", void 0);
 
 function createLayerFactory() {
   return new LayerFactory();
+}
+
+esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S';
+/**
+ * 地图应用
+ */
+
+class FssgEsri extends FssgMap {
+  //#region 私有属性
+
+  /**
+   * 地图对象
+   */
+
+  /**
+    * 视图对象
+    */
+  //#endregion
+  //#region getter setter
+
+  /**
+    * 地图对象
+    */
+  get map() {
+    return this._map;
+  }
+  /**
+    * 视图对象
+    */
+
+
+  get view() {
+    return this._view;
+  }
+  /**
+   * 空间坐标系
+   */
+
+
+  get sr() {
+    var _this$_view;
+
+    if (!this._view) {
+      error(this, `_view未实例无法获取spatialReference属性`);
+    }
+
+    const sr = this === null || this === void 0 ? void 0 : (_this$_view = this._view) === null || _this$_view === void 0 ? void 0 : _this$_view.spatialReference;
+    return sr;
+  }
+  /**
+   * 视图中心点
+   */
+
+
+  get center() {
+    var _this$_view2;
+
+    if (!this._view) {
+      error(this, `_view未实例无法获取center属性`);
+    }
+
+    const center = this === null || this === void 0 ? void 0 : (_this$_view2 = this._view) === null || _this$_view2 === void 0 ? void 0 : _this$_view2.center;
+    return center;
+  }
+  /**
+   * 视图范围
+   */
+
+
+  get extent() {
+    var _this$_view3;
+
+    if (!this._view) {
+      error(this, `_view未实例无法获取extent属性`);
+    }
+
+    const extent = this === null || this === void 0 ? void 0 : (_this$_view3 = this._view) === null || _this$_view3 === void 0 ? void 0 : _this$_view3.extent;
+    return extent;
+  }
+  /**
+   * 缩放等级
+   */
+
+
+  get zoom() {
+    var _this$_view4;
+
+    if (!this._view) {
+      error(this, `_view未实例无法获取zoom属性`);
+    }
+
+    const zoom = this === null || this === void 0 ? void 0 : (_this$_view4 = this._view) === null || _this$_view4 === void 0 ? void 0 : _this$_view4.zoom;
+    return zoom;
+  } //#endregion
+  //#region 构造函数
+
+  /**
+   * 构造地图应用实例
+   * @param container 地图容器
+   * @param options 配置项
+   */
+
+
+  constructor(container, options) {
+    super(container, options, {
+      viewOptions: {
+        center: [0, 0],
+        zoom: 1,
+        ui: {
+          components: []
+        },
+        constraints: {
+          rotationEnabled: false
+        }
+      },
+      mapOptions: {},
+      debug: false,
+      debugName: 'fssgEsri'
+    });
+
+    _defineProperty(this, "basemap", void 0);
+
+    _defineProperty(this, "mapElement", void 0);
+
+    _defineProperty(this, "mapTools", void 0);
+
+    _defineProperty(this, "mapCursor", void 0);
+
+    _defineProperty(this, "_map", void 0);
+
+    _defineProperty(this, "_view", void 0);
+  } //#endregion
+  //#region 私有方法
+
+  /**
+   * 初始化地图
+   */
+
+
+  _initMap() {
+    const {
+      mapOptions
+    } = this.options_;
+    const map = new ArcGISMap(mapOptions);
+    this._map = Object.assign(map, {
+      $owner: this
+    });
+    return this;
+  }
+  /**
+   * 初始化视图
+   */
+
+
+  _initView() {
+    const {
+      viewOptions
+    } = this.options_;
+    const view = new MapView({ ...viewOptions,
+      map: this._map,
+      container: this.container
+    });
+    this._view = Object.assign(view, {
+      $owner: this
+    });
+    return this;
+  }
+  /**
+   * 初始化静态资源
+   */
+
+
+  _initAssetsPath() {
+    const {
+      assetsPath
+    } = this.options_;
+    assetsPath && (esriConfig.assetsPath = assetsPath);
+    return this;
+  }
+  /**
+   * 初始化地图容器样式（移除focus时的边框样式）
+   */
+
+
+  _initRemoveOnlineStyle() {
+    document.styleSheets[0].addRule('.esri-view', 'outline: none !important');
+    document.styleSheets[0].addRule('.esri-view .esri-view-surface', 'outline: none !important');
+    document.styleSheets[0].addRule('.esri-view .esri-view-surface--inset-outline:focus::after', 'outline: none !important');
+    return this;
+  } //#endregion
+  //#region 公有方法
+
+  /**
+   * 安装
+   */
+
+
+  mount() {
+    this._initAssetsPath()._initMap()._initView()._initRemoveOnlineStyle().fire('loaded');
+
+    return this;
+  }
+  /**
+   * 缩放
+   * @param num 缩放值
+   * @param options 配置项
+   */
+
+
+  zoomIn(num = 1, options) {
+    const zoom = this.zoom;
+
+    this._view.goTo({
+      zoom: zoom + Math.round(num)
+    }, options);
+
+    return this;
+  }
+  /**
+   * 缩放
+   * @param num 缩放值
+   * @param options 配置项
+   */
+
+
+  zoomOut(num = 1, options) {
+    const zoom = this.zoom;
+
+    this._view.goTo({
+      zoom: zoom - Math.round(num)
+    }, options);
+
+    return this;
+  }
+  /**
+   * 缩放至
+   * @param num 缩放等级
+   * @param options 配置项
+   */
+
+
+  zoomTo(zoom, options) {
+    this._view.goTo({
+      zoom
+    }, options);
+
+    return this;
+  }
+  /**
+   * 定位
+   * @param xy XY坐标
+   * @param zoom 缩放等级
+   * @param options 配置项
+   */
+
+
+  locateToXY(xy, zoom, options) {
+    const center = createGeometryFactory(this).createPointFromXY(xy);
+
+    if (options !== null && options !== void 0 && options.isZoomAdd && zoom) {
+      zoom = this.zoom + zoom;
+    }
+
+    this._view.goTo({
+      center,
+      zoom
+    }, options);
+
+    return this;
+  }
+  /**
+   * 定位
+   * @param lonLat 经纬度
+   * @param zoom 缩放等级
+   * @param options 配置项
+   */
+
+
+  locateToLonlat(lonLat, zoom, options) {
+    const center = createGeometryFactory(this).createPointFromLonLat(lonLat);
+
+    if (options !== null && options !== void 0 && options.isZoomAdd && zoom) {
+      zoom = this.zoom + zoom;
+    }
+
+    this._view.goTo({
+      center
+    }, options);
+
+    return this;
+  }
+
+}
+
+/**
+ * 地图应用插件抽象类
+ */
+
+class FssgEsriPlugin extends FssgMapPlugin {
+  constructor(...args) {
+    super(...args);
+
+    _defineProperty(this, "map_", void 0);
+
+    _defineProperty(this, "view_", void 0);
+  }
+
+  //#endregion
+
+  /**
+   * 绑定的地图应用实例
+   */
+  get $() {
+    return this.map_.$owner;
+  }
+  /**
+   * 安装插件
+   * @param FssgEsri 地图应用实例
+   */
+
+
+  installPlugin(fssgEsri) {
+    this.map_ = fssgEsri.map;
+    this.view_ = fssgEsri.view;
+    return this;
+  }
+
 }
 
 /**

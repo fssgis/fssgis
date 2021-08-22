@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.1.3",
+  "version": "1.1.4",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "description": "🎉使用Leaflet实现的基于业务功能型的地图库",
@@ -14,7 +14,7 @@
     "leaflet"
   ],
   "dependencies": {
-    "@fssgis/fssg-map": "^1.2.0",
+    "@fssgis/fssg-map": "^1.3.0",
     "@fssgis/observable": "^1.1.2",
     "@fssgis/utils": "^1.1.2",
     "leaflet": "^1.7.1"

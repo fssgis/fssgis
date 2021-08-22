@@ -35,7 +35,7 @@
 
 <script lang="ts">
 import { useFssgEsri, useGeoFactory } from '@fssgis/fssg-esri-hooks'
-import { MapElement } from '@fssgis/fssg-esri'
+import { MapElement, MapCursor } from '@fssgis/fssg-esri'
 import { defineComponent } from 'vue'
 import Point from '@arcgis/core/geometry/Point'
 import { createIntRandom } from '@fssgis/utils'
@@ -48,6 +48,7 @@ export default defineComponent({
 
     const mapElement = new MapElement()
     fssgMap.use(mapElement)
+    fssgMap.use(new MapCursor())
 
     mapElement.when().then(() => {
       clearAll()

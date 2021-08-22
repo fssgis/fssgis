@@ -1422,6 +1422,9 @@ class MapCursor extends FssgEsriPlugin {
     this._typePool = new Map();
     Object.entries(MAP_CURSOR_DIC).forEach(([cType, cData]) => this._typePool.set(cType, cData));
     Object.entries(this.options_.items ?? {}).forEach(([cType, cData]) => this._typePool.set(cType, cData));
+
+    this._setCursor('default');
+
     return this;
   }
   /**

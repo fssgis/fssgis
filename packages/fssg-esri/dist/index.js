@@ -9,6 +9,7 @@ import Extent from '@arcgis/core/geometry/Extent';
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
 import GroupLayer from '@arcgis/core/layers/GroupLayer';
 import WebTileLayer from '@arcgis/core/layers/WebTileLayer';
+import Layer from '@arcgis/core/layers/Layer';
 import EsriBasemap from '@arcgis/core/Basemap';
 import Graphic from '@arcgis/core/Graphic';
 import Geometry from '@arcgis/core/geometry/Geometry';
@@ -339,6 +340,22 @@ class LayerFactory {
 
     LayerFactory._instance = this;
     return this;
+  }
+
+  createLayer(options) {
+    switch (options.layerType) {
+      case 'graphicslayer':
+        return this.createGraphicsLayer(options);
+
+      case 'grouplayer':
+        return this.createGroupLayer(options);
+
+      case 'webtilelayer':
+        return this.createWebTileLayer(options);
+
+      default:
+        return new Layer(options);
+    }
   }
   /**
    * 创建GraphicsLayer
@@ -1457,4 +1474,67 @@ class MapCursor extends FssgEsriPlugin {
 
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, MapCursor, MapElement, MapTools, createGeometryFactory, createLayerFactory };
+/**
+ * 图层控制插件
+ */
+
+class MapLayers extends FssgEsriPlugin {
+  /**
+   * 图层容器池
+   */
+
+  /**
+   * 图层容器图层
+   */
+
+  /**
+   * 可查询的图层集合
+   */
+  get layersWhichCanQuery() {
+    return [...new Set([...this._layerPool.values()])].filter(([_, options]) => options.isQuery);
+  }
+  /**
+   * 不可查询的图层集合
+   */
+
+
+  get layersWhichCantQuery() {
+    return [...new Set([...this._layerPool.values()])].filter(([_, options]) => !options.isQuery);
+  }
+  /**
+   * 构造图层控制插件
+   * @param options 配置项
+   */
+
+
+  constructor(options) {
+    super(options, {
+      items: [],
+      defaultLayerVisible: true
+    });
+
+    _defineProperty(this, "_layerPool", void 0);
+
+    _defineProperty(this, "_group", void 0);
+  }
+  /**
+   * 初始化
+   */
+
+
+  _init() {
+    return this;
+  }
+  /**
+   * 安装插件
+   * @param fssgEsri 地图应用
+   */
+
+
+  installPlugin(fssgEsri) {
+    return super.installPlugin(fssgEsri)._init();
+  }
+
+}
+
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, MapCursor, MapElement, MapLayers, MapTools, createGeometryFactory, createLayerFactory };

@@ -370,6 +370,77 @@ declare class MapCursor extends FssgEsriPlugin<IMapCursorOptions, IMapCursorEven
 }
 
 /**
+ * 图层控制插件配置项
+ */
+interface IMapLayersOptions extends IFssgEsriPluginOptions {
+    items: {
+        id: string;
+        name: string;
+        layerType: string;
+        layerUrl: string;
+        properties?: __esri.LayerProperties;
+        sqlOptions?: {
+            xField: string;
+            yField: string;
+            iconUrl?: string;
+            iconUrlFuncStr?: string;
+        };
+        isQuery?: boolean;
+    }[];
+    defaultLayerVisible?: boolean;
+}
+/**
+ * 图层控制插件事件集
+ */
+interface IMapLayersEvents extends IFssgEsriPluginEvents {
+    'change:visible': {
+        visible: boolean;
+        layer: __esri.Layer;
+        options: IMapLayersOptions['items'][0];
+    };
+    'change:opacity': {
+        opacity: number;
+        layer: __esri.Layer;
+        options: IMapLayersOptions['items'][0];
+    };
+}
+/**
+ * 图层控制插件
+ */
+declare class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEvents> {
+    /**
+     * 图层容器池
+     */
+    private _layerPool;
+    /**
+     * 图层容器图层
+     */
+    private _group;
+    /**
+     * 可查询的图层集合
+     */
+    get layersWhichCanQuery(): [__esri.Layer, IMapLayersOptions['items'][0]][];
+    /**
+     * 不可查询的图层集合
+     */
+    get layersWhichCantQuery(): [__esri.Layer, IMapLayersOptions['items'][0]][];
+    /**
+     * 构造图层控制插件
+     * @param options 配置项
+     */
+    constructor(options?: IMapLayersOptions);
+    /**
+     * 初始化
+     */
+    private _init;
+    /**
+     * 安装插件
+     * @param fssgEsri 地图应用
+     */
+    installPlugin(fssgEsri: FssgEsri): this;
+}
+
+/**
  * 坐标XY
  */
 declare type XY = {
@@ -557,6 +628,18 @@ declare function createGeometryFactory(fssgEsri: FssgEsri): GeometryFacory;
  * 图层工厂接口
  */
 interface ILayerFactory {
+    createLayer(options: {
+        layerType: 'graphicslayer';
+    } & __esri.GraphicsLayerProperties): __esri.GraphicsLayer;
+    createLayer(options: {
+        layerType: 'grouplayer';
+    } & __esri.GroupLayerProperties): __esri.GroupLayer;
+    createLayer(options: {
+        layerType: 'webtilelayer';
+    } & __esri.WebTileLayerProperties): __esri.WebTileLayer;
+    createLayer(options: {
+        layerType: string;
+    } & __esri.LayerProperties): __esri.Layer;
     createGraphicsLayer(options: __esri.GraphicsLayerProperties): __esri.GraphicsLayer;
     createGroupLayer(options: __esri.GroupLayerProperties): __esri.GroupLayer;
     createWebTileLayer(options: __esri.WebTileLayerProperties): __esri.WebTileLayer;
@@ -574,6 +657,18 @@ declare class LayerFactory implements ILayerFactory {
      * 构造图层工厂实例
      */
     constructor();
+    createLayer(options: {
+        layerType: 'graphicslayer';
+    } & __esri.GraphicsLayerProperties): __esri.GraphicsLayer;
+    createLayer(options: {
+        layerType: 'grouplayer';
+    } & __esri.GroupLayerProperties): __esri.GroupLayer;
+    createLayer(options: {
+        layerType: 'webtilelayer';
+    } & __esri.WebTileLayerProperties): __esri.WebTileLayer;
+    createLayer(options: {
+        layerType: string;
+    } & __esri.LayerProperties): __esri.Layer;
     /**
      * 创建GraphicsLayer
      * @param options 配置项
@@ -739,4 +834,4 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     reset(): Promise<this>;
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, ILayerFactory, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapToolsEvents, IMapToolsOptions, IOwner, IView, LonLat, MapCursor, MapElement, MapTools, XY, createGeometryFactory, createLayerFactory };
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, ILayerFactory, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapToolsEvents, IMapToolsOptions, IOwner, IView, LonLat, MapCursor, MapElement, MapLayers, MapTools, XY, createGeometryFactory, createLayerFactory };

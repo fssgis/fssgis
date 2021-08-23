@@ -21,6 +21,7 @@ export default [
       '@arcgis/core/config',
       '@arcgis/core/Basemap',
       '@arcgis/core/views/MapView',
+      '@arcgis/core/layers/Layer',
       '@arcgis/core/layers/GraphicsLayer',
       '@arcgis/core/layers/GroupLayer',
       '@arcgis/core/layers/WebTileLayer',

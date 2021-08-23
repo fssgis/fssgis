@@ -1042,9 +1042,14 @@ class MapElement extends FssgEsriPlugin {
   _init() {
     this._graphicsSymbol = this.options_.graphicsSymbol ?? {};
     this._highlightSymbol = this.options_.highlightSymbol ?? {};
-    this._graphicsLayer = createLayerFactory().createGraphicsLayer();
-    this._highlightLayer = createLayerFactory().createGraphicsLayer();
-    this._groupLayer = createLayerFactory().createGroupLayer({
+    this._graphicsLayer = createLayerFactory().createLayer({
+      layerType: 'graphicslayer'
+    });
+    this._highlightLayer = createLayerFactory().createLayer({
+      layerType: 'graphicslayer'
+    });
+    this._groupLayer = createLayerFactory().createLayer({
+      layerType: 'grouplayer',
       layers: [this._graphicsLayer, this._highlightLayer]
     });
     this.map_.layers.add(this._groupLayer);
@@ -1523,6 +1528,17 @@ class MapLayers extends FssgEsriPlugin {
 
 
   _init() {
+    this._layerPool = new Map();
+    this._group = createLayerFactory().createGroupLayer();
+    this.map_.add(this._group);
+    return this._initLayers();
+  }
+  /**
+   * 初始化图层
+   */
+
+
+  _initLayers() {
     return this;
   }
   /**

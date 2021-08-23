@@ -434,6 +434,10 @@ declare class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEven
      */
     private _init;
     /**
+     * 初始化图层
+     */
+    private _initLayers;
+    /**
      * 安装插件
      * @param fssgEsri 地图应用
      */

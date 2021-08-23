@@ -39,11 +39,11 @@ declare abstract class FssgEsriPlugin<T_OPTIONS extends IFssgEsriPluginOptions =
 interface IBasemapOptions extends IFssgEsriPluginOptions {
     items?: {
         key: string;
-        type?: 'webtilelayer';
+        type?: 'webtilelayer' | 'tilelayer';
         url?: string;
         props?: __esri.LayerProperties;
         lyrs?: {
-            type: 'webtilelayer';
+            type: Required<Required<IBasemapOptions>['items'][0]>['type'];
             url: string;
             props?: __esri.LayerProperties;
         }[];
@@ -670,11 +670,15 @@ interface ILayerFactory {
         layerType: 'webtilelayer';
     } & __esri.WebTileLayerProperties): __esri.WebTileLayer;
     createLayer(options: {
+        layerType: 'tilelayer';
+    } & __esri.TileLayerProperties): __esri.TileLayer;
+    createLayer(options: {
         layerType: string;
     } & __esri.LayerProperties): __esri.Layer;
     createGraphicsLayer(options: __esri.GraphicsLayerProperties): __esri.GraphicsLayer;
     createGroupLayer(options: __esri.GroupLayerProperties): __esri.GroupLayer;
     createWebTileLayer(options: __esri.WebTileLayerProperties): __esri.WebTileLayer;
+    createTileLayer(options: __esri.TileLayerProperties): __esri.TileLayer;
 }
 /**
  * 图层工厂（单例模式）
@@ -698,6 +702,9 @@ declare class LayerFactory implements ILayerFactory {
     createLayer(options: {
         layerType: 'webtilelayer';
     } & __esri.WebTileLayerProperties): __esri.WebTileLayer;
+    createLayer(options: {
+        layerType: 'tilelayer';
+    } & __esri.TileLayerProperties): __esri.TileLayer;
     createLayer(options: {
         layerType: string;
     } & __esri.LayerProperties): __esri.Layer;
@@ -731,6 +738,16 @@ declare class LayerFactory implements ILayerFactory {
      * ```
      */
     createWebTileLayer(options?: __esri.WebTileLayerProperties): __esri.WebTileLayer;
+    /**
+     * 创建TileLayer
+     * @param options 配置项
+     * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-TileLayer.html
+     * @example
+     * ```ts
+     * createLayerFactory().createTileLayer({ \/* xxx *\/ })
+     * ```
+     */
+    createTileLayer(options?: __esri.TileLayerProperties): __esri.TileLayer;
 }
 /**
  * 创建图层工厂

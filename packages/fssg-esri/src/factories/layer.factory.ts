@@ -2,6 +2,7 @@ import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer'
 import GroupLayer from '@arcgis/core/layers/GroupLayer'
 import WebTileLayer from '@arcgis/core/layers/WebTileLayer'
 import Layer from '@arcgis/core/layers/Layer'
+import TileLayer from '@arcgis/core/layers/TileLayer'
 
 /**
  * 图层工厂接口
@@ -10,10 +11,12 @@ export interface ILayerFactory {
   createLayer (options: { layerType: 'graphicslayer' } & __esri.GraphicsLayerProperties) : __esri.GraphicsLayer
   createLayer (options: { layerType: 'grouplayer' } & __esri.GroupLayerProperties) : __esri.GroupLayer
   createLayer (options: { layerType: 'webtilelayer' } & __esri.WebTileLayerProperties) : __esri.WebTileLayer
+  createLayer (options: { layerType: 'tilelayer' } & __esri.TileLayerProperties) : __esri.TileLayer
   createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer
   createGraphicsLayer (options: __esri.GraphicsLayerProperties) : __esri.GraphicsLayer
   createGroupLayer (options: __esri.GroupLayerProperties) : __esri.GroupLayer
   createWebTileLayer (options: __esri.WebTileLayerProperties) : __esri.WebTileLayer
+  createTileLayer (options: __esri.TileLayerProperties) : __esri.TileLayer
 }
 
 /**
@@ -41,6 +44,7 @@ class LayerFactory implements ILayerFactory {
   public createLayer (options: { layerType: 'graphicslayer' } & __esri.GraphicsLayerProperties) : __esri.GraphicsLayer
   public createLayer (options: { layerType: 'grouplayer' } & __esri.GroupLayerProperties) : __esri.GroupLayer
   public createLayer (options: { layerType: 'webtilelayer' } & __esri.WebTileLayerProperties) : __esri.WebTileLayer
+  public createLayer (options: { layerType: 'tilelayer' } & __esri.TileLayerProperties) : __esri.TileLayer
   public createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer
   public createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer {
     switch (options.layerType) {
@@ -50,6 +54,8 @@ class LayerFactory implements ILayerFactory {
         return this.createGroupLayer(options)
       case 'webtilelayer':
         return this.createWebTileLayer(options)
+      case 'tilelayer':
+        return this.createTileLayer(options)
       default:
         return new Layer(options)
     }
@@ -92,6 +98,19 @@ class LayerFactory implements ILayerFactory {
    */
   public createWebTileLayer (options?: __esri.WebTileLayerProperties) : __esri.WebTileLayer {
     return new WebTileLayer(options)
+  }
+
+  /**
+   * 创建TileLayer
+   * @param options 配置项
+   * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-TileLayer.html
+   * @example
+   * ```ts
+   * createLayerFactory().createTileLayer({ \/* xxx *\/ })
+   * ```
+   */
+  public createTileLayer (options?: __esri.TileLayerProperties) : __esri.TileLayer {
+    return new TileLayer(options)
   }
 
 }

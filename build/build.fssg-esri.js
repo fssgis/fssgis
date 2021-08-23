@@ -25,6 +25,7 @@ export default [
       '@arcgis/core/layers/GraphicsLayer',
       '@arcgis/core/layers/GroupLayer',
       '@arcgis/core/layers/WebTileLayer',
+      '@arcgis/core/layers/TileLayer',
       '@arcgis/core/Graphic',
       '@arcgis/core/geometry/Geometry',
       '@arcgis/core/geometry/Point',

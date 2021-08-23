@@ -10,11 +10,11 @@ import EsriBasemap from '@arcgis/core/Basemap'
  export interface IBasemapOptions extends IFssgEsriPluginOptions { // eslint-disable-line
   items?: {
     key: string
-    type?: 'webtilelayer'
+    type?: 'webtilelayer' | 'tilelayer'
     url?: string
     props?: __esri.LayerProperties
     lyrs?: {
-      type: 'webtilelayer'
+      type: Required<Required<IBasemapOptions>['items'][0]>['type']
       url: string
       props?: __esri.LayerProperties
     }[]
@@ -127,24 +127,29 @@ export class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
         const layers: __esri.Layer[] = []
         item.lyrs.forEach(o => {
           if (o.type === 'webtilelayer') {
-            layers.push(
-              createLayerFactory().createWebTileLayer({
-                urlTemplate: o.url,
-                ...o.props
-              })
-            )
+            (o.props as __esri.WebTileLayerProperties).urlTemplate = o.url
+          } else {
+            (o.props as __esri.FeatureLayer).url = o.url
           }
+          layers.push(
+            createLayerFactory().createLayer({
+              layerType: o.type,
+              ...o.props
+            })
+          )
         })
         this._itemPool.set(item.key, layers)
         return
       }
-      let layer: __esri.Layer | undefined
       if (item.type === 'webtilelayer') {
-        layer = createLayerFactory().createWebTileLayer({
-          urlTemplate: item.url,
-          ...item.props
-        })
+        (item.props as __esri.WebTileLayerProperties).urlTemplate = item.url
+      } else {
+        (item.props as __esri.FeatureLayer).url = item.url as string
       }
+      const layer = createLayerFactory().createLayer({
+        layerType: item.type as string,
+        ...item.props
+      })
       if (layer) {
         this._itemPool.set(item.key, [layer])
       }

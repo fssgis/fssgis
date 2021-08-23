@@ -10,6 +10,7 @@ import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
 import GroupLayer from '@arcgis/core/layers/GroupLayer';
 import WebTileLayer from '@arcgis/core/layers/WebTileLayer';
 import Layer from '@arcgis/core/layers/Layer';
+import TileLayer from '@arcgis/core/layers/TileLayer';
 import EsriBasemap from '@arcgis/core/Basemap';
 import Graphic from '@arcgis/core/Graphic';
 import Geometry from '@arcgis/core/geometry/Geometry';
@@ -353,6 +354,9 @@ class LayerFactory {
       case 'webtilelayer':
         return this.createWebTileLayer(options);
 
+      case 'tilelayer':
+        return this.createTileLayer(options);
+
       default:
         return new Layer(options);
     }
@@ -398,6 +402,20 @@ class LayerFactory {
 
   createWebTileLayer(options) {
     return new WebTileLayer(options);
+  }
+  /**
+   * 创建TileLayer
+   * @param options 配置项
+   * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-TileLayer.html
+   * @example
+   * ```ts
+   * createLayerFactory().createTileLayer({ \/* xxx *\/ })
+   * ```
+   */
+
+
+  createTileLayer(options) {
+    return new TileLayer(options);
   }
 
 }
@@ -876,11 +894,15 @@ class Basemap extends FssgEsriPlugin {
         const layers = [];
         item.lyrs.forEach(o => {
           if (o.type === 'webtilelayer') {
-            layers.push(createLayerFactory().createWebTileLayer({
-              urlTemplate: o.url,
-              ...o.props
-            }));
+            o.props.urlTemplate = o.url;
+          } else {
+            o.props.url = o.url;
           }
+
+          layers.push(createLayerFactory().createLayer({
+            layerType: o.type,
+            ...o.props
+          }));
         });
 
         this._itemPool.set(item.key, layers);
@@ -888,14 +910,16 @@ class Basemap extends FssgEsriPlugin {
         return;
       }
 
-      let layer;
-
       if (item.type === 'webtilelayer') {
-        layer = createLayerFactory().createWebTileLayer({
-          urlTemplate: item.url,
-          ...item.props
-        });
+        item.props.urlTemplate = item.url;
+      } else {
+        item.props.url = item.url;
       }
+
+      const layer = createLayerFactory().createLayer({
+        layerType: item.type,
+        ...item.props
+      });
 
       if (layer) {
         this._itemPool.set(item.key, [layer]);

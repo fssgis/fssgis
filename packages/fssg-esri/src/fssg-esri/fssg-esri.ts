@@ -2,7 +2,7 @@ import { FssgMap, IFssgMapEvents, IFssgMapOptions } from '@fssgis/fssg-map'
 import ArcGISMap from '@arcgis/core/Map'
 import MapView from '@arcgis/core/views/MapView'
 import esriConfig from '@arcgis/core/config'
-import { Basemap, MapCursor, MapElement, MapTools } from '../plugins'
+import { Basemap, MapCursor, MapElement, MapLayers, MapTools } from '../plugins'
 import { error } from '@fssgis/fssg-map'
 import { createGeometryFactory, LonLat, XY } from '../factories'
 import FssgEsriPlugin from '../fssg-esri-plugin'
@@ -41,6 +41,7 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
   public mapElement: MapElement
   public mapTools: MapTools
   public mapCursor: MapCursor
+  public mapLayers: MapLayers
 
   //#region 私有属性
 

@@ -373,7 +373,7 @@ declare class MapCursor extends FssgEsriPlugin<IMapCursorOptions, IMapCursorEven
  * 图层控制插件配置项
  */
 interface IMapLayersOptions extends IFssgEsriPluginOptions {
-    items: {
+    items?: {
         id: string;
         name: string;
         layerType: string;
@@ -389,6 +389,7 @@ interface IMapLayersOptions extends IFssgEsriPluginOptions {
     }[];
     defaultLayerVisible?: boolean;
 }
+declare type LayerOptions = Required<IMapLayersOptions>['items'][0];
 /**
  * 图层控制插件事件集
  */
@@ -396,12 +397,12 @@ interface IMapLayersEvents extends IFssgEsriPluginEvents {
     'change:visible': {
         visible: boolean;
         layer: __esri.Layer;
-        options: IMapLayersOptions['items'][0];
+        options: LayerOptions;
     };
     'change:opacity': {
         opacity: number;
         layer: __esri.Layer;
-        options: IMapLayersOptions['items'][0];
+        options: LayerOptions;
     };
 }
 /**
@@ -419,11 +420,11 @@ declare class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEven
     /**
      * 可查询的图层集合
      */
-    get layersWhichCanQuery(): [__esri.Layer, IMapLayersOptions['items'][0]][];
+    get layersWhichCanQuery(): [__esri.Layer, LayerOptions][];
     /**
      * 不可查询的图层集合
      */
-    get layersWhichCantQuery(): [__esri.Layer, IMapLayersOptions['items'][0]][];
+    get layersWhichCantQuery(): [__esri.Layer, LayerOptions][];
     /**
      * 构造图层控制插件
      * @param options 配置项
@@ -438,10 +439,37 @@ declare class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEven
      */
     private _initLayers;
     /**
+     * 查找图层项
+     * @param key 键
+     */
+    private _findItem;
+    /**
      * 安装插件
      * @param fssgEsri 地图应用
      */
     installPlugin(fssgEsri: FssgEsri): this;
+    /**
+     * 通过图层Id查找图层
+     * @param nameOrId 图层名或Id
+     */
+    findLayer<T extends __esri.Layer = __esri.Layer>(nameOrId: string): T | undefined;
+    /**
+     * 通过图层Id查找配置项
+     * @param nameOrIdOrLayer 图层名或Id或图层对象
+     */
+    findLayerOptions(nameOrIdOrLayer: string | __esri.Layer): LayerOptions | undefined;
+    /**
+     * 设置图层可见性
+     * @param nameOrId 图层名或Id
+     * @param visible 可见性，默认为true
+     */
+    setLayerVisible(nameOrId: string, visible?: boolean): this;
+    /**
+     * 设置图层不透明度
+     * @param nameOrId 图层名或Id
+     * @param opacity 不透明度
+     */
+    setLayerOpacity(nameOrId: string, opacity: number): this;
 }
 
 /**
@@ -738,6 +766,7 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     mapElement: MapElement;
     mapTools: MapTools;
     mapCursor: MapCursor;
+    mapLayers: MapLayers;
     /**
      * 地图对象
      */

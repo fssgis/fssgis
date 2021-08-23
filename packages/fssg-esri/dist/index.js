@@ -573,6 +573,8 @@ class FssgEsri extends FssgMap {
 
     _defineProperty(this, "mapCursor", void 0);
 
+    _defineProperty(this, "mapLayers", void 0);
+
     _defineProperty(this, "_map", void 0);
 
     _defineProperty(this, "_view", void 0);
@@ -1539,7 +1541,60 @@ class MapLayers extends FssgEsriPlugin {
 
 
   _initLayers() {
+    var _this$options_$items;
+
+    (_this$options_$items = this.options_.items) === null || _this$options_$items === void 0 ? void 0 : _this$options_$items.forEach(layerOptions => {
+      const props = {
+        visible: this.options_.defaultLayerVisible,
+        ...layerOptions.properties,
+        id: layerOptions.id,
+        name: layerOptions.name,
+        title: layerOptions.name
+      };
+
+      if (layerOptions.layerType === 'webtilelayer') {
+        props.urlTemplate = layerOptions.layerUrl;
+      } else {
+        props.url = layerOptions.layerUrl;
+      }
+
+      if (layerOptions.layerType === 'sqllayer') {
+        props.sqlOptions = layerOptions.sqlOptions;
+      }
+
+      const layer = createLayerFactory().createLayer(props); // eslint-disable-line
+
+      this._group.add(layer);
+
+      this._layerPool.set(layerOptions.id, [layer, layerOptions]).set(layerOptions.name, [layer, layerOptions]).set(layer, [layer, layerOptions]);
+
+      layer.watch('visible', visible => this.fire('change:visible', {
+        visible,
+        layer,
+        options: layerOptions
+      }));
+      layer.watch('opacity', opacity => this.fire('change:opacity', {
+        opacity,
+        layer,
+        options: layerOptions
+      }));
+    });
     return this;
+  }
+  /**
+   * 查找图层项
+   * @param key 键
+   */
+
+
+  _findItem(key) {
+    const item = this._layerPool.get(key);
+
+    if (!item) {
+      throw error(this, `无图层项${key}`);
+    }
+
+    return item;
   }
   /**
    * 安装插件
@@ -1549,6 +1604,52 @@ class MapLayers extends FssgEsriPlugin {
 
   installPlugin(fssgEsri) {
     return super.installPlugin(fssgEsri)._init();
+  }
+  /**
+   * 通过图层Id查找图层
+   * @param nameOrId 图层名或Id
+   */
+
+
+  findLayer(nameOrId) {
+    var _this$_findItem;
+
+    return (_this$_findItem = this._findItem(nameOrId)) === null || _this$_findItem === void 0 ? void 0 : _this$_findItem[0];
+  }
+  /**
+   * 通过图层Id查找配置项
+   * @param nameOrIdOrLayer 图层名或Id或图层对象
+   */
+
+
+  findLayerOptions(nameOrIdOrLayer) {
+    var _this$_findItem2;
+
+    return (_this$_findItem2 = this._findItem(nameOrIdOrLayer)) === null || _this$_findItem2 === void 0 ? void 0 : _this$_findItem2[1];
+  }
+  /**
+   * 设置图层可见性
+   * @param nameOrId 图层名或Id
+   * @param visible 可见性，默认为true
+   */
+
+
+  setLayerVisible(nameOrId, visible = true) {
+    const layer = this.findLayer(nameOrId);
+    layer && (layer.visible = visible);
+    return this;
+  }
+  /**
+   * 设置图层不透明度
+   * @param nameOrId 图层名或Id
+   * @param opacity 不透明度
+   */
+
+
+  setLayerOpacity(nameOrId, opacity) {
+    const layer = this.findLayer(nameOrId);
+    layer && (layer.opacity = opacity);
+    return this;
   }
 
 }

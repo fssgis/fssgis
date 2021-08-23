@@ -1,4 +1,4 @@
-import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions } from '@fssgis/fssg-esri';
+import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers } from '@fssgis/fssg-esri';
 import { Ref } from 'vue';
 
 declare type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void;
@@ -91,4 +91,10 @@ declare function useMapCursor(): MapCursor;
 declare function useMapCursor(fssgEsri: FssgEsri): MapCursor;
 declare function useMapCursor(fssgEsri?: FssgEsri): MapCursor;
 
-export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+declare function createMapLayers(options: IMapLayersOptions): MapLayers;
+declare function createMapLayers(options: IMapLayersOptions, fssgEsri: FssgEsri): MapLayers;
+declare function useMapLayers(): MapLayers;
+declare function useMapLayers(fssgEsri: FssgEsri): MapLayers;
+declare function useMapLayers(fssgEsri?: FssgEsri): MapLayers;
+
+export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, createMapLayers, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapLayers, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

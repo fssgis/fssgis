@@ -1,4 +1,4 @@
-import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor } from '@fssgis/fssg-esri';
+import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers } from '@fssgis/fssg-esri';
 import { getCurrentInstance, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide } from 'vue';
 import { whenRightReturn } from '@fssgis/utils';
 import '@fssgis/observable';
@@ -400,4 +400,16 @@ function useMapCursor(fssgEsri) {
   return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapCursor) ?? inject(SYMBOL_MAPCURSOR);
 }
 
-export { createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+const SYMBOL_MAPLAYERS = Symbol('FssgEsri.MapLayers');
+function createMapLayers(options, fssgEsri) {
+  const mapLayers = new MapLayers(options);
+  fssgEsri = fssgEsri ?? useFssgEsri();
+  fssgEsri.use(mapLayers);
+  provide(SYMBOL_MAPLAYERS, mapLayers);
+  return mapLayers;
+}
+function useMapLayers(fssgEsri) {
+  return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapLayers) ?? inject(SYMBOL_MAPLAYERS);
+}
+
+export { createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, createMapLayers, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapLayers, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

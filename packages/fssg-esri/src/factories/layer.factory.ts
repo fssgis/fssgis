@@ -3,6 +3,7 @@ import GroupLayer from '@arcgis/core/layers/GroupLayer'
 import WebTileLayer from '@arcgis/core/layers/WebTileLayer'
 import Layer from '@arcgis/core/layers/Layer'
 import TileLayer from '@arcgis/core/layers/TileLayer'
+import MapImageLayer from '@arcgis/core/layers/MapImageLayer'
 
 /**
  * 图层工厂接口
@@ -12,11 +13,13 @@ export interface ILayerFactory {
   createLayer (options: { layerType: 'grouplayer' } & __esri.GroupLayerProperties) : __esri.GroupLayer
   createLayer (options: { layerType: 'webtilelayer' } & __esri.WebTileLayerProperties) : __esri.WebTileLayer
   createLayer (options: { layerType: 'tilelayer' } & __esri.TileLayerProperties) : __esri.TileLayer
+  createLayer (options: { layerType: 'dynamiclayer' } & __esri.MapImageLayerProperties & { serverName?: string }) : __esri.MapImageLayer
   createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer
   createGraphicsLayer (options: __esri.GraphicsLayerProperties) : __esri.GraphicsLayer
   createGroupLayer (options: __esri.GroupLayerProperties) : __esri.GroupLayer
   createWebTileLayer (options: __esri.WebTileLayerProperties) : __esri.WebTileLayer
   createTileLayer (options: __esri.TileLayerProperties) : __esri.TileLayer
+  createDynamicLayer (options: __esri.MapImageLayerProperties & { serverName?: string }) : __esri.MapImageLayer
 }
 
 /**
@@ -45,6 +48,7 @@ class LayerFactory implements ILayerFactory {
   public createLayer (options: { layerType: 'grouplayer' } & __esri.GroupLayerProperties) : __esri.GroupLayer
   public createLayer (options: { layerType: 'webtilelayer' } & __esri.WebTileLayerProperties) : __esri.WebTileLayer
   public createLayer (options: { layerType: 'tilelayer' } & __esri.TileLayerProperties) : __esri.TileLayer
+  public createLayer (options: { layerType: 'dynamiclayer' } & __esri.MapImageLayerProperties & { serverName?: string }) : __esri.MapImageLayer
   public createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer
   public createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer {
     switch (options.layerType) {
@@ -56,6 +60,8 @@ class LayerFactory implements ILayerFactory {
         return this.createWebTileLayer(options)
       case 'tilelayer':
         return this.createTileLayer(options)
+      case 'dynamiclayer':
+        return this.createDynamicLayer(options)
       default:
         return new Layer(options)
     }
@@ -111,6 +117,22 @@ class LayerFactory implements ILayerFactory {
    */
   public createTileLayer (options?: __esri.TileLayerProperties) : __esri.TileLayer {
     return new TileLayer(options)
+  }
+
+  /**
+   * 创建动态图层
+   * @param options 配置项
+   */
+  public createDynamicLayer (options?: __esri.MapImageLayerProperties & { serverName?: string, name?: string }) : __esri.MapImageLayer {
+    const layer = new MapImageLayer({ ...options, sublayers: [] })
+    fetch(`${options?.url}?f=pjson`, { method: 'get' }).then(res => res.json()).then(result => {
+      const serverName = options?.serverName ?? options?.name ?? ''
+      const id = result.layers.find(item => item.name === serverName)?.id
+      // eslint-disable-next-line
+      // @ts-ignore
+      layer.sublayers = [{ id }]
+    })
+    return layer
   }
 
 }

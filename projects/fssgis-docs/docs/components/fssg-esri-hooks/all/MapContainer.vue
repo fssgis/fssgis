@@ -156,7 +156,19 @@ export default defineComponent({
       ]
     }, fssgEsri)
     createMapCursor({}, fssgEsri)
-    createMapLayers({}, fssgEsri)
+    createMapLayers({
+      items: [
+        {
+          'id': '346dee7c-11aa-6abc-ac34-f1aa25b73ab5',
+          'name': '周边地区',
+          'layerUrl': 'http://172.16.0.101:6080/arcgis/rest/services/SSSW/xzjx/MapServer',
+          'layerType': 'dynamiclayer',
+          'properties': {
+            'legendEnabled': false,
+          } as __esri.MapImageLayerProperties
+        }
+      ]
+    }, fssgEsri)
 
     const loaded = useFssgEsriLoaded(fssgEsri)
 

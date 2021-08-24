@@ -376,6 +376,7 @@ interface IMapLayersOptions extends IFssgEsriPluginOptions {
     items?: {
         id: string;
         name: string;
+        serverName?: string;
         layerType: string;
         layerUrl: string;
         properties?: __esri.LayerProperties;
@@ -673,12 +674,20 @@ interface ILayerFactory {
         layerType: 'tilelayer';
     } & __esri.TileLayerProperties): __esri.TileLayer;
     createLayer(options: {
+        layerType: 'dynamiclayer';
+    } & __esri.MapImageLayerProperties & {
+        serverName?: string;
+    }): __esri.MapImageLayer;
+    createLayer(options: {
         layerType: string;
     } & __esri.LayerProperties): __esri.Layer;
     createGraphicsLayer(options: __esri.GraphicsLayerProperties): __esri.GraphicsLayer;
     createGroupLayer(options: __esri.GroupLayerProperties): __esri.GroupLayer;
     createWebTileLayer(options: __esri.WebTileLayerProperties): __esri.WebTileLayer;
     createTileLayer(options: __esri.TileLayerProperties): __esri.TileLayer;
+    createDynamicLayer(options: __esri.MapImageLayerProperties & {
+        serverName?: string;
+    }): __esri.MapImageLayer;
 }
 /**
  * 图层工厂（单例模式）
@@ -705,6 +714,11 @@ declare class LayerFactory implements ILayerFactory {
     createLayer(options: {
         layerType: 'tilelayer';
     } & __esri.TileLayerProperties): __esri.TileLayer;
+    createLayer(options: {
+        layerType: 'dynamiclayer';
+    } & __esri.MapImageLayerProperties & {
+        serverName?: string;
+    }): __esri.MapImageLayer;
     createLayer(options: {
         layerType: string;
     } & __esri.LayerProperties): __esri.Layer;
@@ -748,6 +762,14 @@ declare class LayerFactory implements ILayerFactory {
      * ```
      */
     createTileLayer(options?: __esri.TileLayerProperties): __esri.TileLayer;
+    /**
+     * 创建动态图层
+     * @param options 配置项
+     */
+    createDynamicLayer(options?: __esri.MapImageLayerProperties & {
+        serverName?: string;
+        name?: string;
+    }): __esri.MapImageLayer;
 }
 /**
  * 创建图层工厂

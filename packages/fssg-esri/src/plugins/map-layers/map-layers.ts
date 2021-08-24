@@ -10,6 +10,7 @@ export interface IMapLayersOptions extends IFssgEsriPluginOptions {
   items?: {
     id: string
     name: string
+    serverName?: string // 针对动态图层
     layerType: string
     layerUrl: string
     properties?: __esri.LayerProperties
@@ -97,12 +98,11 @@ export class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEvent
    */
   private _initLayers () : this {
     this.options_.items?.forEach(layerOptions => {
+      const { properties, ...others } = layerOptions
       const props : Record<string, unknown> = {
         visible: this.options_.defaultLayerVisible,
-        ...layerOptions.properties,
-        id: layerOptions.id,
-        name: layerOptions.name,
-        title: layerOptions.name,
+        ...properties,
+        ...others,
       }
       if (layerOptions.layerType === 'webtilelayer') {
         props.urlTemplate = layerOptions.layerUrl

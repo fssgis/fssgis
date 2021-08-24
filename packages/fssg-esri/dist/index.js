@@ -11,6 +11,7 @@ import GroupLayer from '@arcgis/core/layers/GroupLayer';
 import WebTileLayer from '@arcgis/core/layers/WebTileLayer';
 import Layer from '@arcgis/core/layers/Layer';
 import TileLayer from '@arcgis/core/layers/TileLayer';
+import MapImageLayer from '@arcgis/core/layers/MapImageLayer';
 import EsriBasemap from '@arcgis/core/Basemap';
 import Graphic from '@arcgis/core/Graphic';
 import Geometry from '@arcgis/core/geometry/Geometry';
@@ -357,6 +358,9 @@ class LayerFactory {
       case 'tilelayer':
         return this.createTileLayer(options);
 
+      case 'dynamiclayer':
+        return this.createDynamicLayer(options);
+
       default:
         return new Layer(options);
     }
@@ -416,6 +420,31 @@ class LayerFactory {
 
   createTileLayer(options) {
     return new TileLayer(options);
+  }
+  /**
+   * 创建动态图层
+   * @param options 配置项
+   */
+
+
+  createDynamicLayer(options) {
+    const layer = new MapImageLayer({ ...options,
+      sublayers: []
+    });
+    fetch(`${options === null || options === void 0 ? void 0 : options.url}?f=pjson`, {
+      method: 'get'
+    }).then(res => res.json()).then(result => {
+      var _result$layers$find;
+
+      const serverName = (options === null || options === void 0 ? void 0 : options.serverName) ?? (options === null || options === void 0 ? void 0 : options.name) ?? '';
+      const id = (_result$layers$find = result.layers.find(item => item.name === serverName)) === null || _result$layers$find === void 0 ? void 0 : _result$layers$find.id; // eslint-disable-next-line
+      // @ts-ignore
+
+      layer.sublayers = [{
+        id
+      }];
+    });
+    return layer;
   }
 
 }
@@ -1568,12 +1597,14 @@ class MapLayers extends FssgEsriPlugin {
     var _this$options_$items;
 
     (_this$options_$items = this.options_.items) === null || _this$options_$items === void 0 ? void 0 : _this$options_$items.forEach(layerOptions => {
+      const {
+        properties,
+        ...others
+      } = layerOptions;
       const props = {
         visible: this.options_.defaultLayerVisible,
-        ...layerOptions.properties,
-        id: layerOptions.id,
-        name: layerOptions.name,
-        title: layerOptions.name
+        ...properties,
+        ...others
       };
 
       if (layerOptions.layerType === 'webtilelayer') {

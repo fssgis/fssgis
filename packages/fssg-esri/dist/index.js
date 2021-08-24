@@ -557,6 +557,7 @@ class LayerFactory {
       method: 'get',
       mode: 'cors'
     }).then(res => res.json()).then(result => {
+      const graphics = [];
       result.forEach(row => {
         if (!row[options.sqlOptions.xField] || !row[options.sqlOptions.yField]) {
           return;
@@ -575,7 +576,10 @@ class LayerFactory {
           }
         };
         const graphic = new Graphic(props);
-        layer.source.push(graphic);
+        graphics.push(graphic);
+      });
+      layer.applyEdits({
+        addFeatures: graphics
       });
     });
     return layer;

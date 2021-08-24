@@ -245,6 +245,7 @@ class LayerFactory implements ILayerFactory {
     }
 
     fetch(options.url, { method: 'get', mode:'cors' }).then(res => res.json()).then(result => {
+      const graphics : __esri.Graphic[] = []
       result.forEach(row => {
         if (!row[options.sqlOptions.xField] || !row[options.sqlOptions.yField]) {
           return
@@ -263,7 +264,10 @@ class LayerFactory implements ILayerFactory {
           } as __esri.PointProperties,
         }
         const graphic = new Graphic(props)
-        layer.source.push(graphic)
+        graphics.push(graphic)
+      })
+      layer.applyEdits({
+        addFeatures: graphics
       })
     })
     return layer

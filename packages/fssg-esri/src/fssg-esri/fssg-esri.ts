@@ -134,6 +134,9 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
         ui: { components: [] },
         constraints: {
           rotationEnabled: false,
+        },
+        popup: {
+          autoOpenEnabled: false,
         }
       },
       mapOptions: {},

@@ -5,6 +5,8 @@ import Layer from '@arcgis/core/layers/Layer'
 import TileLayer from '@arcgis/core/layers/TileLayer'
 import MapImageLayer from '@arcgis/core/layers/MapImageLayer'
 import Graphic from '@arcgis/core/Graphic'
+import FeatureLayer from '@arcgis/core/layers/FeatureLayer'
+import { createGuid } from '@fssgis/utils'
 
 interface ISqlLayerProperties {
   url: string
@@ -28,6 +30,7 @@ export interface ILayerFactory {
   createLayer (options: { layerType: 'dynamiclayer' } & __esri.MapImageLayerProperties & { serverName?: string }) : __esri.MapImageLayer
   createLayer (options: { layerType: 'mapimagelayer' } & __esri.MapImageLayerProperties) : __esri.MapImageLayer
   createLayer (options: { layerType: 'sqllayer' } & __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer
+  createLayer (options: { layerType: 'sqllayer2' } & __esri.FeatureLayerProperties & ISqlLayerProperties) : __esri.FeatureLayer
   createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer
   createGraphicsLayer (options: __esri.GraphicsLayerProperties) : __esri.GraphicsLayer
   createGroupLayer (options: __esri.GroupLayerProperties) : __esri.GroupLayer
@@ -36,6 +39,7 @@ export interface ILayerFactory {
   createDynamicLayer (options: __esri.MapImageLayerProperties & { serverName?: string }) : __esri.MapImageLayer
   createMapImageLayer (options: __esri.MapImageLayerProperties) : __esri.MapImageLayer
   createSqlLayer (options: __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer
+  createSqlLayer2 (options: __esri.FeatureLayerProperties & ISqlLayerProperties) : __esri.FeatureLayer
 }
 
 /**
@@ -67,6 +71,7 @@ class LayerFactory implements ILayerFactory {
   public createLayer (options: { layerType: 'dynamiclayer' } & __esri.MapImageLayerProperties & { serverName?: string }) : __esri.MapImageLayer
   public createLayer (options: { layerType: 'mapimagelayer' } & __esri.MapImageLayerProperties) : __esri.MapImageLayer
   public createLayer (options: { layerType: 'sqllayer' } & __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer
+  public createLayer (options: { layerType: 'sqllayer2' } & __esri.FeatureLayerProperties & ISqlLayerProperties) : __esri.FeatureLayer
   public createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer
   public createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer {
     switch (options.layerType) {
@@ -84,6 +89,8 @@ class LayerFactory implements ILayerFactory {
         return this.createMapImageLayer(options)
       case 'sqllayer':
         return this.createSqlLayer(options as any) // eslint-disable-line
+      case 'sqllayer2':
+        return this.createSqlLayer2(options as any) // eslint-disable-line
       default:
         return new Layer(options)
     }
@@ -157,10 +164,18 @@ class LayerFactory implements ILayerFactory {
     return layer
   }
 
+  /**
+   * 创建MapImageLayer
+   * @param options 配置项
+   */
   public createMapImageLayer (options?: __esri.MapImageLayerProperties) : __esri.MapImageLayer {
     return new MapImageLayer(options)
   }
 
+  /**
+   * 创建SQL图层
+   * @param options 配置项
+   */
   public createSqlLayer (options: __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer {
     const layer = this.createGraphicsLayer(options)
     fetch(options.url, { method: 'get', mode:'cors' }).then(res => res.json()).then(result => {
@@ -201,6 +216,56 @@ class LayerFactory implements ILayerFactory {
       })
     })
 
+    return layer
+  }
+
+  /**
+   * 创建SQL图层
+   * @param options 配置项
+   */
+  public createSqlLayer2 (options: __esri.FeatureLayerProperties & ISqlLayerProperties) : __esri.FeatureLayer {
+    const { url, ...others } = options
+    const layer = new FeatureLayer({
+      spatialReference: options.spatialReference,
+      source: [],
+      objectIdField: '$objectId',
+      geometryType: 'point',
+      ...others,
+    })
+    if (options.sqlOptions.iconUrl) {
+      layer.renderer = {
+        type: 'simple',
+        symbol: {
+          type: 'picture-marker',
+          url: options.sqlOptions.iconUrl,
+          width: '32px',
+          height: '32px'
+        } as __esri.SimpleMarkerSymbolProperties
+      } as __esri.renderers.SimpleRenderer
+    }
+
+    fetch(options.url, { method: 'get', mode:'cors' }).then(res => res.json()).then(result => {
+      result.forEach(row => {
+        if (!row[options.sqlOptions.xField] || !row[options.sqlOptions.yField]) {
+          return
+        }
+        const attributes = row
+        const props : __esri.GraphicProperties = {
+          attributes: {
+            ...attributes,
+            $objectId: createGuid(),
+          },
+          geometry: {
+            type: 'point',
+            x: row[options.sqlOptions.xField],
+            y: row[options.sqlOptions.yField],
+            spatialReference: options.spatialReference,
+          } as __esri.PointProperties,
+        }
+        const graphic = new Graphic(props)
+        layer.source.push(graphic)
+      })
+    })
     return layer
   }
 

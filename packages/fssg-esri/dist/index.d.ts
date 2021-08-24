@@ -695,6 +695,9 @@ interface ILayerFactory {
         layerType: 'sqllayer';
     } & __esri.GraphicsLayerProperties & ISqlLayerProperties): __esri.GraphicsLayer;
     createLayer(options: {
+        layerType: 'sqllayer2';
+    } & __esri.FeatureLayerProperties & ISqlLayerProperties): __esri.FeatureLayer;
+    createLayer(options: {
         layerType: string;
     } & __esri.LayerProperties): __esri.Layer;
     createGraphicsLayer(options: __esri.GraphicsLayerProperties): __esri.GraphicsLayer;
@@ -706,6 +709,7 @@ interface ILayerFactory {
     }): __esri.MapImageLayer;
     createMapImageLayer(options: __esri.MapImageLayerProperties): __esri.MapImageLayer;
     createSqlLayer(options: __esri.GraphicsLayerProperties & ISqlLayerProperties): __esri.GraphicsLayer;
+    createSqlLayer2(options: __esri.FeatureLayerProperties & ISqlLayerProperties): __esri.FeatureLayer;
 }
 /**
  * 图层工厂（单例模式）
@@ -743,6 +747,9 @@ declare class LayerFactory implements ILayerFactory {
     createLayer(options: {
         layerType: 'sqllayer';
     } & __esri.GraphicsLayerProperties & ISqlLayerProperties): __esri.GraphicsLayer;
+    createLayer(options: {
+        layerType: 'sqllayer2';
+    } & __esri.FeatureLayerProperties & ISqlLayerProperties): __esri.FeatureLayer;
     createLayer(options: {
         layerType: string;
     } & __esri.LayerProperties): __esri.Layer;
@@ -794,8 +801,21 @@ declare class LayerFactory implements ILayerFactory {
         serverName?: string;
         name?: string;
     }): __esri.MapImageLayer;
+    /**
+     * 创建MapImageLayer
+     * @param options 配置项
+     */
     createMapImageLayer(options?: __esri.MapImageLayerProperties): __esri.MapImageLayer;
+    /**
+     * 创建SQL图层
+     * @param options 配置项
+     */
     createSqlLayer(options: __esri.GraphicsLayerProperties & ISqlLayerProperties): __esri.GraphicsLayer;
+    /**
+     * 创建SQL图层
+     * @param options 配置项
+     */
+    createSqlLayer2(options: __esri.FeatureLayerProperties & ISqlLayerProperties): __esri.FeatureLayer;
 }
 /**
  * 创建图层工厂

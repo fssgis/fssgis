@@ -109,7 +109,7 @@ export class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEvent
       } else {
         props.url = layerOptions.layerUrl
       }
-      if (layerOptions.layerType === 'sqllayer') {
+      if (layerOptions.layerType === 'sqllayer' || layerOptions.layerType === 'sqllayer2') {
         props.sqlOptions = layerOptions.sqlOptions
         props.spatialReference = this.view_.spatialReference
       }

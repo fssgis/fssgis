@@ -13,9 +13,10 @@ import Layer from '@arcgis/core/layers/Layer';
 import TileLayer from '@arcgis/core/layers/TileLayer';
 import MapImageLayer from '@arcgis/core/layers/MapImageLayer';
 import Graphic from '@arcgis/core/Graphic';
+import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
+import { createGuid, deepCopyJSON, $extend } from '@fssgis/utils';
 import EsriBasemap from '@arcgis/core/Basemap';
 import Geometry from '@arcgis/core/geometry/Geometry';
-import { deepCopyJSON, $extend } from '@fssgis/utils';
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -368,6 +369,10 @@ class LayerFactory {
         return this.createSqlLayer(options);
       // eslint-disable-line
 
+      case 'sqllayer2':
+        return this.createSqlLayer2(options);
+      // eslint-disable-line
+
       default:
         return new Layer(options);
     }
@@ -453,10 +458,20 @@ class LayerFactory {
     });
     return layer;
   }
+  /**
+   * 创建MapImageLayer
+   * @param options 配置项
+   */
+
 
   createMapImageLayer(options) {
     return new MapImageLayer(options);
   }
+  /**
+   * 创建SQL图层
+   * @param options 配置项
+   */
+
 
   createSqlLayer(options) {
     const layer = this.createGraphicsLayer(options);
@@ -503,6 +518,64 @@ class LayerFactory {
 
         const graphic = new Graphic(props);
         layer.graphics.add(graphic);
+      });
+    });
+    return layer;
+  }
+  /**
+   * 创建SQL图层
+   * @param options 配置项
+   */
+
+
+  createSqlLayer2(options) {
+    const {
+      url,
+      ...others
+    } = options;
+    const layer = new FeatureLayer({
+      spatialReference: options.spatialReference,
+      source: [],
+      objectIdField: '$objectId',
+      geometryType: 'point',
+      ...others
+    });
+
+    if (options.sqlOptions.iconUrl) {
+      layer.renderer = {
+        type: 'simple',
+        symbol: {
+          type: 'picture-marker',
+          url: options.sqlOptions.iconUrl,
+          width: '32px',
+          height: '32px'
+        }
+      };
+    }
+
+    fetch(options.url, {
+      method: 'get',
+      mode: 'cors'
+    }).then(res => res.json()).then(result => {
+      result.forEach(row => {
+        if (!row[options.sqlOptions.xField] || !row[options.sqlOptions.yField]) {
+          return;
+        }
+
+        const attributes = row;
+        const props = {
+          attributes: { ...attributes,
+            $objectId: createGuid()
+          },
+          geometry: {
+            type: 'point',
+            x: row[options.sqlOptions.xField],
+            y: row[options.sqlOptions.yField],
+            spatialReference: options.spatialReference
+          }
+        };
+        const graphic = new Graphic(props);
+        layer.source.push(graphic);
       });
     });
     return layer;
@@ -666,6 +739,9 @@ class FssgEsri extends FssgMap {
         },
         constraints: {
           rotationEnabled: false
+        },
+        popup: {
+          autoOpenEnabled: false
         }
       },
       mapOptions: {},
@@ -1674,7 +1750,7 @@ class MapLayers extends FssgEsriPlugin {
         props.url = layerOptions.layerUrl;
       }
 
-      if (layerOptions.layerType === 'sqllayer') {
+      if (layerOptions.layerType === 'sqllayer' || layerOptions.layerType === 'sqllayer2') {
         props.sqlOptions = layerOptions.sqlOptions;
         props.spatialReference = this.view_.spatialReference;
       }

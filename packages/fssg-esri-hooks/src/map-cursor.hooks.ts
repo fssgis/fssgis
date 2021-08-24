@@ -1,6 +1,6 @@
 import { MapCursor, FssgEsri, IMapCursorOptions } from '@fssgis/fssg-esri'
 import { warn } from '@fssgis/fssg-map'
-import { inject, InjectionKey, provide, ref, Ref } from 'vue'
+import { App, inject, InjectionKey, provide, ref, Ref } from 'vue'
 import { controllableWatch, useObservableOn } from './base.hooks'
 import { useFssgEsri } from './fssg-esri.hooks'
 
@@ -67,12 +67,16 @@ export function useMapCursorState (arg0?: FssgEsri | MapCursor) : IMapCursorHook
 
 const SYMBOL_MAPCURSOR : InjectionKey<MapCursor> = Symbol('FssgEsri.MapCursor')
 export function createMapCursor (options: IMapCursorOptions) : MapCursor
-export function createMapCursor (options: IMapCursorOptions, fssgEsri: FssgEsri) : MapCursor
-export function createMapCursor (options: IMapCursorOptions, fssgEsri?: FssgEsri) : MapCursor {
+export function createMapCursor (options: IMapCursorOptions, fssgEsri: FssgEsri, app?: App) : MapCursor
+export function createMapCursor (options: IMapCursorOptions, fssgEsri?: FssgEsri, app?: App) : MapCursor {
   const mapCursor = new MapCursor(options)
   fssgEsri = fssgEsri ?? useFssgEsri()
   fssgEsri.use(mapCursor)
-  provide(SYMBOL_MAPCURSOR, mapCursor)
+  if (app) {
+    app.provide(SYMBOL_MAPCURSOR, mapCursor)
+  } else {
+    provide(SYMBOL_MAPCURSOR, mapCursor)
+  }
   return mapCursor
 }
 

@@ -221,9 +221,15 @@ function useCenterZoom(fssgEsri) {
   };
 }
 const SYMBOL_FSSG_ESRI = Symbol('fssgEsri');
-function createFssgEsri(container, options) {
+function createFssgEsri(container, options, app) {
   const fssgEsri = new FssgEsri(container, options);
-  provide(SYMBOL_FSSG_ESRI, fssgEsri);
+
+  if (app) {
+    app.provide(SYMBOL_FSSG_ESRI, fssgEsri);
+  } else {
+    provide(SYMBOL_FSSG_ESRI, fssgEsri);
+  }
+
   whenRightReturn(500, () => document.getElementById(container)).then(() => {
     fssgEsri.mount();
   });
@@ -311,11 +317,17 @@ function useBasemapState(arg0) {
   };
 }
 const SYMBOL_BASEMAP = Symbol('FssgEsri.Basemap');
-function createBasemap(options, fssgMap) {
+function createBasemap(options, fssgMap, app) {
   const basemap = new Basemap(options);
   fssgMap = fssgMap ?? useFssgEsri();
   fssgMap.use(basemap);
-  provide(SYMBOL_BASEMAP, basemap);
+
+  if (app) {
+    app.provide(SYMBOL_BASEMAP, basemap);
+  } else {
+    provide(SYMBOL_BASEMAP, basemap);
+  }
+
   return basemap;
 }
 function useBasemap(fssgEsri) {
@@ -324,18 +336,30 @@ function useBasemap(fssgEsri) {
 
 const SYMBOL_GEO_FACTORY = Symbol('FssgEsri.GeoFactory');
 const SYMBOL_LYR_FACTORY = Symbol('FssgEsri.LyrFactory');
-function createGeoFactory(fssgEsri) {
+function createGeoFactory(fssgEsri, app) {
   fssgEsri = fssgEsri || useFssgEsri();
   const factory = createGeometryFactory(fssgEsri);
-  provide(SYMBOL_GEO_FACTORY, factory);
+
+  if (app) {
+    app.provide(SYMBOL_GEO_FACTORY, factory);
+  } else {
+    provide(SYMBOL_GEO_FACTORY, factory);
+  }
+
   return factory;
 }
 function useGeoFactory() {
   return inject(SYMBOL_GEO_FACTORY);
 }
-function createLyrFactory() {
+function createLyrFactory(app) {
   const factory = createLayerFactory();
-  provide(SYMBOL_LYR_FACTORY, factory);
+
+  if (app) {
+    app.provide(SYMBOL_LYR_FACTORY, factory);
+  } else {
+    provide(SYMBOL_LYR_FACTORY, factory);
+  }
+
   return factory;
 }
 function useLyrFactory() {
@@ -389,11 +413,17 @@ function useMapCursorState(arg0) {
   };
 }
 const SYMBOL_MAPCURSOR = Symbol('FssgEsri.MapCursor');
-function createMapCursor(options, fssgEsri) {
+function createMapCursor(options, fssgEsri, app) {
   const mapCursor = new MapCursor(options);
   fssgEsri = fssgEsri ?? useFssgEsri();
   fssgEsri.use(mapCursor);
-  provide(SYMBOL_MAPCURSOR, mapCursor);
+
+  if (app) {
+    app.provide(SYMBOL_MAPCURSOR, mapCursor);
+  } else {
+    provide(SYMBOL_MAPCURSOR, mapCursor);
+  }
+
   return mapCursor;
 }
 function useMapCursor(fssgEsri) {
@@ -401,11 +431,17 @@ function useMapCursor(fssgEsri) {
 }
 
 const SYMBOL_MAPLAYERS = Symbol('FssgEsri.MapLayers');
-function createMapLayers(options, fssgEsri) {
+function createMapLayers(options, fssgEsri, app) {
   const mapLayers = new MapLayers(options);
   fssgEsri = fssgEsri ?? useFssgEsri();
   fssgEsri.use(mapLayers);
-  provide(SYMBOL_MAPLAYERS, mapLayers);
+
+  if (app) {
+    app.provide(SYMBOL_MAPLAYERS, mapLayers);
+  } else {
+    provide(SYMBOL_MAPLAYERS, mapLayers);
+  }
+
   return mapLayers;
 }
 function useMapLayers(fssgEsri) {

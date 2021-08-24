@@ -1,5 +1,5 @@
 import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers } from '@fssgis/fssg-esri';
-import { Ref } from 'vue';
+import { Ref, App } from 'vue';
 
 declare type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void;
 declare function useEsriWatch<T extends __esri.Accessor, K extends keyof T>(accessor: T, p: K | K[], callback: EsriWatchCallback<T, K>, options?: {
@@ -41,7 +41,7 @@ declare function useCenterZoom(fssgEsri?: FssgEsri): {
         zoom: number;
     };
 } & IWatchRef;
-declare function createFssgEsri(container: string, options?: IFssgEsriOptions): FssgEsri;
+declare function createFssgEsri(container: string, options?: IFssgEsriOptions, app?: App): FssgEsri;
 declare function useFssgEsri(): FssgEsri;
 declare function useFssgEsriLoaded(fssgEsri?: FssgEsri): Ref<boolean>;
 
@@ -63,14 +63,14 @@ declare function useBasemapState(fssgMap: FssgEsri): IBasemapHook;
 declare function useBasemapState(basemap: Basemap): IBasemapHook;
 declare function useBasemapState(arg0?: FssgEsri | Basemap): IBasemapHook;
 declare function createBasemap(options: IBasemapOptions): Basemap;
-declare function createBasemap(options: IBasemapOptions, fssgMap: FssgEsri): Basemap;
+declare function createBasemap(options: IBasemapOptions, fssgMap: FssgEsri, app?: App): Basemap;
 declare function useBasemap(): Basemap;
 declare function useBasemap(fssgEsri: FssgEsri): Basemap;
 declare function useBasemap(fssgEsri?: FssgEsri): Basemap;
 
-declare function createGeoFactory(fssgEsri?: FssgEsri): GeometryFacory;
+declare function createGeoFactory(fssgEsri?: FssgEsri, app?: App): GeometryFacory;
 declare function useGeoFactory(): GeometryFacory;
-declare function createLyrFactory(): ILayerFactory;
+declare function createLyrFactory(app?: App): ILayerFactory;
 declare function useLyrFactory(): ILayerFactory;
 
 interface IMapCursorHook {
@@ -86,13 +86,13 @@ declare function useMapCursorState(fssgMap: FssgEsri): IMapCursorHook;
 declare function useMapCursorState(mapCursor: MapCursor): IMapCursorHook;
 declare function useMapCursorState(arg0?: FssgEsri | MapCursor): IMapCursorHook;
 declare function createMapCursor(options: IMapCursorOptions): MapCursor;
-declare function createMapCursor(options: IMapCursorOptions, fssgEsri: FssgEsri): MapCursor;
+declare function createMapCursor(options: IMapCursorOptions, fssgEsri: FssgEsri, app?: App): MapCursor;
 declare function useMapCursor(): MapCursor;
 declare function useMapCursor(fssgEsri: FssgEsri): MapCursor;
 declare function useMapCursor(fssgEsri?: FssgEsri): MapCursor;
 
 declare function createMapLayers(options: IMapLayersOptions): MapLayers;
-declare function createMapLayers(options: IMapLayersOptions, fssgEsri: FssgEsri): MapLayers;
+declare function createMapLayers(options: IMapLayersOptions, fssgEsri: FssgEsri, app?: App): MapLayers;
 declare function useMapLayers(): MapLayers;
 declare function useMapLayers(fssgEsri: FssgEsri): MapLayers;
 declare function useMapLayers(fssgEsri?: FssgEsri): MapLayers;

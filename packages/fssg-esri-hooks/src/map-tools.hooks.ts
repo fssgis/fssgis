@@ -1,6 +1,6 @@
 import { MapTools, FssgEsri, IMapToolsOptions } from '@fssgis/fssg-esri'
 import { warn } from '@fssgis/fssg-map'
-import { inject, InjectionKey, provide, ref, Ref } from 'vue'
+import { App, inject, InjectionKey, provide, ref, Ref } from 'vue'
 import { controllableWatch, useObservableOn } from './base.hooks'
 import { useFssgEsri } from './fssg-esri.hooks'
 
@@ -67,12 +67,16 @@ export function useMapToolsState (arg0?: FssgEsri | MapTools) : IMapToolsHook {
 
 const SYMBOL_MAPTOOLS : InjectionKey<MapTools> = Symbol('FssgEsri.MapTools')
 export function createMapTools (options: IMapToolsOptions) : MapTools
-export function createMapTools (options: IMapToolsOptions, fssgEsri: FssgEsri) : MapTools
-export function createMapTools (options: IMapToolsOptions, fssgEsri?: FssgEsri) : MapTools {
+export function createMapTools (options: IMapToolsOptions, fssgEsri: FssgEsri, app?: App) : MapTools
+export function createMapTools (options: IMapToolsOptions, fssgEsri?: FssgEsri, app?: App) : MapTools {
   const mapTools = new MapTools(options)
   fssgEsri = fssgEsri ?? useFssgEsri()
   fssgEsri.use(mapTools)
-  provide(SYMBOL_MAPTOOLS, mapTools)
+  if (app) {
+    app.provide(SYMBOL_MAPTOOLS, mapTools)
+  } else {
+    provide(SYMBOL_MAPTOOLS, mapTools)
+  }
   return mapTools
 }
 

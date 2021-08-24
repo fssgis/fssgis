@@ -1,5 +1,5 @@
 import { FssgEsri, IFssgEsriOptions } from '@fssgis/fssg-esri'
-import { inject, InjectionKey, provide, ref, Ref, shallowReactive, shallowRef, watch, watchEffect } from 'vue'
+import { App, inject, InjectionKey, provide, ref, Ref, shallowReactive, shallowRef, watch, watchEffect } from 'vue'
 import { whenRightReturn } from '@fssgis/utils'
 import { controllableWatch, tryOnBeforeUnmounted } from './base.hooks'
 
@@ -163,9 +163,13 @@ export function useCenterZoom (fssgEsri?: FssgEsri) : { state: { center: __esri.
 
 const SYMBOL_FSSG_ESRI : InjectionKey<FssgEsri> = Symbol('fssgEsri')
 
-export function createFssgEsri (container: string, options?: IFssgEsriOptions) : FssgEsri {
+export function createFssgEsri (container: string, options?: IFssgEsriOptions, app?: App) : FssgEsri {
   const fssgEsri = new FssgEsri(container, options)
-  provide(SYMBOL_FSSG_ESRI, fssgEsri)
+  if (app) {
+    app.provide(SYMBOL_FSSG_ESRI, fssgEsri)
+  } else {
+    provide(SYMBOL_FSSG_ESRI, fssgEsri)
+  }
 
   whenRightReturn(500, () => document.getElementById(container)).then(() => {
     fssgEsri.mount()

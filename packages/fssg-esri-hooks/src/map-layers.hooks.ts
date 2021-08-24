@@ -1,6 +1,6 @@
 import { MapLayers, FssgEsri, IMapLayersOptions } from '@fssgis/fssg-esri'
 import { warn } from '@fssgis/fssg-map'
-import { inject, InjectionKey, provide } from 'vue'
+import { App, inject, InjectionKey, provide } from 'vue'
 import { useFssgEsri } from './fssg-esri.hooks'
 
 function _getMapLayers () : MapLayers
@@ -27,12 +27,16 @@ function _getMapLayers (arg0?: FssgEsri | MapLayers) : MapLayers {
 
 const SYMBOL_MAPLAYERS : InjectionKey<MapLayers> = Symbol('FssgEsri.MapLayers')
 export function createMapLayers (options: IMapLayersOptions) : MapLayers
-export function createMapLayers (options: IMapLayersOptions, fssgEsri: FssgEsri) : MapLayers
-export function createMapLayers (options: IMapLayersOptions, fssgEsri?: FssgEsri) : MapLayers {
+export function createMapLayers (options: IMapLayersOptions, fssgEsri: FssgEsri, app?: App) : MapLayers
+export function createMapLayers (options: IMapLayersOptions, fssgEsri?: FssgEsri, app?: App) : MapLayers {
   const mapLayers = new MapLayers(options)
   fssgEsri = fssgEsri ?? useFssgEsri()
   fssgEsri.use(mapLayers)
-  provide(SYMBOL_MAPLAYERS, mapLayers)
+  if (app) {
+    app.provide(SYMBOL_MAPLAYERS, mapLayers)
+  } else {
+    provide(SYMBOL_MAPLAYERS, mapLayers)
+  }
   return mapLayers
 }
 

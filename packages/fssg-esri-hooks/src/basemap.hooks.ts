@@ -1,5 +1,5 @@
 import { Basemap, FssgEsri, IBasemapOptions } from '@fssgis/fssg-esri'
-import { inject, InjectionKey, provide, ref, Ref } from 'vue'
+import { App, inject, InjectionKey, provide, ref, Ref } from 'vue'
 import { controllableWatch, useObservableOn } from './base.hooks'
 import { useFssgEsri } from './fssg-esri.hooks'
 import { warn } from '@fssgis/fssg-map'
@@ -91,12 +91,16 @@ export function useBasemapState (arg0?: FssgEsri | Basemap) : IBasemapHook {
 
 const SYMBOL_BASEMAP : InjectionKey<Basemap> = Symbol('FssgEsri.Basemap')
 export function createBasemap (options: IBasemapOptions) : Basemap
-export function createBasemap (options: IBasemapOptions, fssgMap: FssgEsri) : Basemap
-export function createBasemap (options: IBasemapOptions, fssgMap?: FssgEsri) : Basemap {
+export function createBasemap (options: IBasemapOptions, fssgMap: FssgEsri, app?: App) : Basemap
+export function createBasemap (options: IBasemapOptions, fssgMap?: FssgEsri, app?: App) : Basemap {
   const basemap = new Basemap(options)
   fssgMap = fssgMap ?? useFssgEsri()
   fssgMap.use(basemap)
-  provide(SYMBOL_BASEMAP, basemap)
+  if (app) {
+    app.provide(SYMBOL_BASEMAP, basemap)
+  } else {
+    provide(SYMBOL_BASEMAP, basemap)
+  }
   return basemap
 }
 

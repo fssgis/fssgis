@@ -657,6 +657,16 @@ declare class GeometryFacory implements IGeometryFactory {
  */
 declare function createGeometryFactory(fssgEsri: FssgEsri): GeometryFacory;
 
+interface ISqlLayerProperties {
+    url: string;
+    sqlOptions: {
+        xField: string;
+        yField: string;
+        iconUrl?: string;
+        iconUrlFuncStr?: string;
+    };
+    spatialReference?: __esri.SpatialReference;
+}
 /**
  * 图层工厂接口
  */
@@ -679,6 +689,12 @@ interface ILayerFactory {
         serverName?: string;
     }): __esri.MapImageLayer;
     createLayer(options: {
+        layerType: 'mapimagelayer';
+    } & __esri.MapImageLayerProperties): __esri.MapImageLayer;
+    createLayer(options: {
+        layerType: 'sqllayer';
+    } & __esri.GraphicsLayerProperties & ISqlLayerProperties): __esri.GraphicsLayer;
+    createLayer(options: {
         layerType: string;
     } & __esri.LayerProperties): __esri.Layer;
     createGraphicsLayer(options: __esri.GraphicsLayerProperties): __esri.GraphicsLayer;
@@ -688,6 +704,8 @@ interface ILayerFactory {
     createDynamicLayer(options: __esri.MapImageLayerProperties & {
         serverName?: string;
     }): __esri.MapImageLayer;
+    createMapImageLayer(options: __esri.MapImageLayerProperties): __esri.MapImageLayer;
+    createSqlLayer(options: __esri.GraphicsLayerProperties & ISqlLayerProperties): __esri.GraphicsLayer;
 }
 /**
  * 图层工厂（单例模式）
@@ -719,6 +737,12 @@ declare class LayerFactory implements ILayerFactory {
     } & __esri.MapImageLayerProperties & {
         serverName?: string;
     }): __esri.MapImageLayer;
+    createLayer(options: {
+        layerType: 'mapimagelayer';
+    } & __esri.MapImageLayerProperties): __esri.MapImageLayer;
+    createLayer(options: {
+        layerType: 'sqllayer';
+    } & __esri.GraphicsLayerProperties & ISqlLayerProperties): __esri.GraphicsLayer;
     createLayer(options: {
         layerType: string;
     } & __esri.LayerProperties): __esri.Layer;
@@ -770,6 +794,8 @@ declare class LayerFactory implements ILayerFactory {
         serverName?: string;
         name?: string;
     }): __esri.MapImageLayer;
+    createMapImageLayer(options?: __esri.MapImageLayerProperties): __esri.MapImageLayer;
+    createSqlLayer(options: __esri.GraphicsLayerProperties & ISqlLayerProperties): __esri.GraphicsLayer;
 }
 /**
  * 创建图层工厂

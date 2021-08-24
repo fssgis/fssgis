@@ -111,6 +111,7 @@ export class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEvent
       }
       if (layerOptions.layerType === 'sqllayer') {
         props.sqlOptions = layerOptions.sqlOptions
+        props.spatialReference = this.view_.spatialReference
       }
       const layer = createLayerFactory().createLayer(props as any) // eslint-disable-line
       this._group.add(layer)

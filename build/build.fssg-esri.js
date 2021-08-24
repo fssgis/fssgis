@@ -33,6 +33,7 @@ export default [
       '@arcgis/core/geometry/Polyline',
       '@arcgis/core/geometry/Polygon',
       '@arcgis/core/geometry/Extent',
+      '@arcgis/core/Graphic',
     ],
     plugins: [
       typescript(),

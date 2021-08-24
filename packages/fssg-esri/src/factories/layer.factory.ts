@@ -4,6 +4,18 @@ import WebTileLayer from '@arcgis/core/layers/WebTileLayer'
 import Layer from '@arcgis/core/layers/Layer'
 import TileLayer from '@arcgis/core/layers/TileLayer'
 import MapImageLayer from '@arcgis/core/layers/MapImageLayer'
+import Graphic from '@arcgis/core/Graphic'
+
+interface ISqlLayerProperties {
+  url: string
+  sqlOptions: {
+    xField: string
+    yField: string
+    iconUrl?: string
+    iconUrlFuncStr?: string
+  }
+  spatialReference?: __esri.SpatialReference
+}
 
 /**
  * 图层工厂接口
@@ -14,12 +26,16 @@ export interface ILayerFactory {
   createLayer (options: { layerType: 'webtilelayer' } & __esri.WebTileLayerProperties) : __esri.WebTileLayer
   createLayer (options: { layerType: 'tilelayer' } & __esri.TileLayerProperties) : __esri.TileLayer
   createLayer (options: { layerType: 'dynamiclayer' } & __esri.MapImageLayerProperties & { serverName?: string }) : __esri.MapImageLayer
+  createLayer (options: { layerType: 'mapimagelayer' } & __esri.MapImageLayerProperties) : __esri.MapImageLayer
+  createLayer (options: { layerType: 'sqllayer' } & __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer
   createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer
   createGraphicsLayer (options: __esri.GraphicsLayerProperties) : __esri.GraphicsLayer
   createGroupLayer (options: __esri.GroupLayerProperties) : __esri.GroupLayer
   createWebTileLayer (options: __esri.WebTileLayerProperties) : __esri.WebTileLayer
   createTileLayer (options: __esri.TileLayerProperties) : __esri.TileLayer
   createDynamicLayer (options: __esri.MapImageLayerProperties & { serverName?: string }) : __esri.MapImageLayer
+  createMapImageLayer (options: __esri.MapImageLayerProperties) : __esri.MapImageLayer
+  createSqlLayer (options: __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer
 }
 
 /**
@@ -49,6 +65,8 @@ class LayerFactory implements ILayerFactory {
   public createLayer (options: { layerType: 'webtilelayer' } & __esri.WebTileLayerProperties) : __esri.WebTileLayer
   public createLayer (options: { layerType: 'tilelayer' } & __esri.TileLayerProperties) : __esri.TileLayer
   public createLayer (options: { layerType: 'dynamiclayer' } & __esri.MapImageLayerProperties & { serverName?: string }) : __esri.MapImageLayer
+  public createLayer (options: { layerType: 'mapimagelayer' } & __esri.MapImageLayerProperties) : __esri.MapImageLayer
+  public createLayer (options: { layerType: 'sqllayer' } & __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer
   public createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer
   public createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer {
     switch (options.layerType) {
@@ -62,6 +80,10 @@ class LayerFactory implements ILayerFactory {
         return this.createTileLayer(options)
       case 'dynamiclayer':
         return this.createDynamicLayer(options)
+      case 'mapimagelayer':
+        return this.createMapImageLayer(options)
+      case 'sqllayer':
+        return this.createSqlLayer(options as any) // eslint-disable-line
       default:
         return new Layer(options)
     }
@@ -132,6 +154,53 @@ class LayerFactory implements ILayerFactory {
       // @ts-ignore
       layer.sublayers = [{ id }]
     })
+    return layer
+  }
+
+  public createMapImageLayer (options?: __esri.MapImageLayerProperties) : __esri.MapImageLayer {
+    return new MapImageLayer(options)
+  }
+
+  public createSqlLayer (options: __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer {
+    const layer = this.createGraphicsLayer(options)
+    fetch(options.url, { method: 'get', mode:'cors' }).then(res => res.json()).then(result => {
+      result.forEach(row => {
+        if (!row[options.sqlOptions.xField] || !row[options.sqlOptions.yField]) {
+          return
+        }
+        const attributes = row
+        let iconUrl
+        if (options.sqlOptions.iconUrl) {
+          iconUrl = options.sqlOptions.iconUrl
+        } else if (options.sqlOptions.iconUrlFuncStr) {
+          iconUrl = eval(options.sqlOptions.iconUrlFuncStr)
+        }
+        const props : __esri.GraphicProperties = {
+          attributes,
+          geometry: {
+            type: 'point',
+            x: row[options.sqlOptions.xField],
+            y: row[options.sqlOptions.yField],
+            spatialReference: options.spatialReference,
+          } as __esri.PointProperties,
+          symbol: {
+            type: 'simple-marker',
+            color: '#4FAFEF',
+          } as __esri.SimpleMarkerSymbolProperties
+        }
+        if (iconUrl) {
+          props['symbol'] = {
+            type: 'picture-marker',
+            url: iconUrl,
+            width: '32px',
+            height: '32px'
+          } as __esri.PictureMarkerSymbolProperties
+        }
+        const graphic = new Graphic(props)
+        layer.graphics.add(graphic)
+      })
+    })
+
     return layer
   }
 

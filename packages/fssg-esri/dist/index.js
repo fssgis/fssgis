@@ -12,8 +12,8 @@ import WebTileLayer from '@arcgis/core/layers/WebTileLayer';
 import Layer from '@arcgis/core/layers/Layer';
 import TileLayer from '@arcgis/core/layers/TileLayer';
 import MapImageLayer from '@arcgis/core/layers/MapImageLayer';
-import EsriBasemap from '@arcgis/core/Basemap';
 import Graphic from '@arcgis/core/Graphic';
+import EsriBasemap from '@arcgis/core/Basemap';
 import Geometry from '@arcgis/core/geometry/Geometry';
 import { deepCopyJSON, $extend } from '@fssgis/utils';
 
@@ -361,6 +361,13 @@ class LayerFactory {
       case 'dynamiclayer':
         return this.createDynamicLayer(options);
 
+      case 'mapimagelayer':
+        return this.createMapImageLayer(options);
+
+      case 'sqllayer':
+        return this.createSqlLayer(options);
+      // eslint-disable-line
+
       default:
         return new Layer(options);
     }
@@ -443,6 +450,60 @@ class LayerFactory {
       layer.sublayers = [{
         id
       }];
+    });
+    return layer;
+  }
+
+  createMapImageLayer(options) {
+    return new MapImageLayer(options);
+  }
+
+  createSqlLayer(options) {
+    const layer = this.createGraphicsLayer(options);
+    fetch(options.url, {
+      method: 'get',
+      mode: 'cors'
+    }).then(res => res.json()).then(result => {
+      result.forEach(row => {
+        if (!row[options.sqlOptions.xField] || !row[options.sqlOptions.yField]) {
+          return;
+        }
+
+        const attributes = row;
+        let iconUrl;
+
+        if (options.sqlOptions.iconUrl) {
+          iconUrl = options.sqlOptions.iconUrl;
+        } else if (options.sqlOptions.iconUrlFuncStr) {
+          iconUrl = eval(options.sqlOptions.iconUrlFuncStr);
+        }
+
+        const props = {
+          attributes,
+          geometry: {
+            type: 'point',
+            x: row[options.sqlOptions.xField],
+            y: row[options.sqlOptions.yField],
+            spatialReference: options.spatialReference
+          },
+          symbol: {
+            type: 'simple-marker',
+            color: '#4FAFEF'
+          }
+        };
+
+        if (iconUrl) {
+          props['symbol'] = {
+            type: 'picture-marker',
+            url: iconUrl,
+            width: '32px',
+            height: '32px'
+          };
+        }
+
+        const graphic = new Graphic(props);
+        layer.graphics.add(graphic);
+      });
     });
     return layer;
   }
@@ -1615,6 +1676,7 @@ class MapLayers extends FssgEsriPlugin {
 
       if (layerOptions.layerType === 'sqllayer') {
         props.sqlOptions = layerOptions.sqlOptions;
+        props.spatialReference = this.view_.spatialReference;
       }
 
       const layer = createLayerFactory().createLayer(props); // eslint-disable-line

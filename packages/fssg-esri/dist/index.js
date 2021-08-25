@@ -1916,7 +1916,11 @@ class Hawkeye extends FssgEsriPlugin {
     Promise.all([sourceView.when, hawkeyeView.when]).then(() => {
       hawkeyeView.extent = sourceView.extent;
       hawkeyeView.constraints.minZoom = hawkeyeView.zoom;
-      hawkeyeView.constraints.maxZoom = hawkeyeView.zoom; //禁止移动地图
+      hawkeyeView.constraints.maxZoom = hawkeyeView.zoom;
+
+      this._fssgEsri.mapElement.set(sourceView.extent);
+
+      hawkeyeView.zoom = 9; //禁止移动地图
 
       hawkeyeView.on('drag', event => {
         event.stopPropagation();
@@ -1932,7 +1936,7 @@ class Hawkeye extends FssgEsriPlugin {
         if (zoom !== 9) {
           hawkeyeView.zoom = 9;
         }
-      }, true);
+      });
     });
     return this;
   }

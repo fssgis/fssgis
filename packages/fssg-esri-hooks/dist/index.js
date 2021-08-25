@@ -549,7 +549,7 @@ function useHawkeye(fssgEsri) {
 }
 
 const SYMBOL_LAYERTREE = Symbol('FssgEsri.LayerTree');
-const SYMBOL_LAYERTREE_STATE = Symbol('FssgEsri.LayerTreeState');
+const SYMBOL_LAYERTREE_LOADED = Symbol('FssgEsri.LayerTreeLOADED');
 function createLayerTree(options, fssgEsri, app) {
   const layerTree = new LayerTree(options);
   fssgEsri = fssgEsri ?? useFssgEsri();
@@ -561,6 +561,23 @@ function createLayerTree(options, fssgEsri, app) {
     provide(SYMBOL_LAYERTREE, layerTree);
   }
 
+  const loaded = ref(false);
+  layerTree.when(() => loaded.value = true);
+
+  if (app) {
+    app.provide(SYMBOL_LAYERTREE_LOADED, loaded);
+  } else {
+    provide(SYMBOL_LAYERTREE_LOADED, loaded);
+  }
+
+  return layerTree;
+}
+function useLayerTree(fssgEsri) {
+  return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.layerTree) ?? inject(SYMBOL_LAYERTREE);
+}
+function useLayerTreeState() {
+  const fssgEsri = useFssgEsri();
+  const layerTree = useLayerTree();
   const state = reactive({
     checkedIds: layerTree.checkedIds,
     treeNodes: layerTree.tree
@@ -568,6 +585,10 @@ function createLayerTree(options, fssgEsri, app) {
   watch(() => state.checkedIds, (newValue, oldValue) => {
     if (!oldValue) {
       layerTree.list.forEach(item => {
+        if (!item.layerId) {
+          return;
+        }
+
         const layer = fssgEsri.mapLayers.findLayer(item.layerId);
 
         if (!layer) {
@@ -612,20 +633,10 @@ function createLayerTree(options, fssgEsri, app) {
       return;
     }
   });
-
-  if (app) {
-    app.provide(SYMBOL_LAYERTREE_STATE, state);
-  } else {
-    provide(SYMBOL_LAYERTREE_STATE, state);
-  }
-
-  return layerTree;
+  return state;
 }
-function useLayerTree(fssgEsri) {
-  return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.layerTree) ?? inject(SYMBOL_LAYERTREE);
-}
-function useLayerTreeState() {
-  return inject(SYMBOL_LAYERTREE_STATE);
+function useLayerTreeLoaded() {
+  return inject(SYMBOL_LAYERTREE_LOADED);
 }
 
-export { createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapTools, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapTools, useMapToolsActivedKey, useMapToolsState, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapTools, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeLoaded, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapTools, useMapToolsActivedKey, useMapToolsState, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

@@ -99,6 +99,9 @@ export class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEvent
    * @returns this
    */
    private _setNodeChecked (node: ITreeNode, checked: boolean) : this {
+    if (!node.layerId) {
+      return this
+    }
     const layer = this.$.mapLayers.findLayer(node.layerId)
     layer && (layer.visible = checked)
     node.associatedLayerIds?.forEach(id => {

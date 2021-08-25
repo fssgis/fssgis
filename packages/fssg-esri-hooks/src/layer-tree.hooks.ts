@@ -1,6 +1,6 @@
 import { LayerTree, FssgEsri, ILayerTreeOptions, ITreeNode } from '@fssgis/fssg-esri'
 import { warn } from '@fssgis/fssg-map'
-import { App, inject, InjectionKey, provide, reactive, watch } from 'vue'
+import { App, inject, InjectionKey, provide, reactive, ref, Ref, watch } from 'vue'
 import { useFssgEsri } from './fssg-esri.hooks'
 
 function _getLayerTree () : LayerTree
@@ -31,7 +31,7 @@ interface ILayerTreeState {
 }
 
 const SYMBOL_LAYERTREE : InjectionKey<LayerTree> = Symbol('FssgEsri.LayerTree')
-const SYMBOL_LAYERTREE_STATE : InjectionKey<ILayerTreeState> = Symbol('FssgEsri.LayerTreeState')
+const SYMBOL_LAYERTREE_LOADED : InjectionKey<Ref<boolean>> = Symbol('FssgEsri.LayerTreeLOADED')
 
 export function createLayerTree (options: ILayerTreeOptions) : LayerTree
 export function createLayerTree (options: ILayerTreeOptions, fssgEsri: FssgEsri, app?: App) : LayerTree
@@ -45,6 +45,27 @@ export function createLayerTree (options: ILayerTreeOptions, fssgEsri?: FssgEsri
     provide(SYMBOL_LAYERTREE, layerTree)
   }
 
+  const loaded = ref(false)
+  layerTree.when(() => loaded.value = true)
+  if (app) {
+    app.provide(SYMBOL_LAYERTREE_LOADED, loaded)
+  } else {
+    provide(SYMBOL_LAYERTREE_LOADED, loaded)
+  }
+
+  return layerTree
+}
+
+export function useLayerTree () : LayerTree
+export function useLayerTree (fssgEsri: FssgEsri) : LayerTree
+export function useLayerTree (fssgEsri?: FssgEsri) : LayerTree
+export function useLayerTree (fssgEsri?: FssgEsri) : LayerTree {
+  return fssgEsri?.layerTree ?? inject(SYMBOL_LAYERTREE) as LayerTree
+}
+
+export function useLayerTreeState () : ILayerTreeState {
+  const fssgEsri = useFssgEsri()
+  const layerTree = useLayerTree()
   const state : ILayerTreeState = reactive({
     checkedIds: layerTree.checkedIds,
     treeNodes: layerTree.tree,
@@ -52,7 +73,10 @@ export function createLayerTree (options: ILayerTreeOptions, fssgEsri?: FssgEsri
   watch(() => state.checkedIds, (newValue, oldValue) => {
     if (!oldValue) {
       layerTree.list.forEach(item => {
-        const layer = (fssgEsri as FssgEsri).mapLayers.findLayer(item.layerId)
+        if (!item.layerId) {
+          return
+        }
+        const layer = fssgEsri.mapLayers.findLayer(item.layerId)
         if (!layer) {
           return
         }
@@ -86,23 +110,9 @@ export function createLayerTree (options: ILayerTreeOptions, fssgEsri?: FssgEsri
       return
     }
   })
-
-  if (app) {
-    app.provide(SYMBOL_LAYERTREE_STATE, state)
-  } else {
-    provide(SYMBOL_LAYERTREE_STATE, state)
-  }
-
-  return layerTree
+  return state
 }
 
-export function useLayerTree () : LayerTree
-export function useLayerTree (fssgEsri: FssgEsri) : LayerTree
-export function useLayerTree (fssgEsri?: FssgEsri) : LayerTree
-export function useLayerTree (fssgEsri?: FssgEsri) : LayerTree {
-  return fssgEsri?.layerTree ?? inject(SYMBOL_LAYERTREE) as LayerTree
-}
-
-export function useLayerTreeState () : ILayerTreeState {
-  return inject(SYMBOL_LAYERTREE_STATE) as ILayerTreeState
+export function useLayerTreeLoaded () : Ref<boolean> {
+  return inject(SYMBOL_LAYERTREE_LOADED) as Ref<boolean>
 }

@@ -2027,6 +2027,10 @@ class LayerTree extends FssgEsriPlugin {
   _setNodeChecked(node, checked) {
     var _node$associatedLayer;
 
+    if (!node.layerId) {
+      return this;
+    }
+
     const layer = this.$.mapLayers.findLayer(node.layerId);
     layer && (layer.visible = checked);
     (_node$associatedLayer = node.associatedLayerIds) === null || _node$associatedLayer === void 0 ? void 0 : _node$associatedLayer.forEach(id => {

@@ -14,7 +14,7 @@ import TileLayer from '@arcgis/core/layers/TileLayer';
 import MapImageLayer from '@arcgis/core/layers/MapImageLayer';
 import Graphic from '@arcgis/core/Graphic';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
-import { createGuid, deepCopyJSON, $extend, whenRightReturn, throttle } from '@fssgis/utils';
+import { createGuid, deepCopyJSON, $extend, whenRightReturn, throttle, listToTree } from '@fssgis/utils';
 import EsriBasemap from '@arcgis/core/Basemap';
 import Geometry from '@arcgis/core/geometry/Geometry';
 
@@ -772,6 +772,8 @@ class FssgEsri extends FssgMap {
     _defineProperty(this, "mapLayers", void 0);
 
     _defineProperty(this, "hawkeye", void 0);
+
+    _defineProperty(this, "layerTree", void 0);
 
     _defineProperty(this, "_map", void 0);
 
@@ -1952,4 +1954,198 @@ class Hawkeye extends FssgEsriPlugin {
 
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, MapCursor, MapElement, MapLayers, MapTools, createGeometryFactory, createLayerFactory };
+class LayerTree extends FssgEsriPlugin {
+  //#region 私有属性
+
+  /**
+  * 图层树列表
+  */
+
+  /**
+  * 图层树
+  */
+
+  /**
+  * 选中的树节点Id
+  */
+  //#endregion
+  //#region getter setter
+
+  /**
+  * 图层树列表
+  */
+  get list() {
+    return this._list;
+  }
+  /**
+  * 图层树
+  */
+
+
+  get tree() {
+    return this._tree;
+  }
+  /**
+  * 选中的树节点Id
+  */
+
+
+  get checkedIds() {
+    return this._checkedIds;
+  } //#endregion
+
+  /**
+   * 构造图层树插件实例
+   * @param options 配置项
+   */
+
+
+  constructor(options = {}) {
+    super(options, {
+      items: []
+    });
+
+    _defineProperty(this, "_list", void 0);
+
+    _defineProperty(this, "_tree", void 0);
+
+    _defineProperty(this, "_checkedIds", void 0);
+
+    this._list = options.items ?? [];
+    this._tree = listToTree(this._list);
+    this._checkedIds = [];
+  } //#region 私有方法
+
+  /**
+   * 设置树节点选中状态
+   * @param node 树节点
+   * @param checked 选中状态
+   * @returns this
+   */
+
+
+  _setNodeChecked(node, checked) {
+    var _node$associatedLayer;
+
+    const layer = this.$.mapLayers.findLayer(node.layerId);
+    layer && (layer.visible = checked);
+    (_node$associatedLayer = node.associatedLayerIds) === null || _node$associatedLayer === void 0 ? void 0 : _node$associatedLayer.forEach(id => {
+      const layer = this.$.mapLayers.findLayer(id);
+      layer && (layer.visible = checked);
+    });
+    return this.fire('change:checked', {
+      node,
+      checked
+    });
+  }
+  /**
+   * 初始化
+   */
+
+
+  _init() {
+    this.$.mapLayers.when().then(() => {
+      this._list.forEach(item => {
+        this._setNodeChecked(item, item.defaultChecked);
+
+        item.defaultChecked && this._checkedIds.push(item.id);
+      });
+    }); // this.on('change:checked', e => {
+    // })
+
+    return this;
+  } //#endregion
+  //#region 公有方法
+
+  /**
+   * 安装插件
+   * @param fssgEsri 地图应用
+   * @returns this
+   */
+
+
+  installPlugin(fssgEsri) {
+    return super.installPlugin(fssgEsri)._init().fire('loaded');
+  }
+  /**
+   * 通过树节点Id查找图层
+   * @param nodeId 树节点Id
+   * @returns 图层
+   */
+
+
+  findLayerFromNodeId(nodeId) {
+    var _this$_list$find;
+
+    const layerId = (_this$_list$find = this._list.find(item => item.id === nodeId)) === null || _this$_list$find === void 0 ? void 0 : _this$_list$find.layerId;
+
+    if (layerId) {
+      return this.$.mapLayers.findLayer(layerId);
+    }
+  }
+  /**
+   * 通过树节点Id查找树节点
+   * @param nodeId 树节点Id
+   * @returns 树节点
+   */
+
+
+  findNodeFromNodeId(nodeId) {
+    return this._list.find(item => item.id === nodeId);
+  }
+  /**
+   * 通过树节点名称查找树节点
+   * @param nodeName 树节点名称
+   * @returns 树节点
+   */
+
+
+  findNodeFromNodeName(nodeName) {
+    return this._list.find(item => item.name === nodeName);
+  }
+  /**
+   * 通过图层Id查找树节点
+   * @param layerId 图层Id
+   * @returns 树节点
+   */
+
+
+  findNodeFromLayerId(layerId) {
+    for (let i = 0; i < this._list.length; i++) {
+      const item = this._list[i];
+
+      if (item.layerId === layerId) {
+        return item;
+      }
+    }
+  }
+  /**
+   * 设置树节点选中状态
+   * @param nodeId 树节点Id
+   * @param checked 选中状态
+   * @returns this
+   */
+
+
+  setNodeCheckById(nodeId, checked) {
+    const node = this.findNodeFromNodeId(nodeId);
+    node && this._setNodeChecked(node, checked);
+    return this;
+  }
+  /**
+   * 设置树节点选中状态
+   * @param nodeName 树节点名称
+   * @param checked 选中状态
+   * @returns this
+   */
+
+
+  setNodeCheckByName(nodeName, check) {
+    const node = this.findNodeFromNodeName(nodeName);
+    node && this._setNodeChecked(node, check);
+    return this;
+  }
+
+}
+
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, LayerTree, MapCursor, MapElement, MapLayers, MapTools, createGeometryFactory, createLayerFactory };

@@ -514,6 +514,120 @@ declare class Hawkeye extends FssgEsriPlugin<IHawkeyeOptions, IHawkeyeEvents> {
 }
 
 /**
+ * 树节点
+ */
+interface ITreeNode {
+    id: string;
+    parentId: string;
+    name: string;
+    layerId: string;
+    defaultChecked: boolean;
+    associatedLayerIds?: string[];
+    children?: ITreeNode[];
+}
+/**
+ * 图层树插件配置项
+ */
+interface ILayerTreeOptions extends IFssgEsriPluginOptions {
+    items?: Omit<ITreeNode, 'children'>[];
+}
+/**
+ * 图层树插件事件集
+ */
+interface ILayerTreeEvents extends IFssgEsriPluginEvents {
+    'change:checked': {
+        node: ITreeNode;
+        checked: boolean;
+    };
+}
+declare class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEvents> {
+    /**
+   * 图层树列表
+   */
+    private _list;
+    /**
+    * 图层树
+    */
+    private _tree;
+    /**
+    * 选中的树节点Id
+    */
+    private _checkedIds;
+    /**
+    * 图层树列表
+    */
+    get list(): ITreeNode[];
+    /**
+    * 图层树
+    */
+    get tree(): ITreeNode[];
+    /**
+    * 选中的树节点Id
+    */
+    get checkedIds(): string[];
+    /**
+     * 构造图层树插件实例
+     * @param options 配置项
+     */
+    constructor(options?: ILayerTreeOptions);
+    /**
+     * 设置树节点选中状态
+     * @param node 树节点
+     * @param checked 选中状态
+     * @returns this
+     */
+    private _setNodeChecked;
+    /**
+     * 初始化
+     */
+    private _init;
+    /**
+     * 安装插件
+     * @param fssgEsri 地图应用
+     * @returns this
+     */
+    installPlugin(fssgEsri: FssgEsri): this;
+    /**
+     * 通过树节点Id查找图层
+     * @param nodeId 树节点Id
+     * @returns 图层
+     */
+    findLayerFromNodeId(nodeId: string): __esri.Layer | undefined;
+    /**
+     * 通过树节点Id查找树节点
+     * @param nodeId 树节点Id
+     * @returns 树节点
+     */
+    findNodeFromNodeId(nodeId: string): ITreeNode | undefined;
+    /**
+     * 通过树节点名称查找树节点
+     * @param nodeName 树节点名称
+     * @returns 树节点
+     */
+    findNodeFromNodeName(nodeName: string): ITreeNode | undefined;
+    /**
+     * 通过图层Id查找树节点
+     * @param layerId 图层Id
+     * @returns 树节点
+     */
+    findNodeFromLayerId(layerId: string): ITreeNode | undefined;
+    /**
+     * 设置树节点选中状态
+     * @param nodeId 树节点Id
+     * @param checked 选中状态
+     * @returns this
+     */
+    setNodeCheckById(nodeId: string, checked: boolean): this;
+    /**
+     * 设置树节点选中状态
+     * @param nodeName 树节点名称
+     * @param checked 选中状态
+     * @returns this
+     */
+    setNodeCheckByName(nodeName: string, check: boolean): this;
+}
+
+/**
  * 坐标XY
  */
 declare type XY = {
@@ -893,6 +1007,7 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     mapCursor: MapCursor;
     mapLayers: MapLayers;
     hawkeye: Hawkeye;
+    layerTree: LayerTree;
     /**
      * 地图对象
      */
@@ -997,4 +1112,4 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     reset(): Promise<this>;
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, ILayerFactory, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapToolsEvents, IMapToolsOptions, IOwner, IView, LonLat, MapCursor, MapElement, MapLayers, MapTools, XY, createGeometryFactory, createLayerFactory };
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapToolsEvents, IMapToolsOptions, IOwner, ITreeNode, IView, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapTools, XY, createGeometryFactory, createLayerFactory };

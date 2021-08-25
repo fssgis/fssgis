@@ -1893,7 +1893,9 @@ class Hawkeye extends FssgEsriPlugin {
 
   _init() {
     this._container = this.options_.container;
-    this._fssgEsri = new FssgEsri(this._container, this.options_.fssgEsriOptions).use(new MapElement({
+    this._fssgEsri = new FssgEsri(this._container, $extend(true, {}, this.$.options, this.options_.fssgEsriOptions, {
+      debug: false
+    })).use(new MapElement({
       graphicsSymbol: {
         fill: this.options_.symbol
       }
@@ -1916,13 +1918,8 @@ class Hawkeye extends FssgEsriPlugin {
     const sourceView = this.$.view;
     const hawkeyeView = this._fssgEsri.view;
     Promise.all([sourceView.when, hawkeyeView.when]).then(() => {
-      hawkeyeView.extent = sourceView.extent;
-      hawkeyeView.constraints.minZoom = hawkeyeView.zoom;
-      hawkeyeView.constraints.maxZoom = hawkeyeView.zoom;
+      this._fssgEsri.mapElement.set(sourceView.extent); //禁止移动地图
 
-      this._fssgEsri.mapElement.set(sourceView.extent);
-
-      hawkeyeView.zoom = 9; //禁止移动地图
 
       hawkeyeView.on('drag', event => {
         event.stopPropagation();
@@ -1934,11 +1931,6 @@ class Hawkeye extends FssgEsriPlugin {
       sourceView.watch(['zoom', 'center'], throttle(() => {
         this._fssgEsri.mapElement.set(sourceView.extent);
       }, 200));
-      hawkeyeView.watch('zoom', zoom => {
-        if (zoom !== 9) {
-          hawkeyeView.zoom = 9;
-        }
-      });
     });
     return this;
   }

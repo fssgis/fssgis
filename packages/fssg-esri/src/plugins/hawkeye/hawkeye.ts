@@ -2,7 +2,7 @@ import MapLayers, { IMapLayersOptions } from '../map-layers'
 import FssgEsri, { IFssgEsriOptions } from '../../fssg-esri'
 import FssgEsriPlugin, { IFssgEsriPluginEvents, IFssgEsriPluginOptions } from '../../fssg-esri-plugin'
 import MapElement from '../map-element'
-import { throttle, whenRightReturn } from '@fssgis/utils'
+import { throttle, whenRightReturn, $extend } from '@fssgis/utils'
 
 /**
  * 鹰眼插件配置项
@@ -50,7 +50,7 @@ export class Hawkeye extends FssgEsriPlugin<IHawkeyeOptions, IHawkeyeEvents> {
    */
   private _init () : this {
     this._container = this.options_.container as string
-    this._fssgEsri = new FssgEsri(this._container, this.options_.fssgEsriOptions)
+    this._fssgEsri = new FssgEsri(this._container, $extend(true, {}, this.$.options, this.options_.fssgEsriOptions, { debug: false }))
       .use(new MapElement({
         graphicsSymbol: {
           fill: this.options_.symbol
@@ -75,12 +75,8 @@ export class Hawkeye extends FssgEsriPlugin<IHawkeyeOptions, IHawkeyeEvents> {
     const sourceView = this.$.view
     const hawkeyeView = this._fssgEsri.view
     Promise.all([sourceView.when, hawkeyeView.when]).then(() => {
-      hawkeyeView.extent = sourceView.extent
-      hawkeyeView.constraints.minZoom = hawkeyeView.zoom
-      hawkeyeView.constraints.maxZoom = hawkeyeView.zoom
       this._fssgEsri.mapElement
         .set(sourceView.extent)
-      hawkeyeView.zoom = 9
       //禁止移动地图
       hawkeyeView.on('drag', event => {
         event.stopPropagation()
@@ -93,11 +89,6 @@ export class Hawkeye extends FssgEsriPlugin<IHawkeyeOptions, IHawkeyeEvents> {
         this._fssgEsri.mapElement
           .set(sourceView.extent)
       }, 200) as __esri.WatchCallback)
-      hawkeyeView.watch('zoom', zoom => {
-        if (zoom !== 9) {
-          hawkeyeView.zoom = 9
-        }
-      })
     })
     return this
   }

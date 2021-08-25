@@ -775,6 +775,8 @@ class FssgEsri extends FssgMap {
 
     _defineProperty(this, "layerTree", void 0);
 
+    _defineProperty(this, "mapModules", void 0);
+
     _defineProperty(this, "_map", void 0);
 
     _defineProperty(this, "_view", void 0);
@@ -2144,4 +2146,116 @@ class LayerTree extends FssgEsriPlugin {
 
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, LayerTree, MapCursor, MapElement, MapLayers, MapTools, createGeometryFactory, createLayerFactory };
+/**
+ * 地图模块控制插件
+ */
+
+class MapModules extends FssgEsriPlugin {
+  //#region 私有属性
+
+  /**
+   * 地图模块集合
+   */
+  //#endregion
+  //#region getter setter
+
+  /**
+  * 地图模块集合
+  */
+  get items() {
+    return this._items;
+  }
+
+  get selectedTitle() {
+    return this._selectedTitle;
+  }
+
+  set selectedTitle(title) {
+    this.selectByTitle(title);
+  } //#endregion
+  //#region 构造函数
+
+  /**
+  * 构造地图模块插件实例
+  * @param options 配置项
+  */
+
+
+  constructor(options = {}) {
+    super(options, {
+      items: []
+    });
+
+    _defineProperty(this, "_items", void 0);
+
+    _defineProperty(this, "_selectedTitle", void 0);
+
+    this._items = this.options_.items ?? [];
+    this._selectedTitle = this.options_.defaultSelectedTitle ?? '';
+  } //#endregion
+  //#region 公有方法
+
+  /**
+  * 选择地图模块
+  * @param moduleId 模块Id
+  * @returns this
+  */
+
+
+  selectById(moduleId) {
+    let item;
+    this._selectedTitle = '';
+
+    this._items.forEach(module => {
+      if (moduleId === module.id) {
+        this._selectedTitle = module.title;
+        item = module;
+        module.treeNodeIds.forEach(nodeId => {
+          this.$.layerTree.setNodeCheckById(nodeId, true);
+        });
+      } else {
+        module.treeNodeIds.forEach(nodeId => {
+          this.$.layerTree.setNodeCheckById(nodeId, false);
+        });
+      }
+    });
+
+    this.fire('change:selected', {
+      item
+    });
+    return this;
+  }
+  /**
+  * 选择地图模块
+  * @param moduleTitle 模块名称
+  * @returns this
+  */
+
+
+  selectByTitle(moduleTitle) {
+    let item;
+    this._selectedTitle = '';
+
+    this._items.forEach(module => {
+      if (moduleTitle === module.title) {
+        this._selectedTitle = module.title;
+        item = module;
+        module.treeNodeIds.forEach(nodeId => {
+          this.$.layerTree.setNodeCheckById(nodeId, true);
+        });
+      } else {
+        module.treeNodeIds.forEach(nodeId => {
+          this.$.layerTree.setNodeCheckById(nodeId, false);
+        });
+      }
+    });
+
+    this.fire('change:selected', {
+      item
+    });
+    return this;
+  }
+
+}
+
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, createGeometryFactory, createLayerFactory };

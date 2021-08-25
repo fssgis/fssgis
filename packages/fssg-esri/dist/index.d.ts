@@ -628,6 +628,63 @@ declare class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEven
 }
 
 /**
+ * 地图模块项
+ */
+interface IModuleItem {
+    id: string;
+    title: string;
+    treeNodeIds: string[];
+}
+/**
+ * 地图模块控制插件配置项
+ */
+interface IMapModulesOptions extends IFssgEsriPluginOptions {
+    items?: IModuleItem[];
+    defaultSelectedTitle?: string;
+}
+/**
+ * 地图模块控制插件事件集
+ */
+interface IMapModulesEvents extends IFssgEsriPluginEvents {
+    'change:selected': {
+        item?: IModuleItem;
+    };
+}
+/**
+ * 地图模块控制插件
+ */
+declare class MapModules extends FssgEsriPlugin<IMapModulesOptions, IMapModulesEvents> {
+    /**
+     * 地图模块集合
+     */
+    private _items;
+    private _selectedTitle;
+    /**
+    * 地图模块集合
+    */
+    get items(): IModuleItem[];
+    get selectedTitle(): string;
+    set selectedTitle(title: string);
+    /**
+    * 构造地图模块插件实例
+    * @param options 配置项
+    */
+    constructor(options?: IMapModulesOptions);
+    /**
+    * 选择地图模块
+    * @param moduleId 模块Id
+    * @returns this
+    */
+    selectById(moduleId: string): this;
+    /**
+    * 选择地图模块
+    * @param moduleTitle 模块名称
+    * @returns this
+    */
+    selectByTitle(moduleTitle: string): this;
+}
+
+/**
  * 坐标XY
  */
 declare type XY = {
@@ -1008,6 +1065,7 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     mapLayers: MapLayers;
     hawkeye: Hawkeye;
     layerTree: LayerTree;
+    mapModules: MapModules;
     /**
      * 地图对象
      */
@@ -1112,4 +1170,4 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     reset(): Promise<this>;
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapToolsEvents, IMapToolsOptions, IOwner, ITreeNode, IView, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapTools, XY, createGeometryFactory, createLayerFactory };
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapModulesEvents, IMapModulesOptions, IMapToolsEvents, IMapToolsOptions, IModuleItem, IOwner, ITreeNode, IView, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapModules, MapTools, XY, createGeometryFactory, createLayerFactory };

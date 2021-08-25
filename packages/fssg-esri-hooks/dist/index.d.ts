@@ -1,4 +1,4 @@
-import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement, MapTools, IMapToolsOptions, IHawkeyeOptions, Hawkeye, ILayerTreeOptions, LayerTree, ITreeNode } from '@fssgis/fssg-esri';
+import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement, MapTools, IMapToolsOptions, IHawkeyeOptions, Hawkeye, ILayerTreeOptions, LayerTree, ITreeNode, MapModules, IMapModulesOptions } from '@fssgis/fssg-esri';
 import { Ref, App } from 'vue';
 
 declare type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void;
@@ -137,6 +137,19 @@ declare function useLayerTree(): LayerTree;
 declare function useLayerTree(fssgEsri: FssgEsri): LayerTree;
 declare function useLayerTree(fssgEsri?: FssgEsri): LayerTree;
 declare function useLayerTreeState(): ILayerTreeState;
-declare function useLayerTreeLoaded(): Ref<boolean>;
 
-export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapTools, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeLoaded, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapTools, useMapToolsActivedKey, useMapToolsState, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+declare function useMapModulesSelectedTitle(): Ref<string>;
+declare function useMapModulesSelectedTitle(fssgMap: FssgEsri): Ref<string>;
+declare function useMapModulesSelectedTitle(mapModules: MapModules): Ref<string>;
+declare function useMapModulesSelectedTitle(arg0?: FssgEsri | MapModules): Ref<string>;
+interface IMapModulesState {
+    selectedId: string;
+}
+declare function createMapModules(options: IMapModulesOptions): MapModules;
+declare function createMapModules(options: IMapModulesOptions, fssgEsri: FssgEsri, app?: App): MapModules;
+declare function useMapModules(): MapModules;
+declare function useMapModules(fssgEsri: FssgEsri): MapModules;
+declare function useMapModules(fssgEsri?: FssgEsri): MapModules;
+declare function useMapModulesState(): IMapModulesState;
+
+export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

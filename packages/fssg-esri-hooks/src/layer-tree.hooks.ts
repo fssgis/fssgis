@@ -31,7 +31,7 @@ interface ILayerTreeState {
 }
 
 const SYMBOL_LAYERTREE : InjectionKey<LayerTree> = Symbol('FssgEsri.LayerTree')
-const SYMBOL_LAYERTREE_LOADED : InjectionKey<Ref<boolean>> = Symbol('FssgEsri.LayerTreeLOADED')
+const SYMBOL_LAYERTREE_STATE : InjectionKey<ILayerTreeState> = Symbol('FssgEsri.LayerTreeSTATE')
 
 export function createLayerTree (options: ILayerTreeOptions) : LayerTree
 export function createLayerTree (options: ILayerTreeOptions, fssgEsri: FssgEsri, app?: App) : LayerTree
@@ -45,12 +45,56 @@ export function createLayerTree (options: ILayerTreeOptions, fssgEsri?: FssgEsri
     provide(SYMBOL_LAYERTREE, layerTree)
   }
 
-  const loaded = ref(false)
-  layerTree.when(() => loaded.value = true)
+  const state : ILayerTreeState = reactive({
+    checkedIds: layerTree.checkedIds,
+    treeNodes: layerTree.tree,
+  })
+  layerTree.when(() => {
+    watch(() => state.checkedIds, (newValue, oldValue) => {
+      if (!oldValue) {
+        layerTree.list.forEach(item => {
+          if (!item.layerId) {
+            return
+          }
+          const layer = (fssgEsri as FssgEsri).mapLayers.findLayer(item.layerId)
+          if (!layer) {
+            return
+          }
+          layer.visible = state.checkedIds.includes(item.id)
+        })
+        return
+      }
+      const insertion = newValue.filter(v => !(oldValue.indexOf(v) > -1))
+      const deletion = oldValue.filter(v => !(newValue.indexOf(v) > -1))
+      insertion.forEach(nodeId => {
+        layerTree.setNodeCheckById(nodeId, true)
+      })
+      deletion.forEach(nodeId => {
+        layerTree.setNodeCheckById(nodeId, false)
+      })
+    }, { immediate: true, deep: true })
+    ;(fssgEsri as FssgEsri).mapLayers.on('change:visible', e => {
+      const node = layerTree.findNodeFromLayerId(e.options.id)
+      if (!node) {
+        return
+      }
+      if (e.visible && !state.checkedIds.includes(node.id)) {
+        state.checkedIds = [...state.checkedIds, node.id]
+        return
+      }
+      const index = state.checkedIds.indexOf(node.id)
+      if (!e.visible && index !== -1) {
+        const newArr = [...state.checkedIds]
+        newArr.splice(index, 1)
+        state.checkedIds = [...newArr]
+        return
+      }
+    })
+  })
   if (app) {
-    app.provide(SYMBOL_LAYERTREE_LOADED, loaded)
+    app.provide(SYMBOL_LAYERTREE_STATE, state)
   } else {
-    provide(SYMBOL_LAYERTREE_LOADED, loaded)
+    provide(SYMBOL_LAYERTREE_STATE, state)
   }
 
   return layerTree
@@ -64,55 +108,5 @@ export function useLayerTree (fssgEsri?: FssgEsri) : LayerTree {
 }
 
 export function useLayerTreeState () : ILayerTreeState {
-  const fssgEsri = useFssgEsri()
-  const layerTree = useLayerTree()
-  const state : ILayerTreeState = reactive({
-    checkedIds: layerTree.checkedIds,
-    treeNodes: layerTree.tree,
-  })
-  watch(() => state.checkedIds, (newValue, oldValue) => {
-    if (!oldValue) {
-      layerTree.list.forEach(item => {
-        if (!item.layerId) {
-          return
-        }
-        const layer = fssgEsri.mapLayers.findLayer(item.layerId)
-        if (!layer) {
-          return
-        }
-        layer.visible = state.checkedIds.includes(item.id)
-      })
-      return
-    }
-    const insertion = newValue.filter(v => !(oldValue.indexOf(v) > -1))
-    const deletion = oldValue.filter(v => !(newValue.indexOf(v) > -1))
-    insertion.forEach(nodeId => {
-      layerTree.setNodeCheckById(nodeId, true)
-    })
-    deletion.forEach(nodeId => {
-      layerTree.setNodeCheckById(nodeId, false)
-    })
-  }, { immediate: true, deep: true })
-  fssgEsri.mapLayers.on('change:visible', e => {
-    const node = layerTree.findNodeFromLayerId(e.options.id)
-    if (!node) {
-      return
-    }
-    if (e.visible && !state.checkedIds.includes(node.id)) {
-      state.checkedIds = [...state.checkedIds, node.id]
-      return
-    }
-    const index = state.checkedIds.indexOf(node.id)
-    if (!e.visible && index !== -1) {
-      const newArr = [...state.checkedIds]
-      newArr.splice(index, 1)
-      state.checkedIds = [...newArr]
-      return
-    }
-  })
-  return state
-}
-
-export function useLayerTreeLoaded () : Ref<boolean> {
-  return inject(SYMBOL_LAYERTREE_LOADED) as Ref<boolean>
+  return inject(SYMBOL_LAYERTREE_STATE) as ILayerTreeState
 }

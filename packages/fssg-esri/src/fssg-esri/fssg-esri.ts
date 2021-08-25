@@ -2,7 +2,7 @@ import { FssgMap, IFssgMapEvents, IFssgMapOptions } from '@fssgis/fssg-map'
 import ArcGISMap from '@arcgis/core/Map'
 import MapView from '@arcgis/core/views/MapView'
 import esriConfig from '@arcgis/core/config'
-import { Basemap, Hawkeye, LayerTree, MapCursor, MapElement, MapLayers, MapTools } from '../plugins'
+import { Basemap, Hawkeye, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools } from '../plugins'
 import { error } from '@fssgis/fssg-map'
 import { createGeometryFactory, LonLat, XY } from '../factories'
 import FssgEsriPlugin from '../fssg-esri-plugin'
@@ -44,6 +44,7 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
   public mapLayers: MapLayers
   public hawkeye: Hawkeye
   public layerTree: LayerTree
+  public mapModules: MapModules
 
   //#region 私有属性
 

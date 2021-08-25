@@ -1,4 +1,4 @@
-import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement, MapTools, Hawkeye, LayerTree } from '@fssgis/fssg-esri';
+import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement, MapTools, Hawkeye, LayerTree, MapModules } from '@fssgis/fssg-esri';
 import { getCurrentInstance, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide, reactive } from 'vue';
 import { whenRightReturn } from '@fssgis/utils';
 import '@fssgis/observable';
@@ -549,7 +549,7 @@ function useHawkeye(fssgEsri) {
 }
 
 const SYMBOL_LAYERTREE = Symbol('FssgEsri.LayerTree');
-const SYMBOL_LAYERTREE_LOADED = Symbol('FssgEsri.LayerTreeLOADED');
+const SYMBOL_LAYERTREE_STATE = Symbol('FssgEsri.LayerTreeSTATE');
 function createLayerTree(options, fssgEsri, app) {
   const layerTree = new LayerTree(options);
   fssgEsri = fssgEsri ?? useFssgEsri();
@@ -561,13 +561,68 @@ function createLayerTree(options, fssgEsri, app) {
     provide(SYMBOL_LAYERTREE, layerTree);
   }
 
-  const loaded = ref(false);
-  layerTree.when(() => loaded.value = true);
+  const state = reactive({
+    checkedIds: layerTree.checkedIds,
+    treeNodes: layerTree.tree
+  });
+  layerTree.when(() => {
+    watch(() => state.checkedIds, (newValue, oldValue) => {
+      if (!oldValue) {
+        layerTree.list.forEach(item => {
+          if (!item.layerId) {
+            return;
+          }
+
+          const layer = fssgEsri.mapLayers.findLayer(item.layerId);
+
+          if (!layer) {
+            return;
+          }
+
+          layer.visible = state.checkedIds.includes(item.id);
+        });
+        return;
+      }
+
+      const insertion = newValue.filter(v => !(oldValue.indexOf(v) > -1));
+      const deletion = oldValue.filter(v => !(newValue.indexOf(v) > -1));
+      insertion.forEach(nodeId => {
+        layerTree.setNodeCheckById(nodeId, true);
+      });
+      deletion.forEach(nodeId => {
+        layerTree.setNodeCheckById(nodeId, false);
+      });
+    }, {
+      immediate: true,
+      deep: true
+    });
+    fssgEsri.mapLayers.on('change:visible', e => {
+      const node = layerTree.findNodeFromLayerId(e.options.id);
+
+      if (!node) {
+        return;
+      }
+
+      if (e.visible && !state.checkedIds.includes(node.id)) {
+        state.checkedIds = [...state.checkedIds, node.id];
+        return;
+      }
+
+      const index = state.checkedIds.indexOf(node.id);
+
+      if (!e.visible && index !== -1) {
+        const newArr = [...state.checkedIds];
+        newArr.splice(index, 1);
+        state.checkedIds = [...newArr];
+        return;
+      }
+    });
+  });
 
   if (app) {
-    app.provide(SYMBOL_LAYERTREE_LOADED, loaded);
+    app.provide(SYMBOL_LAYERTREE_STATE, state);
   } else {
-    provide(SYMBOL_LAYERTREE_LOADED, loaded);
+    provide(SYMBOL_LAYERTREE_STATE, state);
   }
 
   return layerTree;
@@ -576,67 +631,94 @@ function useLayerTree(fssgEsri) {
   return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.layerTree) ?? inject(SYMBOL_LAYERTREE);
 }
 function useLayerTreeState() {
-  const fssgEsri = useFssgEsri();
-  const layerTree = useLayerTree();
+  return inject(SYMBOL_LAYERTREE_STATE);
+}
+
+function _getMapModules(arg0) {
+  let mapModules;
+
+  if (!arg0) {
+    const fssgEsri = useFssgEsri();
+    mapModules = fssgEsri.mapModules;
+
+    if (!mapModules) {
+      warn(this, 'MapModules实例未挂载到FssgMap实例');
+    }
+  } else {
+    if (arg0 instanceof FssgEsri) {
+      mapModules = arg0.mapModules;
+    } else {
+      mapModules = arg0;
+    }
+  }
+
+  return mapModules;
+}
+
+function useMapModulesSelectedTitle(arg0) {
+  const mapModules = _getMapModules(arg0);
+
+  const selectedTitle = ref(mapModules.selectedTitle);
+  controllableWatch(selectedTitle, key => {
+    if (mapModules.selectedTitle !== key) {
+      mapModules.selectedTitle = key;
+    }
+  });
+  useObservableOn(mapModules.on('change:selected', e => {
+    var _e$item;
+
+    if (((_e$item = e.item) === null || _e$item === void 0 ? void 0 : _e$item.title) !== selectedTitle.value) {
+      var _e$item2;
+
+      selectedTitle.value = ((_e$item2 = e.item) === null || _e$item2 === void 0 ? void 0 : _e$item2.title) ?? '';
+    }
+  }));
+  return selectedTitle;
+}
+const SYMBOL_MAPMODULES = Symbol('FssgEsri.MapModules');
+const SYMBOL_MAPMODULES_STATE = Symbol('FssgEsri.MapModulesSTATE');
+function createMapModules(options, fssgEsri, app) {
+  const mapModules = new MapModules(options);
+  fssgEsri = fssgEsri ?? useFssgEsri();
+  fssgEsri.use(mapModules);
+
+  if (app) {
+    app.provide(SYMBOL_MAPMODULES, mapModules);
+  } else {
+    provide(SYMBOL_MAPMODULES, mapModules);
+  }
+
   const state = reactive({
-    checkedIds: layerTree.checkedIds,
-    treeNodes: layerTree.tree
+    selectedId: ''
   });
-  watch(() => state.checkedIds, (newValue, oldValue) => {
-    if (!oldValue) {
-      layerTree.list.forEach(item => {
-        if (!item.layerId) {
-          return;
-        }
-
-        const layer = fssgEsri.mapLayers.findLayer(item.layerId);
-
-        if (!layer) {
-          return;
-        }
-
-        layer.visible = state.checkedIds.includes(item.id);
-      });
-      return;
-    }
-
-    const insertion = newValue.filter(v => !(oldValue.indexOf(v) > -1));
-    const deletion = oldValue.filter(v => !(newValue.indexOf(v) > -1));
-    insertion.forEach(nodeId => {
-      layerTree.setNodeCheckById(nodeId, true);
+  mapModules.when(() => {
+    watch(() => state.selectedId, id => {
+      mapModules.selectById(id);
     });
-    deletion.forEach(nodeId => {
-      layerTree.setNodeCheckById(nodeId, false);
+    mapModules.on('change:selected', e => {
+      var _e$item3;
+
+      if (((_e$item3 = e.item) === null || _e$item3 === void 0 ? void 0 : _e$item3.id) !== state.selectedId) {
+        var _e$item4;
+
+        state.selectedId = ((_e$item4 = e.item) === null || _e$item4 === void 0 ? void 0 : _e$item4.id) ?? '';
+      }
     });
-  }, {
-    immediate: true,
-    deep: true
   });
-  fssgEsri.mapLayers.on('change:visible', e => {
-    const node = layerTree.findNodeFromLayerId(e.options.id);
 
-    if (!node) {
-      return;
-    }
+  if (app) {
+    app.provide(SYMBOL_MAPMODULES_STATE, state);
+  } else {
+    provide(SYMBOL_MAPMODULES_STATE, state);
+  }
 
-    if (e.visible && !state.checkedIds.includes(node.id)) {
-      state.checkedIds = [...state.checkedIds, node.id];
-      return;
-    }
-
-    const index = state.checkedIds.indexOf(node.id);
-
-    if (!e.visible && index !== -1) {
-      const newArr = [...state.checkedIds];
-      newArr.splice(index, 1);
-      state.checkedIds = [...newArr];
-      return;
-    }
-  });
-  return state;
+  return mapModules;
 }
-function useLayerTreeLoaded() {
-  return inject(SYMBOL_LAYERTREE_LOADED);
+function useMapModules(fssgEsri) {
+  return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapModules) ?? inject(SYMBOL_MAPMODULES);
+}
+function useMapModulesState() {
+  return inject(SYMBOL_MAPMODULES_STATE);
 }
 
-export { createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapTools, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeLoaded, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapTools, useMapToolsActivedKey, useMapToolsState, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

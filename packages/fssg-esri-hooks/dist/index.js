@@ -1,4 +1,4 @@
-import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers } from '@fssgis/fssg-esri';
+import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement } from '@fssgis/fssg-esri';
 import { getCurrentInstance, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide } from 'vue';
 import { whenRightReturn } from '@fssgis/utils';
 import '@fssgis/observable';
@@ -448,4 +448,22 @@ function useMapLayers(fssgEsri) {
   return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapLayers) ?? inject(SYMBOL_MAPLAYERS);
 }
 
-export { createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, createMapLayers, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapLayers, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+const SYMBOL_MAPELEMENT = Symbol('FssgEsri.MapElement');
+function createMapElement(options, fssgEsri, app) {
+  const mapElement = new MapElement(options);
+  fssgEsri = fssgEsri ?? useFssgEsri();
+  fssgEsri.use(mapElement);
+
+  if (app) {
+    app.provide(SYMBOL_MAPELEMENT, mapElement);
+  } else {
+    provide(SYMBOL_MAPELEMENT, mapElement);
+  }
+
+  return mapElement;
+}
+function useMapElement(fssgEsri) {
+  return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapElement) ?? inject(SYMBOL_MAPELEMENT);
+}
+
+export { createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, createMapElement, createMapLayers, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

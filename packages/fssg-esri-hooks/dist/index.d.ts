@@ -1,4 +1,4 @@
-import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers } from '@fssgis/fssg-esri';
+import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement } from '@fssgis/fssg-esri';
 import { Ref, App } from 'vue';
 
 declare type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void;
@@ -97,4 +97,10 @@ declare function useMapLayers(): MapLayers;
 declare function useMapLayers(fssgEsri: FssgEsri): MapLayers;
 declare function useMapLayers(fssgEsri?: FssgEsri): MapLayers;
 
-export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, createMapLayers, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapLayers, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+declare function createMapElement(options: IMapElementOptions): MapElement;
+declare function createMapElement(options: IMapElementOptions, fssgEsri: FssgEsri, app?: App): MapElement;
+declare function useMapElement(): MapElement;
+declare function useMapElement(fssgEsri: FssgEsri): MapElement;
+declare function useMapElement(fssgEsri?: FssgEsri): MapElement;
+
+export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, createMapElement, createMapLayers, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

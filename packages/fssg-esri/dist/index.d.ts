@@ -474,6 +474,46 @@ declare class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEven
 }
 
 /**
+ * 鹰眼插件配置项
+ */
+interface IHawkeyeOptions extends IFssgEsriPluginOptions {
+    container?: string;
+    symbol?: __esri.SimpleFillSymbolProperties;
+    layers?: Required<IMapLayersOptions>['items'];
+    fssgEsriOptions?: IFssgEsriOptions;
+}
+/**
+ * 鹰眼插件事件集
+ */
+interface IHawkeyeEvents extends IFssgEsriPluginEvents {
+}
+/**
+ * 鹰眼插件
+ */
+declare class Hawkeye extends FssgEsriPlugin<IHawkeyeOptions, IHawkeyeEvents> {
+    private _fssgEsri;
+    private _container;
+    /**
+     * 构造鹰眼插件
+     * @param options 配置项
+     */
+    constructor(options?: IHawkeyeOptions);
+    /**
+     * 初始化
+     */
+    private _init;
+    /**
+     * 初始化地图同步
+     */
+    private _initExtentSync;
+    /**
+     * 安装插件
+     * @param fssgEsri 地图应用
+     */
+    installPlugin(fssgEsri: FssgEsri): this;
+}
+
+/**
  * 坐标XY
  */
 declare type XY = {
@@ -852,6 +892,7 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     mapTools: MapTools;
     mapCursor: MapCursor;
     mapLayers: MapLayers;
+    hawkeye: Hawkeye;
     /**
      * 地图对象
      */
@@ -868,6 +909,10 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
       * 视图对象
       */
     get view(): IView;
+    /**
+     * 配置项
+     */
+    get options(): IFssgEsriOptions;
     /**
      * 空间坐标系
      */
@@ -952,4 +997,4 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     reset(): Promise<this>;
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, ILayerFactory, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapToolsEvents, IMapToolsOptions, IOwner, IView, LonLat, MapCursor, MapElement, MapLayers, MapTools, XY, createGeometryFactory, createLayerFactory };
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, ILayerFactory, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapToolsEvents, IMapToolsOptions, IOwner, IView, LonLat, MapCursor, MapElement, MapLayers, MapTools, XY, createGeometryFactory, createLayerFactory };

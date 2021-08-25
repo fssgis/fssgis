@@ -14,7 +14,7 @@ import TileLayer from '@arcgis/core/layers/TileLayer';
 import MapImageLayer from '@arcgis/core/layers/MapImageLayer';
 import Graphic from '@arcgis/core/Graphic';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
-import { createGuid, deepCopyJSON, $extend } from '@fssgis/utils';
+import { createGuid, deepCopyJSON, $extend, whenRightReturn, throttle } from '@fssgis/utils';
 import EsriBasemap from '@arcgis/core/Basemap';
 import Geometry from '@arcgis/core/geometry/Geometry';
 
@@ -665,6 +665,14 @@ class FssgEsri extends FssgMap {
     return this._view;
   }
   /**
+   * 配置项
+   */
+
+
+  get options() {
+    return this.options_;
+  }
+  /**
    * 空间坐标系
    */
 
@@ -762,6 +770,8 @@ class FssgEsri extends FssgMap {
     _defineProperty(this, "mapCursor", void 0);
 
     _defineProperty(this, "mapLayers", void 0);
+
+    _defineProperty(this, "hawkeye", void 0);
 
     _defineProperty(this, "_map", void 0);
 
@@ -1851,4 +1861,91 @@ class MapLayers extends FssgEsriPlugin {
 
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, MapCursor, MapElement, MapLayers, MapTools, createGeometryFactory, createLayerFactory };
+/**
+ * 鹰眼插件
+ */
+
+class Hawkeye extends FssgEsriPlugin {
+  /**
+   * 构造鹰眼插件
+   * @param options 配置项
+   */
+  constructor(options) {
+    super(options, {
+      container: 'hawkeye-container',
+      symbol: {
+        type: 'simple-fill',
+        color: [255, 0, 0, 0.1]
+      },
+      layers: []
+    });
+
+    _defineProperty(this, "_fssgEsri", void 0);
+
+    _defineProperty(this, "_container", void 0);
+  }
+  /**
+   * 初始化
+   */
+
+
+  _init() {
+    this._container = this.options_.container;
+    this._fssgEsri = new FssgEsri(this._container, this.options_.fssgEsriOptions).use(new MapElement({
+      graphicsSymbol: {
+        fill: this.options_.symbol
+      }
+    })).use(new MapLayers({
+      items: this.options_.layers
+    }));
+    this.$.when().then(() => whenRightReturn(1000, () => document.getElementById(this._container))).then(() => {
+      this._fssgEsri.mount();
+
+      this._initExtentSync();
+    });
+    return this;
+  }
+  /**
+   * 初始化地图同步
+   */
+
+
+  _initExtentSync() {
+    const sourceView = this.$.view;
+    const hawkeyeView = this._fssgEsri.view;
+    Promise.all([sourceView.when, hawkeyeView.when]).then(() => {
+      hawkeyeView.extent = sourceView.extent;
+      hawkeyeView.constraints.minZoom = hawkeyeView.zoom;
+      hawkeyeView.constraints.maxZoom = hawkeyeView.zoom; //禁止移动地图
+
+      hawkeyeView.on('drag', event => {
+        event.stopPropagation();
+      });
+      hawkeyeView.on('mouse-wheel', event => {
+        event.stopPropagation();
+      }); // 动态主图绘制范围
+
+      sourceView.watch(['zoom', 'center'], throttle(() => {
+        this._fssgEsri.mapElement.set(sourceView.extent);
+      }, 200));
+      hawkeyeView.watch('zoom', zoom => {
+        if (zoom !== 9) {
+          hawkeyeView.zoom = 9;
+        }
+      }, true);
+    });
+    return this;
+  }
+  /**
+   * 安装插件
+   * @param fssgEsri 地图应用
+   */
+
+
+  installPlugin(fssgEsri) {
+    return super.installPlugin(fssgEsri)._init();
+  }
+
+}
+
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, MapCursor, MapElement, MapLayers, MapTools, createGeometryFactory, createLayerFactory };

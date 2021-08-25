@@ -1,5 +1,5 @@
-import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement, MapTools, Hawkeye } from '@fssgis/fssg-esri';
-import { getCurrentInstance, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide } from 'vue';
+import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement, MapTools, Hawkeye, LayerTree } from '@fssgis/fssg-esri';
+import { getCurrentInstance, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide, reactive } from 'vue';
 import { whenRightReturn } from '@fssgis/utils';
 import '@fssgis/observable';
 
@@ -548,4 +548,84 @@ function useHawkeye(fssgEsri) {
   return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.hawkeye) ?? inject(SYMBOL_HAWKEYE);
 }
 
-export { createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapTools, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapTools, useMapToolsActivedKey, useMapToolsState, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+const SYMBOL_LAYERTREE = Symbol('FssgEsri.LayerTree');
+const SYMBOL_LAYERTREE_STATE = Symbol('FssgEsri.LayerTreeState');
+function createLayerTree(options, fssgEsri, app) {
+  const layerTree = new LayerTree(options);
+  fssgEsri = fssgEsri ?? useFssgEsri();
+  fssgEsri.use(layerTree);
+
+  if (app) {
+    app.provide(SYMBOL_LAYERTREE, layerTree);
+  } else {
+    provide(SYMBOL_LAYERTREE, layerTree);
+  }
+
+  const state = reactive({
+    checkedIds: layerTree.checkedIds,
+    treeNodes: layerTree.tree
+  });
+  watch(() => state.checkedIds, (newValue, oldValue) => {
+    if (!oldValue) {
+      layerTree.list.forEach(item => {
+        const layer = fssgEsri.mapLayers.findLayer(item.layerId);
+
+        if (!layer) {
+          return;
+        }
+
+        layer.visible = state.checkedIds.includes(item.id);
+      });
+      return;
+    }
+
+    const insertion = newValue.filter(v => !(oldValue.indexOf(v) > -1));
+    const deletion = oldValue.filter(v => !(newValue.indexOf(v) > -1));
+    insertion.forEach(nodeId => {
+      layerTree.setNodeCheckById(nodeId, true);
+    });
+    deletion.forEach(nodeId => {
+      layerTree.setNodeCheckById(nodeId, false);
+    });
+  }, {
+    immediate: true,
+    deep: true
+  });
+  fssgEsri.mapLayers.on('change:visible', e => {
+    const node = layerTree.findNodeFromLayerId(e.options.id);
+
+    if (!node) {
+      return;
+    }
+
+    if (e.visible && !state.checkedIds.includes(node.id)) {
+      state.checkedIds = [...state.checkedIds, node.id];
+      return;
+    }
+
+    const index = state.checkedIds.indexOf(node.id);
+
+    if (!e.visible && index !== -1) {
+      const newArr = [...state.checkedIds];
+      newArr.splice(index, 1);
+      state.checkedIds = [...newArr];
+      return;
+    }
+  });
+
+  if (app) {
+    app.provide(SYMBOL_LAYERTREE_STATE, state);
+  } else {
+    provide(SYMBOL_LAYERTREE_STATE, state);
+  }
+
+  return layerTree;
+}
+function useLayerTree(fssgEsri) {
+  return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.layerTree) ?? inject(SYMBOL_LAYERTREE);
+}
+function useLayerTreeState() {
+  return inject(SYMBOL_LAYERTREE_STATE);
+}
+
+export { createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapTools, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapTools, useMapToolsActivedKey, useMapToolsState, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

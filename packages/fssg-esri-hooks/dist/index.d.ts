@@ -1,4 +1,4 @@
-import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement, MapTools, IMapToolsOptions, IHawkeyeOptions, Hawkeye } from '@fssgis/fssg-esri';
+import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement, MapTools, IMapToolsOptions, IHawkeyeOptions, Hawkeye, ILayerTreeOptions, LayerTree, ITreeNode } from '@fssgis/fssg-esri';
 import { Ref, App } from 'vue';
 
 declare type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void;
@@ -127,4 +127,15 @@ declare function useHawkeye(): Hawkeye;
 declare function useHawkeye(fssgEsri: FssgEsri): Hawkeye;
 declare function useHawkeye(fssgEsri?: FssgEsri): Hawkeye;
 
-export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapTools, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapTools, useMapToolsActivedKey, useMapToolsState, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+interface ILayerTreeState {
+    checkedIds: string[];
+    treeNodes: ITreeNode[];
+}
+declare function createLayerTree(options: ILayerTreeOptions): LayerTree;
+declare function createLayerTree(options: ILayerTreeOptions, fssgEsri: FssgEsri, app?: App): LayerTree;
+declare function useLayerTree(): LayerTree;
+declare function useLayerTree(fssgEsri: FssgEsri): LayerTree;
+declare function useLayerTree(fssgEsri?: FssgEsri): LayerTree;
+declare function useLayerTreeState(): ILayerTreeState;
+
+export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapTools, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapTools, useMapToolsActivedKey, useMapToolsState, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

@@ -1,4 +1,4 @@
-import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement } from '@fssgis/fssg-esri';
+import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement, MapTools, IMapToolsOptions } from '@fssgis/fssg-esri';
 import { Ref, App } from 'vue';
 
 declare type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void;
@@ -103,4 +103,22 @@ declare function useMapElement(): MapElement;
 declare function useMapElement(fssgEsri: FssgEsri): MapElement;
 declare function useMapElement(fssgEsri?: FssgEsri): MapElement;
 
-export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, createMapElement, createMapLayers, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+interface IMapToolsHook {
+    activedKey: Ref<string>;
+    mapTools: MapTools;
+}
+declare function useMapToolsActivedKey(): Ref<string>;
+declare function useMapToolsActivedKey(fssgMap: FssgEsri): Ref<string>;
+declare function useMapToolsActivedKey(mapTools: MapTools): Ref<string>;
+declare function useMapToolsActivedKey(arg0?: FssgEsri | MapTools): Ref<string>;
+declare function useMapToolsState(): IMapToolsHook;
+declare function useMapToolsState(fssgMap: FssgEsri): IMapToolsHook;
+declare function useMapToolsState(mapTools: MapTools): IMapToolsHook;
+declare function useMapToolsState(arg0?: FssgEsri | MapTools): IMapToolsHook;
+declare function createMapTools(options: IMapToolsOptions): MapTools;
+declare function createMapTools(options: IMapToolsOptions, fssgEsri: FssgEsri, app?: App): MapTools;
+declare function useMapTools(): MapTools;
+declare function useMapTools(fssgEsri: FssgEsri): MapTools;
+declare function useMapTools(fssgEsri?: FssgEsri): MapTools;
+
+export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapTools, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapTools, useMapToolsActivedKey, useMapToolsState, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

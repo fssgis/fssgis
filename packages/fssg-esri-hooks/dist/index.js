@@ -1,4 +1,4 @@
-import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement } from '@fssgis/fssg-esri';
+import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement, MapTools } from '@fssgis/fssg-esri';
 import { getCurrentInstance, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide } from 'vue';
 import { whenRightReturn } from '@fssgis/utils';
 import '@fssgis/observable';
@@ -466,4 +466,68 @@ function useMapElement(fssgEsri) {
   return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapElement) ?? inject(SYMBOL_MAPELEMENT);
 }
 
-export { createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, createMapElement, createMapLayers, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+function _getMapTools(arg0) {
+  let mapTools;
+
+  if (!arg0) {
+    const fssgEsri = useFssgEsri();
+    mapTools = fssgEsri.mapTools;
+
+    if (!mapTools) {
+      warn(this, 'MapTools实例未挂载到FssgMap实例');
+    }
+  } else {
+    if (arg0 instanceof FssgEsri) {
+      mapTools = arg0.mapTools;
+    } else {
+      mapTools = arg0;
+    }
+  }
+
+  return mapTools;
+}
+
+function useMapToolsActivedKey(arg0) {
+  const mapTools = _getMapTools(arg0);
+
+  const activedKey = ref(mapTools.activedKey);
+  controllableWatch(activedKey, v => {
+    if (mapTools.activedKey !== v) {
+      mapTools.activedKey = v;
+    }
+  });
+  useObservableOn(mapTools.on('change', e => {
+    if (e.currentKey !== activedKey.value) {
+      activedKey.value = e.currentKey;
+    }
+  }));
+  return activedKey;
+}
+function useMapToolsState(arg0) {
+  const mapTools = _getMapTools(arg0);
+
+  const activedKey = useMapToolsActivedKey(arg0);
+  return {
+    mapTools,
+    activedKey
+  };
+}
+const SYMBOL_MAPTOOLS = Symbol('FssgEsri.MapTools');
+function createMapTools(options, fssgEsri, app) {
+  const mapTools = new MapTools(options);
+  fssgEsri = fssgEsri ?? useFssgEsri();
+  fssgEsri.use(mapTools);
+
+  if (app) {
+    app.provide(SYMBOL_MAPTOOLS, mapTools);
+  } else {
+    provide(SYMBOL_MAPTOOLS, mapTools);
+  }
+
+  return mapTools;
+}
+function useMapTools(fssgEsri) {
+  return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapTools) ?? inject(SYMBOL_MAPTOOLS);
+}
+
+export { createBasemap, createFssgEsri, createGeoFactory, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapTools, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapTools, useMapToolsActivedKey, useMapToolsState, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

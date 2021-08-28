@@ -2,6 +2,7 @@ import { warn } from '@fssgis/fssg-map'
 import FssgEsri from '../../fssg-esri'
 import FssgEsriPlugin, { IFssgEsriPluginEvents, IFssgEsriPluginOptions } from '../../fssg-esri-plugin'
 import { FssgEsriBaseTool } from './base-tool'
+import ZoomHomeTool from './tools/zoom/zoom-home'
 
 /**
  * 地图工具链配置项
@@ -64,6 +65,7 @@ export class MapTools extends FssgEsriPlugin<IMapToolsOptions, IMapToolsEvents> 
   private _init () : this {
     this._toolPool
       .set('default', new FssgEsriBaseTool(this.map_, this.view_, { isOnceTool: false }))
+      .set('zoom-home', new ZoomHomeTool(this.map_, this.view_))
     return this
   }
 

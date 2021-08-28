@@ -1450,6 +1450,50 @@ class FssgEsriBaseTool extends BaseTool {
 }
 
 /**
+ * 缩放至起始位置工具
+ */
+
+class ZoomHomeTool extends FssgEsriBaseTool {
+  /**
+   * 起始位置
+   */
+
+  /**
+   * 构造缩放至起始位置工具
+   * @param map 地图
+   * @param view 视图
+   * @param options 配置项
+   * @param defaultOptions 默认配置项
+   */
+  constructor(map, view, options, defaultOptions) {
+    super(map, view, options, defaultOptions);
+
+    _defineProperty(this, "home", void 0);
+
+    view.when().then(() => this.home = view.extent);
+  }
+  /**
+   * 工具激活时触发
+   */
+
+
+  onToolActived_(e) {
+    if (!super.onToolActived_(e)) {
+      return false;
+    }
+
+    if (!this.home) {
+      warn(this, '无定位范围');
+      return true;
+    }
+
+    this.view_.goTo(this.home);
+    return true;
+  }
+
+}
+
+/**
  * 地图工具链
  */
 
@@ -1497,7 +1541,7 @@ class MapTools extends FssgEsriPlugin {
   _init() {
     this._toolPool.set('default', new FssgEsriBaseTool(this.map_, this.view_, {
       isOnceTool: false
-    }));
+    })).set('zoom-home', new ZoomHomeTool(this.map_, this.view_));
 
     return this;
   }

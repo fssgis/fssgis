@@ -2,7 +2,13 @@ import { warn } from '@fssgis/fssg-map'
 import FssgEsri from '../../fssg-esri'
 import FssgEsriPlugin, { IFssgEsriPluginEvents, IFssgEsriPluginOptions } from '../../fssg-esri-plugin'
 import { FssgEsriBaseTool } from './base-tool'
-import ZoomHomeTool from './tools/zoom/zoom-home'
+import {
+  DrawPointTool,
+  DrawPolygonTool,
+  DrawPolylineTool,
+  ZoomHomeTool,
+} from './tools'
+import ClearTool from './tools/clear/clear-tool'
 
 /**
  * 地图工具链配置项
@@ -66,6 +72,10 @@ export class MapTools extends FssgEsriPlugin<IMapToolsOptions, IMapToolsEvents> 
     this._toolPool
       .set('default', new FssgEsriBaseTool(this.map_, this.view_, { isOnceTool: false }))
       .set('zoom-home', new ZoomHomeTool(this.map_, this.view_))
+      .set('draw-point', new DrawPointTool(this.map_, this.view_))
+      .set('draw-polyline', new DrawPolylineTool(this.map_, this.view_))
+      .set('draw-polygon', new DrawPolygonTool(this.map_, this.view_))
+      .set('clear', new ClearTool(this.map_, this.view_))
     return this
   }
 

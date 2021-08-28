@@ -17,6 +17,7 @@ import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
 import { createGuid, deepCopyJSON, $extend, whenRightReturn, throttle, listToTree } from '@fssgis/utils';
 import EsriBasemap from '@arcgis/core/Basemap';
 import Geometry from '@arcgis/core/geometry/Geometry';
+import Draw from '@arcgis/core/views/draw/Draw';
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -1325,8 +1326,8 @@ class MapElement extends FssgEsriPlugin {
     if (arg0 instanceof Geometry || ((_arg = arg0) === null || _arg === void 0 ? void 0 : _arg[0]) instanceof Geometry) {
       const graphics = [];
       arg0 = arg0;
-      arg0 = Array.isArray(arg0) ? arg0 : [arg0];
-      arg0.forEach(geometry => {
+      const geometries = Array.isArray(arg0) ? arg0 : [arg0];
+      geometries.forEach(geometry => {
         arg1 = $extend(true, {}, this._getSymbol(geometry.type), arg1);
         const graphic = new Graphic({
           geometry,
@@ -1371,8 +1372,8 @@ class MapElement extends FssgEsriPlugin {
     if (arg0 instanceof Geometry || ((_arg2 = arg0) === null || _arg2 === void 0 ? void 0 : _arg2[0]) instanceof Geometry) {
       const graphics = [];
       arg0 = arg0;
-      arg0 = Array.isArray(arg0) ? arg0 : [arg0];
-      arg0.forEach(geometry => {
+      const geometries = Array.isArray(arg0) ? arg0 : [arg0];
+      geometries.forEach(geometry => {
         arg1 = $extend(true, {}, this._getSymbol(geometry.type, true), arg1);
         const graphic = new Graphic({
           geometry,
@@ -1493,6 +1494,482 @@ class ZoomHomeTool extends FssgEsriBaseTool {
 
 }
 
+class DrawTool extends FssgEsriBaseTool {
+  //#region 私有属性
+
+  /** 绘制图元存储容器 */
+
+  /** 绘制过程图元 */
+
+  /** 绘制时样式 */
+
+  /** 绘制完成样式 */
+  //#endregion
+  //#region 保护属性
+
+  /** 绘图对象 */
+
+  /** 绘制任务对象 */
+
+  /** 绘图类型 */
+
+  /** 绘制目标是否仅允许存在一个 */
+  //#endregion
+  //#region 构造函数
+
+  /**
+   * 构造绘图工具对象
+   * @param map 地图对象
+   * @param view 视图对象
+   */
+  constructor(map, view, options) {
+    super(map, view, options, {
+      cursorType: 'draw',
+      isOnceTool: false
+    });
+
+    _defineProperty(this, "_graphics", new Set());
+
+    _defineProperty(this, "_tempGraphic", void 0);
+
+    _defineProperty(this, "_drawingStyle", {
+      marker: {
+        color: [255, 0, 0, .3],
+        size: 12,
+        outline: {
+          color: [255, 0, 0, .5]
+        }
+      },
+      line: {
+        color: [255, 0, 0, .3]
+      },
+      fill: {
+        color: [255, 0, 0, .3],
+        outline: {
+          color: [255, 0, 0, .5]
+        }
+      }
+    });
+
+    _defineProperty(this, "_drawedStyle", {
+      marker: {
+        color: [255, 0, 0, .5],
+        size: 12,
+        outline: {
+          color: [255, 0, 0, 1]
+        }
+      },
+      line: {
+        color: [255, 0, 0, 1]
+      },
+      fill: {
+        color: [255, 0, 0, .5],
+        outline: {
+          color: [255, 0, 0, 1]
+        }
+      }
+    });
+
+    _defineProperty(this, "draw_", void 0);
+
+    _defineProperty(this, "action_", void 0);
+
+    _defineProperty(this, "drawType_", void 0);
+
+    _defineProperty(this, "cursorType_", void 0);
+
+    _defineProperty(this, "onlyOneGraphic_", void 0);
+
+    this.draw_ = new Draw({
+      view
+    });
+    this.drawType_ = this.options_.drawType;
+    this.onlyOneGraphic_ = !!this.options_.onlyOneGraphic;
+    this.cursorType_ = this.options_.cursorType ?? 'default';
+    this.on('draw-start', e => this.onDrawStart_(e));
+    this.on('draw-move', e => this.onDrawMove_(e));
+    this.on('draw-end', e => this.onDrawEnd_(e));
+  } //#endregion
+  //#region 私有方法
+
+
+  _matchStyle(geometry, symbolOptions) {
+    const type = geometry.type;
+
+    switch (type) {
+      case 'point':
+      case 'multipoint':
+        return symbolOptions.marker ?? {};
+
+      case 'polyline':
+        return symbolOptions.line ?? {};
+
+      case 'polygon':
+      case 'extent':
+        return symbolOptions.fill ?? {};
+
+      default:
+        return {};
+    }
+  } //#endregion
+  //#region 保护方法
+
+  /**
+   * 初始化任务
+   */
+
+
+  initAction_() {
+    var _this$action_;
+
+    (_this$action_ = this.action_) === null || _this$action_ === void 0 ? void 0 : _this$action_.destroy();
+    return this;
+  }
+  /**
+   * 工具激活处理事件
+   */
+
+
+  onToolActived_(e) {
+    if (!super.onToolActived_(e)) {
+      return false;
+    }
+
+    const {
+      mapElement,
+      mapCursor
+    } = this.$;
+
+    if (!mapElement) {
+      // TODO
+      return false;
+    }
+
+    mapCursor.cursorType = this.cursorType_;
+    this.initAction_();
+    return true;
+  }
+  /**
+   * 工具失活处理事件
+   */
+
+
+  onToolDeactived_(e) {
+    if (!super.onToolDeactived_(e)) {
+      return false;
+    }
+
+    this.action_.destroy();
+    this.draw_.destroy();
+    const {
+      mapElement
+    } = this.map_.$owner;
+
+    if (!mapElement) {
+      return false;
+    }
+
+    this._tempGraphic && mapElement.remove(this._tempGraphic);
+    this._tempGraphic = null;
+    const {
+      mapCursor
+    } = this.$;
+    mapCursor.cursorType = 'default';
+    return true;
+  }
+  /**
+   * 工具绘制开始处理事件
+   */
+
+
+  onDrawStart_(e) {
+    if (!this.actived) {
+      return false;
+    }
+
+    const {
+      x,
+      y
+    } = e;
+    return new Point({
+      x,
+      y,
+      spatialReference: this.view_.spatialReference
+    });
+  }
+  /**
+   * 工具绘制过程处理事件
+   */
+
+
+  onDrawMove_(e) {
+    if (!this.actived) {
+      return false;
+    }
+
+    const {
+      mapElement
+    } = this.map_.$owner;
+
+    if (!mapElement) {
+      return false;
+    }
+
+    this._tempGraphic && mapElement.remove(this._tempGraphic);
+    this._tempGraphic = mapElement.add(e.geometry, this._matchStyle(e.geometry, this._drawingStyle));
+    return this._tempGraphic;
+  }
+  /**
+   * 工具绘制完成处理事件
+   */
+
+
+  onDrawEnd_(e) {
+    if (!this.actived) {
+      return false;
+    }
+
+    const {
+      mapElement
+    } = this.map_.$owner;
+
+    if (!mapElement) {
+      return false;
+    }
+
+    this._tempGraphic && mapElement.remove(this._tempGraphic);
+    this._tempGraphic = null;
+    let graphic;
+
+    if (this.onlyOneGraphic_) {
+      graphic = mapElement.set(e.geometry, this._matchStyle(e.geometry, this._drawedStyle));
+
+      this._graphics.clear();
+    } else {
+      graphic = mapElement.add(e.geometry, this._matchStyle(e.geometry, this._drawedStyle));
+    }
+
+    this._graphics.add(graphic);
+
+    this.initAction_();
+    return graphic;
+  } //#endregion
+  //#region 公有方法
+
+  /**
+   *清理绘制过的图元
+   */
+
+
+  clearDrawed() {
+    const {
+      mapElement
+    } = this.map_.$owner;
+
+    if (!mapElement) {
+      return this;
+    }
+
+    mapElement.remove([...this._graphics]);
+
+    this._graphics.clear();
+
+    return this;
+  }
+  /**
+   * 设置绘制完成图元样式
+   */
+
+
+  setDrawedStyle(style) {
+    $extend(true, this._drawedStyle, style);
+    return this;
+  }
+  /**
+   * 设置绘制时图元样式
+   */
+
+
+  setDrawingStyle(style) {
+    $extend(true, this._drawingStyle, style);
+    return this;
+  }
+
+}
+
+class DrawPointTool extends DrawTool {
+  constructor(map, view, onlyOneGraphic = false) {
+    super(map, view, {
+      drawType: 'point',
+      onlyOneGraphic,
+      cursorType: 'draw-point'
+    });
+
+    _defineProperty(this, "_pointerMoveHandler", void 0);
+  }
+
+  initAction_() {
+    super.initAction_();
+    this.action_ = this.draw_.create('point');
+    this.action_.on('draw-complete', e => {
+      const [x, y] = e.coordinates;
+      this.fire('draw-start', {
+        x,
+        y
+      });
+      const geometry = new Point({
+        x,
+        y,
+        spatialReference: this.view_.spatialReference
+      });
+      this.fire('draw-end', {
+        geometry
+      });
+    });
+    this._pointerMoveHandler = this.view_.on('pointer-move', e => {
+      const geometry = this.view_.toMap(e);
+      this.fire('draw-move', {
+        geometry
+      });
+    });
+    return this;
+  }
+
+  onToolDeactived_(e) {
+    if (!super.onToolDeactived_(e)) {
+      return false;
+    }
+
+    this._pointerMoveHandler.remove();
+
+    return true;
+  }
+
+}
+
+class DrawPolygonTool extends DrawTool {
+  constructor(map, view, options) {
+    super(map, view, { ...options,
+      drawType: 'polygon',
+      cursorType: 'draw-polygon'
+    });
+  }
+
+  initAction_() {
+    this.action_ = this.draw_.create('polygon');
+    this.action_.on(['vertex-add', 'cursor-update', 'vertex-remove'], e => {
+      const rings = e.vertices;
+
+      if (rings.length === 1) {
+        e.type === 'vertex-add' && this.fire('draw-start', {
+          x: rings[0][0][0],
+          y: rings[0][0][1]
+        });
+        return;
+      }
+
+      const geometry = new Polygon({
+        rings,
+        spatialReference: this.view_.spatialReference
+      });
+      this.fire('draw-move', {
+        geometry
+      });
+    });
+    this.action_.on('draw-complete', e => {
+      const rings = e.vertices;
+      const geometry = new Polygon({
+        rings,
+        spatialReference: this.view_.spatialReference
+      });
+      this.fire('draw-end', {
+        geometry
+      });
+    });
+    return this;
+  }
+
+}
+
+class DrawPolylineTool extends DrawTool {
+  constructor(map, view, onlyOneGraphic = false) {
+    super(map, view, {
+      drawType: 'polyline',
+      onlyOneGraphic,
+      cursorType: 'draw-line'
+    });
+  }
+
+  initAction_() {
+    this.action_ = this.draw_.create('polyline');
+    this.action_.on(['vertex-add', 'cursor-update', 'vertex-remove'], e => {
+      const paths = e.vertices;
+
+      if (paths.length === 1) {
+        e.type === 'vertex-add' && this.fire('draw-start', {
+          x: paths[0][0],
+          y: paths[0][1]
+        });
+        return;
+      }
+
+      const geometry = new Polyline({
+        paths,
+        spatialReference: this.view_.spatialReference
+      });
+      this.fire('draw-move', {
+        geometry
+      });
+    });
+    this.action_.on('draw-complete', e => {
+      const paths = e.vertices;
+      const geometry = new Polyline({
+        paths,
+        spatialReference: this.view_.spatialReference
+      });
+      this.fire('draw-end', {
+        geometry
+      });
+    });
+    return this;
+  }
+
+}
+
+class ClearTool extends FssgEsriBaseTool {
+  //#region 构造函数
+
+  /**
+   * 构造比例放大工具对象
+   * @param map 地图对象
+   * @param view 视图对象
+   */
+  constructor(map, view) {
+    super(map, view, {
+      isOnceTool: true
+    });
+  } //#endregion
+  //#region 保护方法
+
+
+  onToolActived_(e) {
+    if (!super.onToolActived_(e)) {
+      return false;
+    }
+
+    const {
+      mapElement
+    } = this.$;
+
+    if (mapElement) {
+      mapElement.clear(true);
+    }
+
+    return true;
+  }
+
+}
+
 /**
  * 地图工具链
  */
@@ -1541,7 +2018,7 @@ class MapTools extends FssgEsriPlugin {
   _init() {
     this._toolPool.set('default', new FssgEsriBaseTool(this.map_, this.view_, {
       isOnceTool: false
-    })).set('zoom-home', new ZoomHomeTool(this.map_, this.view_));
+    })).set('zoom-home', new ZoomHomeTool(this.map_, this.view_)).set('draw-point', new DrawPointTool(this.map_, this.view_)).set('draw-polyline', new DrawPolylineTool(this.map_, this.view_)).set('draw-polygon', new DrawPolygonTool(this.map_, this.view_)).set('clear', new ClearTool(this.map_, this.view_));
 
     return this;
   }

@@ -47,4 +47,4 @@ export class FssgEsriBaseTool<
 
 }
 
-export default BaseTool
+export default FssgEsriBaseTool

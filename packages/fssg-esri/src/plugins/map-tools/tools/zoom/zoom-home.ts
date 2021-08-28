@@ -1,7 +1,7 @@
 import { OnToolActivedParams, OnToolActivedReture } from '@fssgis/fssg-map'
 import { warn } from '@fssgis/fssg-map'
 import { IMap, IView } from '../../../../fssg-esri'
-import { FssgEsriBaseTool, IFssgEsriBaseToolEvents, IFssgEsriBaseToolOptions } from '../../base-tool'
+import FssgEsriBaseTool, { IFssgEsriBaseToolEvents, IFssgEsriBaseToolOptions } from '../../base-tool'
 
 /**
  * 缩放至起始位置工具配置项

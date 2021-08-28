@@ -175,8 +175,8 @@ export class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementEv
     if (arg0 instanceof Geometry || arg0?.[0] instanceof Geometry) {
       const graphics : __esri.Graphic[] = []
       arg0 = arg0 as __esri.Geometry | __esri.Geometry[]
-      arg0 = Array.isArray(arg0) ? arg0 : [arg0] as __esri.Geometry[]
-      arg0.forEach(geometry => {
+      const geometries = Array.isArray(arg0) ? arg0 : [arg0] as __esri.Geometry[]
+      geometries.forEach(geometry => {
         arg1 = $extend(true, {}, this._getSymbol(geometry.type), arg1)
         const graphic = new Graphic({ geometry, symbol: arg1 })
         graphics.push(graphic)
@@ -229,8 +229,8 @@ export class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementEv
     if (arg0 instanceof Geometry || arg0?.[0] instanceof Geometry) {
       const graphics : __esri.Graphic[] = []
       arg0 = arg0 as __esri.Geometry | __esri.Geometry[]
-      arg0 = Array.isArray(arg0) ? arg0 : [arg0] as __esri.Geometry[]
-      arg0.forEach(geometry => {
+      const geometries = Array.isArray(arg0) ? arg0 : [arg0] as __esri.Geometry[]
+      geometries.forEach(geometry => {
         arg1 = $extend(true, {}, this._getSymbol(geometry.type, true), arg1)
         const graphic = new Graphic({ geometry, symbol: arg1 })
         graphics.push(graphic)

@@ -2453,6 +2453,13 @@ class Hawkeye extends FssgEsriPlugin {
 
       sourceView.watch(['zoom', 'center'], throttle(() => {
         this._fssgEsri.mapElement.set(sourceView.extent);
+
+        hawkeyeView.goTo({
+          zoom: sourceView.zoom - 4,
+          center: sourceView.center
+        }, {
+          duration: 100
+        });
       }, 200));
     });
     return this;

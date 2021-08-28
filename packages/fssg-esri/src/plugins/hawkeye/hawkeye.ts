@@ -88,6 +88,10 @@ export class Hawkeye extends FssgEsriPlugin<IHawkeyeOptions, IHawkeyeEvents> {
       sourceView.watch(['zoom', 'center'], throttle(() => {
         this._fssgEsri.mapElement
           .set(sourceView.extent)
+        hawkeyeView.goTo({
+          zoom: sourceView.zoom - 4,
+          center: sourceView.center,
+        }, { duration: 100 })
       }, 200) as __esri.WatchCallback)
     })
     return this

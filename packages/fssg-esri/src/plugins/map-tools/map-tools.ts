@@ -7,6 +7,9 @@ import {
   DrawPolygonTool,
   DrawPolylineTool,
   ZoomHomeTool,
+  MeasureCoordinateTool,
+  MeasureLengthTool,
+  MeasureAreaTool,
 } from './tools'
 import ClearTool from './tools/clear/clear-tool'
 
@@ -76,6 +79,9 @@ export class MapTools extends FssgEsriPlugin<IMapToolsOptions, IMapToolsEvents> 
       .set('draw-polyline', new DrawPolylineTool(this.map_, this.view_))
       .set('draw-polygon', new DrawPolygonTool(this.map_, this.view_))
       .set('clear', new ClearTool(this.map_, this.view_))
+      .set('measure-coordinate', new MeasureCoordinateTool(this.map_, this.view_))
+      .set('measure-length', new MeasureLengthTool(this.map_, this.view_))
+      .set('measure-area', new MeasureAreaTool(this.map_, this.view_))
     return this
   }
 

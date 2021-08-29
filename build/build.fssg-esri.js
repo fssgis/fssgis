@@ -34,6 +34,7 @@ export default [
       '@arcgis/core/geometry/Polyline',
       '@arcgis/core/geometry/Polygon',
       '@arcgis/core/geometry/Extent',
+      '@arcgis/core/geometry/geometryEngineAsync',
       '@arcgis/core/views/draw/Draw',
       '@arcgis/core/views/draw/DrawAction',
     ],

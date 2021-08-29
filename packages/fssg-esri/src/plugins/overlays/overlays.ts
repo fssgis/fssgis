@@ -45,6 +45,8 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
     this._overlayContainer.classList.add('fssg-overlay-container')
     this._overlayContainer.style.height = '100%'
     this._overlayContainer.style.width = '100%'
+    this._overlayContainer.style.top = '0'
+    this._overlayContainer.style.left = '0'
     this._overlayContainer.style.position = 'absolute'
     this._overlayContainer.style.pointerEvents = 'none'
     this._overlayContainer.style.overflow = 'hidden'
@@ -129,7 +131,7 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
     return id
   }
 
-  public removeOverlayById (id: string) : this {
+  public removeById (id: string) : this {
     const item = this._overlayPool.get(id)
     if (item) {
       item.container.remove()
@@ -139,7 +141,7 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
     return this
   }
 
-  public clearOverlays () : this {
+  public clear () : this {
     [...this._overlayPool.values()].forEach(item => {
       item.container.remove()
       item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve)

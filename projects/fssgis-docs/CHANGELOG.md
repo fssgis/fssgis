@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://gitee.com/fssgis/fssgis/compare/@fssgis/docs@1.2.0...@fssgis/docs@1.3.0) (2021-08-29)
+
+
+### Features
+
+* **esri, 图层工厂:** 支持动态图层的创建 ([cde3453](https://gitee.com/fssgis/fssgis/commits/cde345367e5199cb1489e74e4a9529d90b28015f))
+* **esri:** tilelayer 图层加载支持 ([307c957](https://gitee.com/fssgis/fssgis/commits/307c95799e04297cd462a13a97e76eb7c40f84b6))
+
+
+
+
+
 # [1.2.0](https://gitee.com/fssgis/fssgis/compare/@fssgis/docs@1.1.4...@fssgis/docs@1.2.0) (2021-08-23)
 
 

@@ -725,8 +725,8 @@ declare class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents>
     private _init;
     installPlugin(fssgEsri: FssgEsri): this;
     add(options: IOverlayAddOptions): string;
-    removeOverlayById(id: string): this;
-    clearOverlays(): this;
+    removeById(id: string): this;
+    clear(): this;
 }
 
 /**

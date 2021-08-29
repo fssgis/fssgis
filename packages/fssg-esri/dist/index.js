@@ -18,6 +18,7 @@ import { createGuid, deepCopyJSON, $extend, whenRightReturn, throttle, listToTre
 import EsriBasemap from '@arcgis/core/Basemap';
 import Geometry from '@arcgis/core/geometry/Geometry';
 import Draw from '@arcgis/core/views/draw/Draw';
+import { planarLength, planarArea } from '@arcgis/core/geometry/geometryEngineAsync';
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -1966,6 +1967,225 @@ class DrawPolylineTool extends DrawTool {
 
 }
 
+class MeasureCoordinateTool extends DrawPointTool {
+  constructor(map, view) {
+    super(map, view);
+
+    _defineProperty(this, "_overlayIds", void 0);
+
+    this._overlayIds = new Set();
+  }
+
+  onDrawMove_(e) {
+    const graphic = super.onDrawMove_(e);
+
+    if (!graphic) {
+      return false;
+    }
+
+    const point = graphic.geometry;
+    this.view_.$owner.mouseTips.showTips(`x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`);
+    return graphic;
+  }
+
+  onToolDeactived_(e) {
+    if (!super.onToolDeactived_(e)) {
+      return false;
+    }
+
+    this.view_.$owner.mouseTips.cancelTips();
+    return true;
+  }
+
+  onDrawEnd_(e) {
+    const graphic = super.onDrawEnd_(e);
+
+    if (!graphic) {
+      return false;
+    }
+
+    const point = graphic.geometry;
+    const id = this.view_.$owner.overlays.add({
+      point,
+      content: `x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`,
+      offsetX: 0,
+      offsetY: 0,
+      showBezierCurve: true
+    });
+
+    this._overlayIds.add(id);
+
+    return graphic;
+  }
+
+  clearMeasure() {
+    this._overlayIds.forEach(id => {
+      this.view_.$owner.overlays.removeById(id);
+    });
+
+    return this.clearDrawed();
+  }
+
+}
+
+class MeasureLengthTool extends DrawPolylineTool {
+  constructor(map, view) {
+    super(map, view);
+
+    _defineProperty(this, "_overlayIds", void 0);
+
+    _defineProperty(this, "unit", void 0);
+
+    _defineProperty(this, "fixedCount", void 0);
+
+    _defineProperty(this, "_unitStrDic", {
+      'kilometers': 'km',
+      'feet': 'feet',
+      'meters': 'm',
+      'miles': 'miles',
+      'nautical-miles': 'nautical-miles',
+      'yards': 'yards'
+    });
+
+    this._overlayIds = new Set();
+    this.fixedCount = 3;
+    this.unit = 'kilometers';
+  }
+
+  onDrawMove_(e) {
+    const graphic = super.onDrawMove_(e);
+
+    if (!graphic) {
+      return false;
+    }
+
+    const line = graphic.geometry;
+    planarLength(line, this.unit).then(length => {
+      this.view_.$owner.mouseTips.showTips(`长度：${length.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`);
+    });
+    return graphic;
+  }
+
+  onToolDeactived_(e) {
+    if (!super.onToolDeactived_(e)) {
+      return false;
+    }
+
+    this.view_.$owner.mouseTips.cancelTips();
+    return true;
+  }
+
+  onDrawEnd_(e) {
+    const graphic = super.onDrawEnd_(e);
+
+    if (!graphic) {
+      return false;
+    }
+
+    const line = graphic.geometry;
+    planarLength(line, this.unit).then(length => {
+      const id = this.view_.$owner.overlays.add({
+        point: line.extent.center,
+        content: `长度：${length.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`
+      });
+
+      this._overlayIds.add(id);
+    });
+    this.view_.$owner.mouseTips.cancelTips();
+    return graphic;
+  }
+
+  clearMeasure() {
+    this._overlayIds.forEach(id => {
+      this.view_.$owner.overlays.removeById(id);
+    });
+
+    return this.clearDrawed();
+  }
+
+}
+
+class MeasureAreaTool extends DrawPolygonTool {
+  constructor(map, view) {
+    super(map, view);
+
+    _defineProperty(this, "_overlayIds", void 0);
+
+    _defineProperty(this, "unit", void 0);
+
+    _defineProperty(this, "fixedCount", void 0);
+
+    _defineProperty(this, "_unitStrDic", {
+      'acres': 'acres',
+      'ares': 'ares',
+      'hectares': 'hectares',
+      'square-feet': 'square-feet',
+      'square-kilometers': 'km²',
+      'square-meters': 'm²',
+      'square-miles': 'square-miles',
+      'square-yards': 'square-yards'
+    });
+
+    this._overlayIds = new Set();
+    this.fixedCount = 3;
+    this.unit = 'square-kilometers';
+  }
+
+  onDrawMove_(e) {
+    const graphic = super.onDrawMove_(e);
+
+    if (!graphic) {
+      return false;
+    }
+
+    const polygon = graphic.geometry;
+    planarArea(polygon, this.unit).then(area => {
+      area = Math.abs(area);
+      this.view_.$owner.mouseTips.showTips(`面积：${area.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`);
+    });
+    return graphic;
+  }
+
+  onToolDeactived_(e) {
+    if (!super.onToolDeactived_(e)) {
+      return false;
+    }
+
+    this.view_.$owner.mouseTips.cancelTips();
+    return true;
+  }
+
+  onDrawEnd_(e) {
+    const graphic = super.onDrawEnd_(e);
+
+    if (!graphic) {
+      return false;
+    }
+
+    const polygon = graphic.geometry;
+    planarArea(polygon, this.unit).then(area => {
+      area = Math.abs(area);
+      const id = this.view_.$owner.overlays.add({
+        point: polygon.extent.center,
+        content: `面积：${area.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`
+      });
+
+      this._overlayIds.add(id);
+    });
+    this.view_.$owner.mouseTips.cancelTips();
+    return graphic;
+  }
+
+  clearMeasure() {
+    this._overlayIds.forEach(id => {
+      this.view_.$owner.overlays.removeById(id);
+    });
+
+    return this.clearDrawed();
+  }
+
+}
+
 class ClearTool extends FssgEsriBaseTool {
   //#region 构造函数
 
@@ -1988,11 +2208,21 @@ class ClearTool extends FssgEsriBaseTool {
     }
 
     const {
-      mapElement
+      mapElement,
+      overlays,
+      mouseTips
     } = this.$;
 
     if (mapElement) {
       mapElement.clear(true);
+    }
+
+    if (overlays) {
+      overlays.clear();
+    }
+
+    if (mouseTips) {
+      mouseTips.cancelTips();
     }
 
     return true;
@@ -2048,7 +2278,7 @@ class MapTools extends FssgEsriPlugin {
   _init() {
     this._toolPool.set('default', new FssgEsriBaseTool(this.map_, this.view_, {
       isOnceTool: false
-    })).set('zoom-home', new ZoomHomeTool(this.map_, this.view_)).set('draw-point', new DrawPointTool(this.map_, this.view_)).set('draw-polyline', new DrawPolylineTool(this.map_, this.view_)).set('draw-polygon', new DrawPolygonTool(this.map_, this.view_)).set('clear', new ClearTool(this.map_, this.view_));
+    })).set('zoom-home', new ZoomHomeTool(this.map_, this.view_)).set('draw-point', new DrawPointTool(this.map_, this.view_)).set('draw-polyline', new DrawPolylineTool(this.map_, this.view_)).set('draw-polygon', new DrawPolygonTool(this.map_, this.view_)).set('clear', new ClearTool(this.map_, this.view_)).set('measure-coordinate', new MeasureCoordinateTool(this.map_, this.view_)).set('measure-length', new MeasureLengthTool(this.map_, this.view_)).set('measure-area', new MeasureAreaTool(this.map_, this.view_));
 
     return this;
   }
@@ -2908,6 +3138,8 @@ class Overlays extends FssgEsriPlugin {
 
     this._overlayContainer.style.height = '100%';
     this._overlayContainer.style.width = '100%';
+    this._overlayContainer.style.top = '0';
+    this._overlayContainer.style.left = '0';
     this._overlayContainer.style.position = 'absolute';
     this._overlayContainer.style.pointerEvents = 'none';
     this._overlayContainer.style.overflow = 'hidden';
@@ -2980,7 +3212,7 @@ class Overlays extends FssgEsriPlugin {
     return id;
   }
 
-  removeOverlayById(id) {
+  removeById(id) {
     const item = this._overlayPool.get(id);
 
     if (item) {
@@ -2993,7 +3225,7 @@ class Overlays extends FssgEsriPlugin {
     return this;
   }
 
-  clearOverlays() {
+  clear() {
     [...this._overlayPool.values()].forEach(item => {
       item.container.remove();
       item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve);

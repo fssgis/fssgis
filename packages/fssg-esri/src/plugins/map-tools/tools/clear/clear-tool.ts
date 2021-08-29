@@ -23,9 +23,15 @@ export class ClearTool extends FssgEsriBaseTool {
     if (!super.onToolActived_(e)) {
       return false
     }
-    const { mapElement } = this.$
+    const { mapElement, overlays, mouseTips } = this.$
     if (mapElement) {
       mapElement.clear(true)
+    }
+    if (overlays) {
+      overlays.clear()
+    }
+    if (mouseTips) {
+      mouseTips.cancelTips()
     }
     return true
   }

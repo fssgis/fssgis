@@ -1,0 +1,316 @@
+0 silly argv {
+0 silly argv   _: [ 'publish' ],
+0 silly argv   amend: true,
+0 silly argv   'conventional-commits': true,
+0 silly argv   conventionalCommits: true,
+0 silly argv   push: false,
+0 silly argv   composed: 'publish',
+0 silly argv   lernaVersion: '4.0.0',
+0 silly argv   '$0': 'C:\\Users\\fssgwxz\\AppData\\Roaming\\npm\\node_modules\\lerna\\cli.js'
+0 silly argv }
+1 notice cli v4.0.0
+2 verbose rootPath D:\projects\y2021.next\sszhpsythpt\frontend-map\branches\fssgis
+3 info versioning independent
+4 verbose session e8dcd01eb06d3b0e
+5 verbose user-agent lerna/4.0.0/node@v16.1.0+ia32 (win32)
+6 silly argv {
+6 silly argv   _: [ 'publish' ],
+6 silly argv   amend: true,
+6 silly argv   'conventional-commits': true,
+6 silly argv   conventionalCommits: true,
+6 silly argv   push: false,
+6 silly argv   composed: 'publish',
+6 silly argv   lernaVersion: '4.0.0'
+6 silly argv }
+7 verbose rootPath D:\projects\y2021.next\sszhpsythpt\frontend-map\branches\fssgis
+8 silly isAnythingCommitted
+9 verbose isAnythingCommitted 1
+10 silly getCurrentBranch
+11 verbose currentBranch main
+12 silly hasTags
+13 verbose hasTags true
+14 silly git-describe.sync "@fssgis/docs@1.2.0-32-g000c7f6" => {"lastTagName":"@fssgis/docs@1.2.0","lastVersion":"1.2.0","refCount":"32","sha":"000c7f6","isDirty":false}
+15 info Looking for changed packages since @fssgis/docs@1.2.0
+16 info ignoring diff in paths matching [
+16 info ignoring diff in paths matching   'ignored-file',
+16 info ignoring diff in paths matching   '*.md',
+16 info ignoring diff in paths matching   '.gitignore',
+16 info ignoring diff in paths matching   'project/sszhpsythpt',
+16 info ignoring diff in paths matching   'project/sszhpsythpt-psyzt'
+16 info ignoring diff in paths matching ]
+17 silly checking diff clis/svg2icon
+18 silly no diff found in @fssgis/svg2icon
+19 silly checking diff packages/fssg-esri-hooks
+20 silly found diff in packages/fssg-esri-hooks/CHANGELOG.md
+20 silly found diff in packages/fssg-esri-hooks/dist/index.d.ts
+20 silly found diff in packages/fssg-esri-hooks/dist/index.js
+20 silly found diff in packages/fssg-esri-hooks/package.json
+20 silly found diff in packages/fssg-esri-hooks/src/basemap.hooks.ts
+20 silly found diff in packages/fssg-esri-hooks/src/factory.hooks.ts
+20 silly found diff in packages/fssg-esri-hooks/src/fssg-esri.hooks.ts
+20 silly found diff in packages/fssg-esri-hooks/src/hawkeye.hooks.ts
+20 silly found diff in packages/fssg-esri-hooks/src/index.ts
+20 silly found diff in packages/fssg-esri-hooks/src/layer-tree.hooks.ts
+20 silly found diff in packages/fssg-esri-hooks/src/map-cursor.hooks.ts
+20 silly found diff in packages/fssg-esri-hooks/src/map-element.hooks.ts
+20 silly found diff in packages/fssg-esri-hooks/src/map-layers.hooks.ts
+20 silly found diff in packages/fssg-esri-hooks/src/map-modules.hooks.ts
+20 silly found diff in packages/fssg-esri-hooks/src/map-tools.hooks.ts
+20 silly found diff in packages/fssg-esri-hooks/src/mouse-tips.hooks.ts
+20 silly found diff in packages/fssg-esri-hooks/src/overlays.hooks.ts
+21 verbose filtered diff [
+21 verbose filtered diff   'packages/fssg-esri-hooks/dist/index.d.ts',
+21 verbose filtered diff   'packages/fssg-esri-hooks/dist/index.js',
+21 verbose filtered diff   'packages/fssg-esri-hooks/package.json',
+21 verbose filtered diff   'packages/fssg-esri-hooks/src/basemap.hooks.ts',
+21 verbose filtered diff   'packages/fssg-esri-hooks/src/factory.hooks.ts',
+21 verbose filtered diff   'packages/fssg-esri-hooks/src/fssg-esri.hooks.ts',
+21 verbose filtered diff   'packages/fssg-esri-hooks/src/hawkeye.hooks.ts',
+21 verbose filtered diff   'packages/fssg-esri-hooks/src/index.ts',
+21 verbose filtered diff   'packages/fssg-esri-hooks/src/layer-tree.hooks.ts',
+21 verbose filtered diff   'packages/fssg-esri-hooks/src/map-cursor.hooks.ts',
+21 verbose filtered diff   'packages/fssg-esri-hooks/src/map-element.hooks.ts',
+21 verbose filtered diff   'packages/fssg-esri-hooks/src/map-layers.hooks.ts',
+21 verbose filtered diff   'packages/fssg-esri-hooks/src/map-modules.hooks.ts',
+21 verbose filtered diff   'packages/fssg-esri-hooks/src/map-tools.hooks.ts',
+21 verbose filtered diff   'packages/fssg-esri-hooks/src/mouse-tips.hooks.ts',
+21 verbose filtered diff   'packages/fssg-esri-hooks/src/overlays.hooks.ts'
+21 verbose filtered diff ]
+22 silly checking diff packages/fssg-esri
+23 silly found diff in packages/fssg-esri/CHANGELOG.md
+23 silly found diff in packages/fssg-esri/dist/index.d.ts
+23 silly found diff in packages/fssg-esri/dist/index.js
+23 silly found diff in packages/fssg-esri/package.json
+23 silly found diff in packages/fssg-esri/src/factories/geometry.factory.ts
+23 silly found diff in packages/fssg-esri/src/factories/layer.factory.ts
+23 silly found diff in packages/fssg-esri/src/fssg-esri/fssg-esri.ts
+23 silly found diff in packages/fssg-esri/src/plugins/basemap/basemap.ts
+23 silly found diff in packages/fssg-esri/src/plugins/hawkeye/hawkeye.ts
+23 silly found diff in packages/fssg-esri/src/plugins/hawkeye/index.ts
+23 silly found diff in packages/fssg-esri/src/plugins/index.ts
+23 silly found diff in packages/fssg-esri/src/plugins/layer-tree/index.ts
+23 silly found diff in packages/fssg-esri/src/plugins/layer-tree/layer-tree.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-element/map-element.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-layers/index.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-layers/map-layers.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-modules/index.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-modules/map-modules.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-tools/base-tool.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-tools/map-tools.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-tools/tools/clear/clear-tool.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-tools/tools/draw/draw-point-tool.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-tools/tools/draw/draw-polygon-tool.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-tools/tools/draw/draw-polyline-tool.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-tools/tools/draw/draw-tool.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-tools/tools/index.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-tools/tools/measure/measure-area-tool.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-tools/tools/measure/measure-coordiante-tool.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-tools/tools/measure/measure-length-tool.ts
+23 silly found diff in packages/fssg-esri/src/plugins/map-tools/tools/zoom/zoom-home.ts
+23 silly found diff in packages/fssg-esri/src/plugins/mouse-tips/index.ts
+23 silly found diff in packages/fssg-esri/src/plugins/mouse-tips/mouse-tips.ts
+23 silly found diff in packages/fssg-esri/src/plugins/overlays/index.ts
+23 silly found diff in packages/fssg-esri/src/plugins/overlays/overlays.ts
+24 verbose filtered diff [
+24 verbose filtered diff   'packages/fssg-esri/dist/index.d.ts',
+24 verbose filtered diff   'packages/fssg-esri/dist/index.js',
+24 verbose filtered diff   'packages/fssg-esri/package.json',
+24 verbose filtered diff   'packages/fssg-esri/src/factories/geometry.factory.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/factories/layer.factory.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/fssg-esri/fssg-esri.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/basemap/basemap.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/hawkeye/hawkeye.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/hawkeye/index.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/index.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/layer-tree/index.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/layer-tree/layer-tree.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-element/map-element.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-layers/index.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-layers/map-layers.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-modules/index.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-modules/map-modules.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-tools/base-tool.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-tools/map-tools.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-tools/tools/clear/clear-tool.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-tools/tools/draw/draw-point-tool.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-tools/tools/draw/draw-polygon-tool.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-tools/tools/draw/draw-polyline-tool.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-tools/tools/draw/draw-tool.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-tools/tools/index.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-tools/tools/measure/measure-area-tool.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-tools/tools/measure/measure-coordiante-tool.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-tools/tools/measure/measure-length-tool.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/map-tools/tools/zoom/zoom-home.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/mouse-tips/index.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/mouse-tips/mouse-tips.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/overlays/index.ts',
+24 verbose filtered diff   'packages/fssg-esri/src/plugins/overlays/overlays.ts'
+24 verbose filtered diff ]
+25 silly checking diff packages/fssg-leaflet
+26 silly no diff found in @fssgis/fssg-leaflet
+27 silly checking diff packages/fssg-map
+28 silly no diff found in @fssgis/fssg-map
+29 silly checking diff packages/fssgis-attributes
+30 silly no diff found in @fssgis/attributes
+31 silly checking diff packages/fssgis-axios
+32 silly no diff found in @fssgis/axios
+33 silly checking diff packages/fssgis-ext
+34 silly no diff found in @fssgis/ext
+35 silly checking diff packages/fssgis-generic
+36 silly no diff found in @fssgis/generic
+37 silly checking diff packages/fssgis-map
+38 silly no diff found in @fssgis/map
+39 silly checking diff packages/fssgis-observable
+40 silly no diff found in @fssgis/observable
+41 silly checking diff packages/fssgis-storage
+42 silly no diff found in @fssgis/storage
+43 silly checking diff packages/fssgis-ui
+44 silly no diff found in @fssgis/ui
+45 silly checking diff packages/fssgis-utils
+46 silly no diff found in @fssgis/utils
+47 silly checking diff packages/fssgis-watcher
+48 silly no diff found in @fssgis/watcher
+49 silly checking diff projects/fssgis-docs
+50 silly found diff in projects/fssgis-docs/CHANGELOG.md
+50 silly found diff in projects/fssgis-docs/docs/.vitepress/config.js
+50 silly found diff in projects/fssgis-docs/docs/components/fssg-esri-hooks/all/MapContainer.vue
+50 silly found diff in projects/fssgis-docs/docs/guide/esri-hooks/all.md
+50 silly found diff in projects/fssgis-docs/package.json
+51 verbose filtered diff [
+51 verbose filtered diff   'projects/fssgis-docs/docs/.vitepress/config.js',
+51 verbose filtered diff   'projects/fssgis-docs/docs/components/fssg-esri-hooks/all/MapContainer.vue',
+51 verbose filtered diff   'projects/fssgis-docs/package.json'
+51 verbose filtered diff ]
+52 silly checking diff projects/sszhpsythpt-psyzt
+53 silly no diff found in sszhpsythpt-psyzt
+54 silly checking diff projects/sszhpsythpt
+55 silly no diff found in sszhpsythpt
+56 verbose updated @fssgis/fssg-esri-hooks
+57 verbose updated @fssgis/fssg-esri
+58 verbose updated @fssgis/docs
+59 warn version Skipping working tree validation, proceed at your own risk
+60 silly independent for @fssgis/fssg-esri-hooks at D:\projects\y2021.next\sszhpsythpt\frontend-map\branches\fssgis\packages\fssg-esri-hooks
+61 verbose getChangelogConfig using preset "conventional-changelog-angular"
+62 silly npa Result {
+62 silly npa   type: 'tag',
+62 silly npa   registry: true,
+62 silly npa   where: undefined,
+62 silly npa   raw: 'conventional-changelog-angular',
+62 silly npa   name: 'conventional-changelog-angular',
+62 silly npa   escapedName: 'conventional-changelog-angular',
+62 silly npa   scope: undefined,
+62 silly npa   rawSpec: '',
+62 silly npa   saveSpec: null,
+62 silly npa   fetchSpec: 'latest',
+62 silly npa   gitRange: undefined,
+62 silly npa   gitCommittish: undefined,
+62 silly npa   hosted: undefined
+62 silly npa }
+63 verbose getChangelogConfig Attempting to resolve preset "conventional-changelog-angular"
+64 info getChangelogConfig Successfully resolved preset "conventional-changelog-angular"
+65 verbose independent increment 1.4.0 by minor
+66 silly independent for @fssgis/fssg-esri at D:\projects\y2021.next\sszhpsythpt\frontend-map\branches\fssgis\packages\fssg-esri
+67 verbose independent increment 1.5.0 by minor
+68 silly independent for @fssgis/docs at D:\projects\y2021.next\sszhpsythpt\frontend-map\branches\fssgis\projects\fssgis-docs
+69 verbose independent increment 1.3.0 by minor
+70 info execute Skipping git push
+71 info execute Skipping releases
+72 silly lifecycle No script for "preversion" in "fssgis", continuing
+73 silly lifecycle No script for "preversion" in "@fssgis/fssg-esri", continuing
+74 silly lifecycle No script for "version" in "@fssgis/fssg-esri", continuing
+75 silly independent for @fssgis/fssg-esri at D:\projects\y2021.next\sszhpsythpt\frontend-map\branches\fssgis\packages\fssg-esri
+76 silly independent writing new entry: "# [1.6.0](https://gitee.com/fssgis/fssgis/compare/@fssgis/fssg-esri@1.4.0...@fssgis/fssg-esri@1.6.0) (2021-08-29)\n\n\n### Features\n\n* **esri, 图层工厂:** 提供统一调度方法createLayer() ([765d1c4](https://gitee.com/fssgis/fssgis/commits/765d1c482d643afe1b18c9d509b821a867d877ed))\n* **esri, 图层工厂:** 支持动态图层的创建 ([cde3453](https://gitee.com/fssgis/fssgis/commits/cde345367e5199cb1489e74e4a9529d90b28015f))\n* **esri, 图层工程:** 支持sql图层创建，基于FeatureLayer ([b19d260](https://gitee.com/fssgis/fssgis/commits/b19d260476d0937b387bbb4ad64e48ede9541ea1))\n* **esri, 图层工程:** 支持sql图层创建，基于GraphicsLayer ([65481f8](https://gitee.com/fssgis/fssgis/commits/65481f8c86e56ebd6e913ba9909902ecf6652f3e))\n* **esri, 鹰眼插件:** 鹰眼插件 功能集成 包括 其响应式钩子 ([17f4a12](https://gitee.com/fssgis/fssgis/commits/17f4a12bc306920066c78f30e1e204e7d2ed7360))\n* **esri, Hawkeye:** 调整鹰眼地图应用初始化配置 ([2487899](https://gitee.com/fssgis/fssgis/commits/2487899ecfec60aca8893017f96b01ee1dd0a01a))\n* **esri, hawkeye:** 增加鹰眼中心位置和缩放示意 ([bb98fb9](https://gitee.com/fssgis/fssgis/commits/bb98fb9f4ee82be8a41d5e1f9037cfc2ec977548))\n* **esri, LayerTree:** 调整图层树插件逻辑 ([d0fc552](https://gitee.com/fssgis/fssgis/commits/d0fc55202d4e4d7e2bbe0c3c18aa3a6d2468c4d0))\n* **esri, MapModules:** 地图模块控制插件集成 ([9a08dee](https://gitee.com/fssgis/fssgis/commits/9a08dee27e45346da6a5312ea78465510a379a57))\n* **esri, mapTools:** 地图绘制工具集成 ([ba681e4](https://gitee.com/fssgis/fssgis/commits/ba681e4cb01fc3af7e1e4f076cb73108c91a7ad2))\n* **esri, mapTools:** 缩放至起始位置工具集成 ([208aae3](https://gitee.com/fssgis/fssgis/commits/208aae3b1e416b26c685862b31cfa0c15ad2aca1))\n* **esri, mouseTips:** 地图鼠标提示控制插件集成 ([724b3cc](https://gitee.com/fssgis/fssgis/commits/724b3cccd44fce5ea902e143dd67a63ae914ef5a))\n* **esri, overlays:** 地图覆盖层插件集成 ([fcd8a7f](https://gitee.com/fssgis/fssgis/commits/fcd8a7fded0698f12e99dadb98381758f0c0a932))\n* **esri:** 测量工具集成 ([b8a573b](https://gitee.com/fssgis/fssgis/commits/b8a573be8b4d1c11854ca062b1c6912eb76fa542))\n* **esri:** 图层控制插件集成 ([fad2657](https://gitee.com/fssgis/fssgis/commits/fad26573778f95e179455197922e0fa1a24c7b43))\n* **esri:** LayerTree图层树插件集成 ([e5ae6c6](https://gitee.com/fssgis/fssgis/commits/e5ae6c6a1dfde1ac5af7276e8948abcdf1f4df9e))\n* **esri:** tilelayer 图层加载支持 ([307c957](https://gitee.com/fssgis/fssgis/commits/307c95799e04297cd462a13a97e76eb7c40f84b6))\n\n\n\n"
+77 verbose independent wrote D:\projects\y2021.next\sszhpsythpt\frontend-map\branches\fssgis\packages\fssg-esri\CHANGELOG.md
+78 silly lifecycle No script for "preversion" in "@fssgis/fssg-esri-hooks", continuing
+79 silly lifecycle No script for "version" in "@fssgis/fssg-esri-hooks", continuing
+80 silly independent for @fssgis/fssg-esri-hooks at D:\projects\y2021.next\sszhpsythpt\frontend-map\branches\fssgis\packages\fssg-esri-hooks
+81 silly independent writing new entry: "# [1.5.0](https://gitee.com/fssgis/fssgis/compare/@fssgis/fssg-esri-hooks@1.3.0...@fssgis/fssg-esri-hooks@1.5.0) (2021-08-29)\n\n\n### Features\n\n* **esri-hooks:** 地图控制插件响应式钩子 集成 ([0c98830](https://gitee.com/fssgis/fssgis/commits/0c98830500c7acc415966365c4f006749654f95e))\n* **esri-hooks:** 钩子create函数提供app实例参数 ([e5d28d9](https://gitee.com/fssgis/fssgis/commits/e5d28d9e034ab946bc00145de582df7e9d2d0687))\n* **esri-hooks:** 集成MapElement响应式钩子 ([9a6f948](https://gitee.com/fssgis/fssgis/commits/9a6f948b204cff321d8e3c4958c80d11af66ca2e))\n* **esri-hooks:** 图层树插件响应式钩子 ([23d86c8](https://gitee.com/fssgis/fssgis/commits/23d86c836fa86de7c8b61f47e4f41b3b4c08e804))\n* **esri-hooks:** MapTools响应式钩子导出 ([2c09e72](https://gitee.com/fssgis/fssgis/commits/2c09e729aa883c2724b65a310bd46457ed8a39d6))\n* **esri, 鹰眼插件:** 鹰眼插件 功能集成 包括 其响应式钩子 ([17f4a12](https://gitee.com/fssgis/fssgis/commits/17f4a12bc306920066c78f30e1e204e7d2ed7360))\n* **esri, LayerTree:** 调整图层树插件逻辑 ([d0fc552](https://gitee.com/fssgis/fssgis/commits/d0fc55202d4e4d7e2bbe0c3c18aa3a6d2468c4d0))\n* **esri, MapModules:** 地图模块控制插件集成 ([9a08dee](https://gitee.com/fssgis/fssgis/commits/9a08dee27e45346da6a5312ea78465510a379a57))\n* **esri, mouseTips:** 地图鼠标提示控制插件集成 ([724b3cc](https://gitee.com/fssgis/fssgis/commits/724b3cccd44fce5ea902e143dd67a63ae914ef5a))\n* **esri, overlays:** 地图覆盖层插件集成 ([fcd8a7f](https://gitee.com/fssgis/fssgis/commits/fcd8a7fded0698f12e99dadb98381758f0c0a932))\n* **esri:** 测量工具集成 ([b8a573b](https://gitee.com/fssgis/fssgis/commits/b8a573be8b4d1c11854ca062b1c6912eb76fa542))\n\n\n\n"
+82 verbose independent wrote D:\projects\y2021.next\sszhpsythpt\frontend-map\branches\fssgis\packages\fssg-esri-hooks\CHANGELOG.md
+83 silly lifecycle No script for "preversion" in "@fssgis/docs", continuing
+84 silly lifecycle No script for "version" in "@fssgis/docs", continuing
+85 silly independent for @fssgis/docs at D:\projects\y2021.next\sszhpsythpt\frontend-map\branches\fssgis\projects\fssgis-docs
+86 silly independent writing new entry: "# [1.4.0](https://gitee.com/fssgis/fssgis/compare/@fssgis/docs@1.2.0...@fssgis/docs@1.4.0) (2021-08-29)\n\n\n### Features\n\n* **esri, 图层工厂:** 支持动态图层的创建 ([cde3453](https://gitee.com/fssgis/fssgis/commits/cde345367e5199cb1489e74e4a9529d90b28015f))\n* **esri:** 测量工具集成 ([b8a573b](https://gitee.com/fssgis/fssgis/commits/b8a573be8b4d1c11854ca062b1c6912eb76fa542))\n* **esri:** tilelayer 图层加载支持 ([307c957](https://gitee.com/fssgis/fssgis/commits/307c95799e04297cd462a13a97e76eb7c40f84b6))\n\n\n\n"
+87 verbose independent wrote D:\projects\y2021.next\sszhpsythpt\frontend-map\branches\fssgis\projects\fssgis-docs\CHANGELOG.md
+88 silly lifecycle No script for "version" in "fssgis", continuing
+89 silly gitAdd [
+89 silly gitAdd   'packages/fssg-esri/package.json',
+89 silly gitAdd   'packages/fssg-esri/CHANGELOG.md',
+89 silly gitAdd   'packages/fssg-esri-hooks/package.json',
+89 silly gitAdd   'packages/fssg-esri-hooks/CHANGELOG.md',
+89 silly gitAdd   'projects/fssgis-docs/package.json',
+89 silly gitAdd   'projects/fssgis-docs/CHANGELOG.md'
+89 silly gitAdd ]
+90 silly gitCommit chore: publish
+90 silly gitCommit
+90 silly gitCommit  - @fssgis/fssg-esri-hooks@1.5.0
+90 silly gitCommit  - @fssgis/fssg-esri@1.6.0
+90 silly gitCommit  - @fssgis/docs@1.4.0
+91 verbose git [ 'commit', '--amend', '--no-edit' ]
+92 silly gitTag @fssgis/fssg-esri-hooks@1.5.0
+93 verbose git [
+93 verbose git   'tag',
+93 verbose git   '@fssgis/fssg-esri-hooks@1.5.0',
+93 verbose git   '-m',
+93 verbose git   '@fssgis/fssg-esri-hooks@1.5.0'
+93 verbose git ]
+94 silly gitTag @fssgis/fssg-esri@1.6.0
+95 verbose git [ 'tag', '@fssgis/fssg-esri@1.6.0', '-m', '@fssgis/fssg-esri@1.6.0' ]
+96 silly gitTag @fssgis/docs@1.4.0
+97 verbose git [ 'tag', '@fssgis/docs@1.4.0', '-m', '@fssgis/docs@1.4.0' ]
+98 silly lifecycle No script for "postversion" in "@fssgis/fssg-esri-hooks", continuing
+99 silly lifecycle No script for "postversion" in "@fssgis/fssg-esri", continuing
+100 silly lifecycle No script for "postversion" in "@fssgis/docs", continuing
+101 silly lifecycle No script for "postversion" in "fssgis", continuing
+102 info publish Publishing packages to npm...
+103 notice Skipping all user and access validation due to third-party registry
+104 notice Make sure you're authenticated properly ¯\_(ツ)_/¯
+105 warn ENOLICENSE Packages @fssgis/fssg-esri-hooks and @fssgis/fssg-esri are missing a license.
+105 warn ENOLICENSE One way to fix this is to add a LICENSE.md file to the root of this repository.
+105 warn ENOLICENSE See https://choosealicense.com for additional guidance.
+106 silly getCurrentSHA
+107 verbose getCurrentSHA 40411f4669d71d9b4bfee896b586f0663b6c4289
+108 warn lifecycle Skipping root "prepublish" because it has already been called
+109 silly lifecycle No script for "prepare" in "fssgis", continuing
+110 silly lifecycle No script for "prepublishOnly" in "fssgis", continuing
+111 silly lifecycle No script for "prepack" in "fssgis", continuing
+112 verbose pack-directory packages\fssg-esri
+113 silly lifecycle No script for "prepublish" in "@fssgis/fssg-esri", continuing
+114 silly lifecycle No script for "prepare" in "@fssgis/fssg-esri", continuing
+115 silly lifecycle No script for "prepublishOnly" in "@fssgis/fssg-esri", continuing
+116 silly lifecycle No script for "prepack" in "@fssgis/fssg-esri", continuing
+117 silly lifecycle No script for "postpack" in "@fssgis/fssg-esri", continuing
+118 verbose packed packages\fssg-esri
+119 verbose pack-directory packages\fssg-esri-hooks
+120 silly lifecycle No script for "prepublish" in "@fssgis/fssg-esri-hooks", continuing
+121 silly lifecycle No script for "prepare" in "@fssgis/fssg-esri-hooks", continuing
+122 silly lifecycle No script for "prepublishOnly" in "@fssgis/fssg-esri-hooks", continuing
+123 silly lifecycle No script for "prepack" in "@fssgis/fssg-esri-hooks", continuing
+124 silly lifecycle No script for "postpack" in "@fssgis/fssg-esri-hooks", continuing
+125 verbose packed packages\fssg-esri-hooks
+126 silly lifecycle No script for "postpack" in "fssgis", continuing
+127 verbose publish @fssgis/fssg-esri
+128 silly FetchError: request to https://registry.npmjs.org/@fssgis%2ffssg-esri failed, reason: socket hang up
+128 silly     at ClientRequest.<anonymous> (C:\Users\fssgwxz\AppData\Roaming\npm\node_modules\lerna\node_modules\minipass-fetch\lib\index.js:110:14)
+128 silly     at ClientRequest.emit (node:events:365:28)
+128 silly     at TLSSocket.socketOnEnd (node:_http_client:471:9)
+128 silly     at TLSSocket.emit (node:events:377:35)
+128 silly     at endReadableNT (node:internal/streams/readable:1312:12)
+128 silly     at processTicksAndRejections (node:internal/process/task_queues:83:21)
+128 silly  FetchError: request to https://registry.npmjs.org/@fssgis%2ffssg-esri failed, reason: socket hang up
+128 silly     at ClientRequest.<anonymous> (C:\Users\fssgwxz\AppData\Roaming\npm\node_modules\lerna\node_modules\minipass-fetch\lib\index.js:110:14)
+128 silly     at ClientRequest.emit (node:events:365:28)
+128 silly     at TLSSocket.socketOnEnd (node:_http_client:471:9)
+128 silly     at TLSSocket.emit (node:events:377:35)
+128 silly     at endReadableNT (node:internal/streams/readable:1312:12)
+128 silly     at processTicksAndRejections (node:internal/process/task_queues:83:21) {
+128 silly   code: 'ECONNRESET',
+128 silly   errno: 'ECONNRESET',
+128 silly   type: 'system'
+128 silly }
+129 error ECONNRESET request to https://registry.npmjs.org/@fssgis%2ffssg-esri failed, reason: socket hang up
+130 error FetchError: request to https://registry.npmjs.org/@fssgis%2ffssg-esri failed, reason: socket hang up
+130 error     at ClientRequest.<anonymous> (C:\Users\fssgwxz\AppData\Roaming\npm\node_modules\lerna\node_modules\minipass-fetch\lib\index.js:110:14)
+130 error     at ClientRequest.emit (node:events:365:28)
+130 error     at TLSSocket.socketOnEnd (node:_http_client:471:9)
+130 error     at TLSSocket.emit (node:events:377:35)
+130 error     at endReadableNT (node:internal/streams/readable:1312:12)

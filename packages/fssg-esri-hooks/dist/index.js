@@ -1,4 +1,4 @@
-import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement, MapTools, Hawkeye, LayerTree, MapModules } from '@fssgis/fssg-esri';
+import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement, MapTools, Hawkeye, LayerTree, MapModules, MouseTips } from '@fssgis/fssg-esri';
 import { getCurrentInstance, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide, reactive } from 'vue';
 import { whenRightReturn } from '@fssgis/utils';
 import '@fssgis/observable';
@@ -721,4 +721,22 @@ function useMapModulesState() {
   return inject(SYMBOL_MAPMODULES_STATE);
 }
 
-export { createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+const SYMBOL_MOUSETIPS = Symbol('FssgEsri.MouseTips');
+function createMouseTips(options, fssgEsri, app) {
+  const mouseTips = new MouseTips(options);
+  fssgEsri = fssgEsri ?? useFssgEsri();
+  fssgEsri.use(mouseTips);
+
+  if (app) {
+    app.provide(SYMBOL_MOUSETIPS, mouseTips);
+  } else {
+    provide(SYMBOL_MOUSETIPS, mouseTips);
+  }
+
+  return mouseTips;
+}
+function useMouseTips(fssgEsri) {
+  return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mouseTips) ?? inject(SYMBOL_MOUSETIPS);
+}
+
+export { createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, createMouseTips, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

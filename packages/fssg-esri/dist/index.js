@@ -778,6 +778,8 @@ class FssgEsri extends FssgMap {
 
     _defineProperty(this, "mapModules", void 0);
 
+    _defineProperty(this, "mouseTips", void 0);
+
     _defineProperty(this, "_map", void 0);
 
     _defineProperty(this, "_view", void 0);
@@ -2786,4 +2788,80 @@ class MapModules extends FssgEsriPlugin {
 
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, createGeometryFactory, createLayerFactory };
+class MouseTips extends FssgEsriPlugin {
+  constructor(options) {
+    super(options, {});
+
+    _defineProperty(this, "_handlers", void 0);
+
+    _defineProperty(this, "_tipsDom", void 0);
+  }
+
+  _init() {
+    this._handlers = new Set();
+    return this;
+  }
+
+  installPlugin(fssgEsri) {
+    return super.installPlugin(fssgEsri)._init();
+  }
+
+  showTips(tips) {
+    if (!this._tipsDom) {
+      this._tipsDom = document.createElement('div');
+
+      this._tipsDom.classList.add('fssg-mouse-tips');
+
+      this._tipsDom.style.position = 'absolute';
+      this._tipsDom.style.padding = '4px 8px';
+      this._tipsDom.style.backgroundColor = '#00000085';
+      this._tipsDom.style.color = '#fff';
+      this._tipsDom.style.boxShadow = '0 1px 4px rgb(0 0 0 / 80%)';
+      this.view_.container.append(this._tipsDom);
+    }
+
+    this._handlers.forEach(item => item.remove());
+
+    this._handlers.clear();
+
+    this._tipsDom.innerHTML = tips;
+    const pointerMouveHandler = this.view_.on('pointer-move', throttle(e => {
+      this._tipsDom.style.top = `${e.y + 16}px`;
+      this._tipsDom.style.left = `${e.x + 16}px`;
+    }, 100));
+
+    this._handlers.add(pointerMouveHandler);
+
+    const pointerLeaveHandler = this.view_.on('pointer-leave', () => {
+      this._tipsDom.style.display = 'none';
+    });
+
+    this._handlers.add(pointerLeaveHandler);
+
+    const pointerEnter = this.view_.on('pointer-enter', () => {
+      this._tipsDom.style.display = 'block';
+    });
+
+    this._handlers.add(pointerEnter);
+
+    return this;
+  }
+
+  cancelTips() {
+    var _this$_tipsDom, _this$_tipsDom$remove;
+
+    (_this$_tipsDom = this._tipsDom) === null || _this$_tipsDom === void 0 ? void 0 : (_this$_tipsDom$remove = _this$_tipsDom.remove) === null || _this$_tipsDom$remove === void 0 ? void 0 : _this$_tipsDom$remove.call(_this$_tipsDom); // eslint-disable-next-line
+    // @ts-ignore
+
+    this._tipsDom = null;
+
+    this._handlers.forEach(item => item.remove());
+
+    this._handlers.clear();
+
+    return this;
+  }
+
+}
+
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MouseTips, createGeometryFactory, createLayerFactory };

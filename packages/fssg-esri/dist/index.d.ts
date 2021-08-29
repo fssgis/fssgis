@@ -684,6 +684,20 @@ declare class MapModules extends FssgEsriPlugin<IMapModulesOptions, IMapModulesE
     selectByTitle(moduleTitle: string): this;
 }
 
+interface IMouseTipsOptions extends IFssgEsriPluginOptions {
+}
+interface IMouseTipsEvents extends IFssgEsriPluginEvents {
+}
+declare class MouseTips extends FssgEsriPlugin<IMouseTipsOptions, IMouseTipsEvents> {
+    private _handlers;
+    private _tipsDom;
+    constructor(options?: IMouseTipsOptions);
+    private _init;
+    installPlugin(fssgEsri: FssgEsri): this;
+    showTips(tips: string): this;
+    cancelTips(): this;
+}
+
 /**
  * 坐标XY
  */
@@ -1066,6 +1080,7 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     hawkeye: Hawkeye;
     layerTree: LayerTree;
     mapModules: MapModules;
+    mouseTips: MouseTips;
     /**
      * 地图对象
      */
@@ -1170,4 +1185,4 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     reset(): Promise<this>;
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapModulesEvents, IMapModulesOptions, IMapToolsEvents, IMapToolsOptions, IModuleItem, IOwner, ITreeNode, IView, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapModules, MapTools, XY, createGeometryFactory, createLayerFactory };
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapModulesEvents, IMapModulesOptions, IMapToolsEvents, IMapToolsOptions, IModuleItem, IMouseTipsEvents, IMouseTipsOptions, IOwner, ITreeNode, IView, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapModules, MapTools, MouseTips, XY, createGeometryFactory, createLayerFactory };

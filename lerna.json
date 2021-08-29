@@ -5,9 +5,7 @@
       "ignoreChanges": [
         "ignored-file",
         "*.md",
-        ".gitignore",
-        "project/sszhpsythpt",
-        "project/sszhpsythpt-psyzt"
+        ".gitignore"
       ],
       "message": "chore: publish",
       "registry": "https://registry.npmjs.org"

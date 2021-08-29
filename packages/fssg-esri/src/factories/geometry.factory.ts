@@ -3,6 +3,7 @@ import Point from '@arcgis/core/geometry/Point'
 import Polyline from '@arcgis/core/geometry/Polyline'
 import Polygon from '@arcgis/core/geometry/Polygon'
 import Extent from '@arcgis/core/geometry/Extent'
+import { FssgMap } from '../../../fssg-map/dist'
 
 /**
  * 坐标XY
@@ -36,6 +37,7 @@ export interface IGeometryFactory {
   createPolylineFromPoints (points: __esri.Point[]) : __esri.Polyline
   createPolylineFromXYs (XYs: XY[]) : __esri.Polyline
   createPolylineFromLonLats (lonLats: LonLat[]) : __esri.Polyline
+  createBezierCurve (pt1: __esri.Point, pt2: __esri.Point) : __esri.Polyline
 
   createPolygon (options: __esri.PolygonProperties) : __esri.Polygon
   createPolygonFromPoints (points: __esri.Point[]) : __esri.Polygon
@@ -287,6 +289,28 @@ export class GeometryFacory implements IGeometryFactory {
     return polygon
   }
 
+  /**
+   * 创建贝塞尔曲线（二阶） Second-order
+   * @param pt1 点1
+   * @param pt2 点2
+   */
+  public createBezierCurve (pt1: __esri.Point, pt2: __esri.Point) : __esri.Polyline {
+    const xys : [number, number][] = []
+    const [x1, y1] = [pt1.x, pt1.y]
+    const [x2, y2] = [pt2.x, pt2.y]
+    const cx = x1 + (x2 - x1) / 2
+    const cy = y2
+    let t = 0
+    const num = 100
+    for (let i = 1; i < num + 1; i++) {
+    //用i当作t，算出点坐标，放入数组
+      t = i / num
+      const x = Math.pow(1 - t, 2) * x1 + 2 * t * (1 - t) * cx + Math.pow(t, 2) * x2
+      const y = Math.pow(1 - t, 2) * y1 + 2 * t * (1 - t) * cy + Math.pow(t, 2) * y2
+      xys.push([x, y])
+    }
+    return this.createPolylineFromXYs(xys)
+  }
 }
 
 /**

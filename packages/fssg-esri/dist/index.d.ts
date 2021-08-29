@@ -698,6 +698,37 @@ declare class MouseTips extends FssgEsriPlugin<IMouseTipsOptions, IMouseTipsEven
     cancelTips(): this;
 }
 
+interface IOverlaysOptions extends IFssgEsriPluginOptions {
+}
+interface IOverlaysEvents extends IFssgEsriPluginEvents {
+}
+interface IOverlayAddOptions {
+    point: __esri.Point;
+    content: string | HTMLDivElement;
+    offsetX?: number;
+    offsetY?: number;
+    showBezierCurve?: boolean;
+    bezierCurveSymbol?: __esri.LineSymbolProperties;
+}
+interface IOverlay {
+    container: HTMLDivElement;
+    mapXY: __esri.Point;
+    offsetX: number;
+    offsetY: number;
+    bezierCurve?: __esri.Graphic;
+    bezierCurveSymbol?: __esri.LineSymbolProperties;
+}
+declare class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> {
+    private _overlayPool;
+    private _overlayContainer;
+    constructor(options?: IOverlaysOptions);
+    private _init;
+    installPlugin(fssgEsri: FssgEsri): this;
+    add(options: IOverlayAddOptions): string;
+    removeOverlayById(id: string): this;
+    clearOverlays(): this;
+}
+
 /**
  * 坐标XY
  */
@@ -733,6 +764,7 @@ interface IGeometryFactory {
     createPolylineFromPoints(points: __esri.Point[]): __esri.Polyline;
     createPolylineFromXYs(XYs: XY[]): __esri.Polyline;
     createPolylineFromLonLats(lonLats: LonLat[]): __esri.Polyline;
+    createBezierCurve(pt1: __esri.Point, pt2: __esri.Point): __esri.Polyline;
     createPolygon(options: __esri.PolygonProperties): __esri.Polygon;
     createPolygonFromPoints(points: __esri.Point[]): __esri.Polygon;
     createPolygonFromPolyline(polyline: __esri.Polyline): __esri.Polygon;
@@ -875,6 +907,12 @@ declare class GeometryFacory implements IGeometryFactory {
      * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Polygon.html
      */
     createPolygonFromLonLats(lonLats: LonLat[]): __esri.Polygon;
+    /**
+     * 创建贝塞尔曲线（二阶） Second-order
+     * @param pt1 点1
+     * @param pt2 点2
+     */
+    createBezierCurve(pt1: __esri.Point, pt2: __esri.Point): __esri.Polyline;
 }
 /**
  * 创建几何工厂
@@ -1081,6 +1119,7 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     layerTree: LayerTree;
     mapModules: MapModules;
     mouseTips: MouseTips;
+    overlays: Overlays;
     /**
      * 地图对象
      */
@@ -1185,4 +1224,4 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     reset(): Promise<this>;
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapModulesEvents, IMapModulesOptions, IMapToolsEvents, IMapToolsOptions, IModuleItem, IMouseTipsEvents, IMouseTipsOptions, IOwner, ITreeNode, IView, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapModules, MapTools, MouseTips, XY, createGeometryFactory, createLayerFactory };
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapModulesEvents, IMapModulesOptions, IMapToolsEvents, IMapToolsOptions, IModuleItem, IMouseTipsEvents, IMouseTipsOptions, IOverlay, IOverlayAddOptions, IOverlaysEvents, IOverlaysOptions, IOwner, ITreeNode, IView, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapModules, MapTools, MouseTips, Overlays, XY, createGeometryFactory, createLayerFactory };

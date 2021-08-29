@@ -1,4 +1,4 @@
-import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement, MapTools, IMapToolsOptions, IHawkeyeOptions, Hawkeye, ILayerTreeOptions, LayerTree, ITreeNode, MapModules, IMapModulesOptions, IMouseTipsOptions, MouseTips } from '@fssgis/fssg-esri';
+import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement, MapTools, IMapToolsOptions, IHawkeyeOptions, Hawkeye, ILayerTreeOptions, LayerTree, ITreeNode, MapModules, IMapModulesOptions, IMouseTipsOptions, MouseTips, IOverlaysOptions, Overlays } from '@fssgis/fssg-esri';
 import { Ref, App } from 'vue';
 
 declare type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void;
@@ -158,4 +158,10 @@ declare function useMouseTips(): MouseTips;
 declare function useMouseTips(fssgEsri: FssgEsri): MouseTips;
 declare function useMouseTips(fssgEsri?: FssgEsri): MouseTips;
 
-export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, createMouseTips, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+declare function createOverlays(options: IOverlaysOptions): Overlays;
+declare function createOverlays(options: IOverlaysOptions, fssgEsri: FssgEsri, app?: App): Overlays;
+declare function useOverlays(): Overlays;
+declare function useOverlays(fssgEsri: FssgEsri): Overlays;
+declare function useOverlays(fssgEsri?: FssgEsri): Overlays;
+
+export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, createMouseTips, createOverlays, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useOverlays, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

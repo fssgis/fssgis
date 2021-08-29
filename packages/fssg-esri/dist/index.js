@@ -311,6 +311,32 @@ class GeometryFacory {
     const polygon = this.createPolygonFromPoints(points);
     return polygon;
   }
+  /**
+   * 创建贝塞尔曲线（二阶） Second-order
+   * @param pt1 点1
+   * @param pt2 点2
+   */
+
+
+  createBezierCurve(pt1, pt2) {
+    const xys = [];
+    const [x1, y1] = [pt1.x, pt1.y];
+    const [x2, y2] = [pt2.x, pt2.y];
+    const cx = x1 + (x2 - x1) / 2;
+    const cy = y2;
+    let t = 0;
+    const num = 100;
+
+    for (let i = 1; i < num + 1; i++) {
+      //用i当作t，算出点坐标，放入数组
+      t = i / num;
+      const x = Math.pow(1 - t, 2) * x1 + 2 * t * (1 - t) * cx + Math.pow(t, 2) * x2;
+      const y = Math.pow(1 - t, 2) * y1 + 2 * t * (1 - t) * cy + Math.pow(t, 2) * y2;
+      xys.push([x, y]);
+    }
+
+    return this.createPolylineFromXYs(xys);
+  }
 
 }
 /**
@@ -779,6 +805,8 @@ class FssgEsri extends FssgMap {
     _defineProperty(this, "mapModules", void 0);
 
     _defineProperty(this, "mouseTips", void 0);
+
+    _defineProperty(this, "overlays", void 0);
 
     _defineProperty(this, "_map", void 0);
 
@@ -2864,4 +2892,118 @@ class MouseTips extends FssgEsriPlugin {
 
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MouseTips, createGeometryFactory, createLayerFactory };
+class Overlays extends FssgEsriPlugin {
+  constructor(options) {
+    super(options, {});
+
+    _defineProperty(this, "_overlayPool", void 0);
+
+    _defineProperty(this, "_overlayContainer", void 0);
+  }
+
+  _init() {
+    this._overlayContainer = document.createElement('div');
+
+    this._overlayContainer.classList.add('fssg-overlay-container');
+
+    this._overlayContainer.style.height = '100%';
+    this._overlayContainer.style.width = '100%';
+    this._overlayContainer.style.position = 'absolute';
+    this._overlayContainer.style.pointerEvents = 'none';
+    this._overlayContainer.style.overflow = 'hidden';
+    this.view_.container.append(this._overlayContainer);
+    this._overlayPool = new Map();
+    this.view_.when().then(() => {
+      this.view_.watch('extent', throttle(() => {
+        [...this._overlayPool.values()].forEach(item => {
+          const screenPt = this.view_.toScreen(item.mapXY);
+          item.container.style.top = `${screenPt.y + item.offsetY}px`;
+          item.container.style.left = `${screenPt.x + item.offsetX}px`;
+          const mapPt = this.view_.toMap({
+            x: screenPt.x + (item.offsetX ?? 0),
+            y: screenPt.y + (item.offsetY ?? 0)
+          });
+
+          if (item.bezierCurve) {
+            item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve);
+            item.bezierCurve = this.view_.$owner.mapElement.add(createGeometryFactory(this.$).createBezierCurve(item.mapXY, mapPt), item.bezierCurveSymbol);
+          }
+        });
+      }, 200));
+    });
+    return this;
+  }
+
+  installPlugin(fssgEsri) {
+    return super.installPlugin(fssgEsri)._init().fire('loaded');
+  }
+
+  add(options) {
+    const overlay = document.createElement('div');
+    overlay.classList.add('fssg-overlay');
+    overlay.style.position = 'absolute';
+    overlay.style.padding = '4px 8px';
+    overlay.style.backgroundColor = '#00000085';
+    overlay.style.color = '#fff';
+    overlay.style.boxShadow = '0 1px 4px rgb(0 0 0 / 80%)';
+    overlay.style.width = 'fit-content';
+    overlay.style.pointerEvents = 'all';
+    overlay.style.transition = 'all .1s ease-in-out';
+    typeof options.content === 'string' ? overlay.innerHTML = options.content : overlay.append(options.content);
+    const screenPt = this.view_.toScreen(options.point);
+    overlay.style.top = `${screenPt.y + (options.offsetY ?? 0)}px`;
+    overlay.style.left = `${screenPt.x + (options.offsetX ?? 0)}px`;
+    const mapPt = this.view_.toMap({
+      x: screenPt.x + (options.offsetX ?? 0),
+      y: screenPt.y + (options.offsetY ?? 0)
+    });
+    let bezierCurve = undefined;
+
+    if (options.showBezierCurve) {
+      bezierCurve = this.view_.$owner.mapElement.add(createGeometryFactory(this.$).createBezierCurve(options.point, mapPt), options.bezierCurveSymbol);
+    }
+
+    const id = createGuid();
+    overlay.id = id;
+
+    this._overlayPool.set(id, {
+      container: overlay,
+      mapXY: options.point,
+      offsetX: options.offsetX ?? 0,
+      offsetY: options.offsetY ?? 0,
+      bezierCurve: bezierCurve,
+      bezierCurveSymbol: options.bezierCurveSymbol
+    });
+
+    this._overlayContainer.append(overlay);
+
+    return id;
+  }
+
+  removeOverlayById(id) {
+    const item = this._overlayPool.get(id);
+
+    if (item) {
+      item.container.remove();
+      item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve);
+
+      this._overlayPool.delete(id);
+    }
+
+    return this;
+  }
+
+  clearOverlays() {
+    [...this._overlayPool.values()].forEach(item => {
+      item.container.remove();
+      item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve);
+    });
+
+    this._overlayPool.clear();
+
+    return this;
+  }
+
+}
+
+export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MouseTips, Overlays, createGeometryFactory, createLayerFactory };

@@ -188,6 +188,14 @@ export class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEvent
     return this
   }
 
+  public async forEach (callback: (item: [__esri.Layer, LayerOptions]) => void) : Promise<this> {
+    const values = [...this._layerPool.values()]
+    for (let i = 0; i < values.length; i++) {
+      await callback(values[i])
+    }
+    return this
+  }
+
 }
 
 export default MapLayers

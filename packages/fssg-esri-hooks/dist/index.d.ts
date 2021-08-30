@@ -1,5 +1,32 @@
+import { WatchSource, WatchCallback, WatchOptions, Ref, App } from 'vue';
+import { IHandle } from '@fssgis/observable';
 import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement, MapTools, IMapToolsOptions, IHawkeyeOptions, Hawkeye, ILayerTreeOptions, LayerTree, ITreeNode, MapModules, IMapModulesOptions, IMouseTipsOptions, MouseTips, IOverlaysOptions, Overlays } from '@fssgis/fssg-esri';
-import { Ref, App } from 'vue';
+
+declare type MapSources<T> = {
+    [K in keyof T]: T[K] extends WatchSource<infer V> ? V : never;
+};
+declare type MapOldSources<T, Immediate> = {
+    [K in keyof T]: T[K] extends WatchSource<infer V> ? Immediate extends true ? V | undefined : V : never;
+};
+declare function tryOnUnmounted(callback: () => void): void;
+declare function tryOnBeforeUnmounted(callback: () => void): void;
+declare function controllableWatch(sources: (object | WatchSource<unknown>)[], cb: WatchCallback<(object | WatchSource<unknown>)[], (object | WatchSource<unknown>)[]>, options?: WatchOptions<false> | undefined): {
+    start(): void;
+    stop: () => void;
+};
+declare function controllableWatch<T extends readonly (object | WatchSource<unknown>)[], Immediate extends Readonly<boolean> = false>(source: T, cb: WatchCallback<MapOldSources<T, false>, MapOldSources<T, Immediate>>, options?: WatchOptions<Immediate> | undefined): {
+    start(): void;
+    stop: () => void;
+};
+declare function controllableWatch<T, Immediate extends Readonly<boolean> = false>(source: WatchSource<T>, cb: WatchCallback<T, Immediate extends true ? T | undefined : T>, options?: WatchOptions<Immediate> | undefined): {
+    start(): void;
+    stop: () => void;
+};
+declare function controllableWatch<T extends object, Immediate extends Readonly<boolean> = false>(source: T, cb: WatchCallback<T, Immediate extends true ? T | undefined : T>, options?: WatchOptions<Immediate> | undefined): {
+    start(): void;
+    stop: () => void;
+};
+declare function useObservableOn(handle: IHandle): void;
 
 declare type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void;
 declare function useEsriWatch<T extends __esri.Accessor, K extends keyof T>(accessor: T, p: K | K[], callback: EsriWatchCallback<T, K>, options?: {
@@ -164,4 +191,4 @@ declare function useOverlays(): Overlays;
 declare function useOverlays(fssgEsri: FssgEsri): Overlays;
 declare function useOverlays(fssgEsri?: FssgEsri): Overlays;
 
-export { EsriWatchCallback, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, createMouseTips, createOverlays, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useOverlays, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { EsriWatchCallback, MapOldSources, MapSources, controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, createMouseTips, createOverlays, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useObservableOn, useOverlays, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

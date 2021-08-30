@@ -55,6 +55,18 @@ export class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementEv
 
   //#endregion
 
+  //#region getter
+
+  public get graphicsLayer () : __esri.GraphicsLayer {
+    return this._graphicsLayer
+  }
+
+  public get highlightLayer () : __esri.GraphicsLayer {
+    return this._highlightLayer
+  }
+
+  //#endregion
+
   /**
    * 构造图元控制插件对象
    * @param options 配置项

@@ -18,7 +18,7 @@ import { createGuid, deepCopyJSON, $extend, whenRightReturn, throttle, listToTre
 import EsriBasemap from '@arcgis/core/Basemap';
 import Geometry from '@arcgis/core/geometry/Geometry';
 import Draw from '@arcgis/core/views/draw/Draw';
-import { planarLength, planarArea } from '@arcgis/core/geometry/geometryEngineAsync';
+import { planarLength, planarArea, buffer } from '@arcgis/core/geometry/geometryEngineAsync';
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -1207,11 +1207,21 @@ class MapElement extends FssgEsriPlugin {
 
   /** 图元图层存储图层组 */
   //#endregion
+  //#region getter
+  get graphicsLayer() {
+    return this._graphicsLayer;
+  }
+
+  get highlightLayer() {
+    return this._highlightLayer;
+  } //#endregion
 
   /**
    * 构造图元控制插件对象
    * @param options 配置项
    */
+
+
   constructor(options) {
     super(options, {
       graphicsSymbol: {
@@ -2186,6 +2196,151 @@ class MeasureAreaTool extends DrawPolygonTool {
 
 }
 
+class HitTestTool extends DrawPointTool {
+  //#region 静态方法
+  static getAttributesFromGraphic(graphic) {
+    return Object.entries(graphic.attributes).map(([name, value]) => ({
+      name,
+      value
+    }));
+  }
+
+  static parseAttributesFromArcGISServer(attributes, graphic) {
+    let layer = graphic.layer ?? graphic.sourceLayer; // eslint-disable-line
+
+    const fieldsSelf = layer === null || layer === void 0 ? void 0 : layer.fields; // ArcGIS内置字段配置信息
+
+    if (fieldsSelf) {
+      fieldsSelf.forEach(field => {
+        const item = attributes.find(v => v.name === field.name);
+        item && (item.alias = field.alias);
+      });
+    }
+
+    return attributes;
+  }
+
+  static parseAttributesFromCustomConfig(attributes, graphic, attributesConfig) {
+    let layer = graphic.layer ?? graphic.sourceLayer; // eslint-disable-line
+
+    const name = layer.name ?? layer.layer.name; // eslint-disable-line
+
+    const attr = attributesConfig.find(item => item.layerName === name);
+
+    if (attr) {
+      var _attr$fields;
+
+      attr.exclude && (attributes = attributes.filter(item => {
+        var _attr$exclude;
+
+        return !((_attr$exclude = attr.exclude) !== null && _attr$exclude !== void 0 && _attr$exclude.includes(item.name));
+      }));
+      (_attr$fields = attr.fields) === null || _attr$fields === void 0 ? void 0 : _attr$fields.forEach(field => {
+        const item = attributes.find(v => v.name === field.name);
+
+        if (item) {
+          item.alias = field.alias;
+          item.type = field.type;
+        }
+      });
+    }
+
+    return attributes;
+  } //#endregion
+
+
+  constructor(map, view) {
+    super(map, view);
+    this.cursorType_ = 'help';
+    this.setDrawingStyle({
+      marker: {
+        size: 0
+      }
+    });
+  }
+
+  async _queryWithMapImageLayer(geometry) {
+    const fssgMap = this.$;
+    const ret = [];
+    await fssgMap.mapLayers.forEach(async ([layer, options]) => {
+      if (!['mapimagelayer', 'dynaimclayer'].includes(options.layerType)) {
+        return;
+      }
+
+      if (!options.isQuery) {
+        return;
+      }
+
+      if (!layer.visible) {
+        return;
+      }
+
+      const sublayer = layer.sublayers.getItemAt(0);
+      const screenPoint = this.view_.toScreen(geometry);
+      screenPoint.x += 10;
+      const point = this.view_.toMap(screenPoint);
+      const bufferDistance = Math.abs(geometry.x - point.x);
+      const polygon = await buffer(geometry, bufferDistance, 'meters');
+      const {
+        features
+      } = await sublayer.queryFeatures({
+        geometry: Array.isArray(polygon) ? polygon[0] : polygon,
+        returnGeometry: true,
+        // distance: 10000,
+        outFields: ['*']
+      });
+
+      if (features.length > 0) {
+        ret.push(...features);
+      }
+    });
+    return ret;
+  } //#region 保护方法
+
+
+  onDrawEnd_(e) {
+    const graphic = super.onDrawEnd_(e);
+
+    if (!graphic) {
+      return false;
+    }
+
+    this.clearDrawed();
+    const point = graphic.geometry;
+    const screen = this.view_.toScreen(point);
+    const {
+      mapElement,
+      mapLayers
+    } = this.$;
+    Promise.all([this._queryWithMapImageLayer(point), this.view_.hitTest(screen, {
+      exclude: [mapElement.graphicsLayer, mapElement.highlightLayer, ...mapLayers.layersWhichCantQuery.map(([layer]) => layer)]
+    })]).then(([queryResult, hitTestResult]) => {
+      var _hitTestResult$result, _hitTestResult$result2;
+
+      const mapPoint = (_hitTestResult$result = hitTestResult.results) === null || _hitTestResult$result === void 0 ? void 0 : (_hitTestResult$result2 = _hitTestResult$result[0]) === null || _hitTestResult$result2 === void 0 ? void 0 : _hitTestResult$result2.mapPoint;
+      queryResult.forEach(graphic => {
+        hitTestResult.results.push({
+          graphic,
+          mapPoint
+        });
+      });
+      this.finsheHitTest_(hitTestResult);
+    });
+
+    this._queryWithMapImageLayer(point);
+
+    return graphic;
+  }
+
+  finsheHitTest_(result) {
+    this.fire('finshed', {
+      results: result.results
+    });
+    return result.results;
+  }
+
+}
+
 class ClearTool extends FssgEsriBaseTool {
   //#region 构造函数
 
@@ -2278,7 +2433,7 @@ class MapTools extends FssgEsriPlugin {
   _init() {
     this._toolPool.set('default', new FssgEsriBaseTool(this.map_, this.view_, {
       isOnceTool: false
-    })).set('zoom-home', new ZoomHomeTool(this.map_, this.view_)).set('draw-point', new DrawPointTool(this.map_, this.view_)).set('draw-polyline', new DrawPolylineTool(this.map_, this.view_)).set('draw-polygon', new DrawPolygonTool(this.map_, this.view_)).set('clear', new ClearTool(this.map_, this.view_)).set('measure-coordinate', new MeasureCoordinateTool(this.map_, this.view_)).set('measure-length', new MeasureLengthTool(this.map_, this.view_)).set('measure-area', new MeasureAreaTool(this.map_, this.view_));
+    })).set('zoom-home', new ZoomHomeTool(this.map_, this.view_)).set('draw-point', new DrawPointTool(this.map_, this.view_)).set('draw-polyline', new DrawPolylineTool(this.map_, this.view_)).set('draw-polygon', new DrawPolygonTool(this.map_, this.view_)).set('clear', new ClearTool(this.map_, this.view_)).set('measure-coordinate', new MeasureCoordinateTool(this.map_, this.view_)).set('measure-length', new MeasureLengthTool(this.map_, this.view_)).set('measure-area', new MeasureAreaTool(this.map_, this.view_)).set('hit-test', new HitTestTool(this.map_, this.view_));
 
     return this;
   }
@@ -2641,6 +2796,16 @@ class MapLayers extends FssgEsriPlugin {
   setLayerOpacity(nameOrId, opacity) {
     const layer = this.findLayer(nameOrId);
     layer && (layer.opacity = opacity);
+    return this;
+  }
+
+  async forEach(callback) {
+    const values = [...this._layerPool.values()];
+
+    for (let i = 0; i < values.length; i++) {
+      await callback(values[i]);
+    }
+
     return this;
   }
 
@@ -3238,4 +3403,4 @@ class Overlays extends FssgEsriPlugin {
 
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MouseTips, Overlays, createGeometryFactory, createLayerFactory };
+export { Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, ZoomHomeTool, createGeometryFactory, createLayerFactory };

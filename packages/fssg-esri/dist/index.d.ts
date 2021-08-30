@@ -1,4 +1,10 @@
-import { IFssgMapPluginOptions, IFssgMapPluginEvents, FssgMapPlugin, BaseTool, IBaseToolOptions, IBaseToolEvents, IFssgMapOptions, IFssgMapEvents, FssgMap } from '@fssgis/fssg-map';
+import { IFssgMapPluginOptions, IFssgMapPluginEvents, FssgMapPlugin, IBaseToolOptions, IBaseToolEvents, BaseTool, OnToolActivedParams, OnToolActivedReture, OnToolDeactivedParams, OnToolDeactivedReture, IFssgMapOptions, IFssgMapEvents, FssgMap } from '@fssgis/fssg-map';
+import Geometry from '@arcgis/core/geometry/Geometry';
+import Draw from '@arcgis/core/views/draw/Draw';
+import DrawAction from '@arcgis/core/views/draw/DrawAction';
+import Graphic from '@arcgis/core/Graphic';
+import { ICallbackParams } from '@fssgis/observable';
+import Point from '@arcgis/core/geometry/Point';
 
 /**
  * 地图应用插件配置项
@@ -168,6 +174,8 @@ declare class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementE
     private _highlightLayer;
     /** 图元图层存储图层组 */
     private _groupLayer;
+    get graphicsLayer(): __esri.GraphicsLayer;
+    get highlightLayer(): __esri.GraphicsLayer;
     /**
      * 构造图元控制插件对象
      * @param options 配置项
@@ -313,6 +321,234 @@ declare class MapTools extends FssgEsriPlugin<IMapToolsOptions, IMapToolsEvents>
      * @param key 工具Key
      */
     getTool<T extends FssgEsriBaseTool>(key: string): T | undefined;
+}
+
+/**
+ * 缩放至起始位置工具配置项
+ */
+interface IZoomHomeToolOptions extends IFssgEsriBaseToolOptions {
+}
+/**
+ * 缩放至起始位置工具事件集
+ */
+interface IZoomHomeToolEvents extends IFssgEsriBaseToolEvents {
+}
+/**
+ * 缩放至起始位置工具
+ */
+declare class ZoomHomeTool<T_OPTIONS extends IZoomHomeToolOptions = IZoomHomeToolOptions, T_EVENTS extends IZoomHomeToolEvents = IZoomHomeToolEvents> extends FssgEsriBaseTool<T_OPTIONS & IZoomHomeToolOptions, T_EVENTS & IZoomHomeToolEvents> {
+    /**
+     * 起始位置
+     */
+    home: __esri.Geometry | {
+        center: __esri.Point;
+        zoom: number;
+    };
+    /**
+     * 构造缩放至起始位置工具
+     * @param map 地图
+     * @param view 视图
+     * @param options 配置项
+     * @param defaultOptions 默认配置项
+     */
+    constructor(map: IMap, view: IView, options?: T_OPTIONS, defaultOptions?: T_OPTIONS);
+    /**
+     * 工具激活时触发
+     */
+    protected onToolActived_(e: OnToolActivedParams<this>): OnToolActivedReture;
+}
+
+declare type DrawType = 'point' | 'multipoint' | 'polyline' | 'polygon' | 'rectangle' | 'circle' | 'ellipse';
+declare type OnDrawStartParams<T> = ICallbackParams<'draw-start', T> & {
+    x: number;
+    y: number;
+};
+declare type OnDrawMoveParams<T> = ICallbackParams<'draw-move', T> & {
+    geometry: Geometry;
+};
+declare type OnDrawEndParams<T> = ICallbackParams<'draw-end', T> & {
+    geometry: Geometry;
+};
+declare type OnDrawStartReture = Point | false;
+declare type OnDrawMoveReture = Graphic | false;
+declare type OnDrawEndReture = Graphic | false;
+interface IDrawToolOptions extends IFssgEsriBaseToolOptions {
+    drawType: DrawType;
+    onlyOneGraphic?: boolean;
+    cursorType?: string;
+}
+interface IDrawToolEvents extends IFssgEsriBaseToolEvents {
+    'draw-start': {
+        x: number;
+        y: number;
+    };
+    'draw-move': {
+        geometry: Geometry;
+    };
+    'draw-end': {
+        geometry: Geometry;
+    };
+}
+declare abstract class DrawTool<T_OPTIONS extends IDrawToolOptions = IDrawToolOptions, T_EVENTS extends IDrawToolEvents = IDrawToolEvents> extends FssgEsriBaseTool<T_OPTIONS, T_EVENTS> {
+    /** 绘制图元存储容器 */
+    private _graphics;
+    /** 绘制过程图元 */
+    private _tempGraphic;
+    /** 绘制时样式 */
+    private _drawingStyle;
+    /** 绘制完成样式 */
+    private _drawedStyle;
+    /** 绘图对象 */
+    protected draw_: Draw;
+    /** 绘制任务对象 */
+    protected action_: DrawAction;
+    /** 绘图类型 */
+    protected drawType_: DrawType;
+    protected cursorType_: string;
+    /** 绘制目标是否仅允许存在一个 */
+    private onlyOneGraphic_;
+    /**
+     * 构造绘图工具对象
+     * @param map 地图对象
+     * @param view 视图对象
+     */
+    constructor(map: IMap, view: IView, options: T_OPTIONS);
+    private _matchStyle;
+    /**
+     * 初始化任务
+     */
+    protected initAction_(): this;
+    /**
+     * 工具激活处理事件
+     */
+    protected onToolActived_(e: OnToolActivedParams<this>): OnToolActivedReture;
+    /**
+     * 工具失活处理事件
+     */
+    protected onToolDeactived_(e: OnToolDeactivedParams<this>): OnToolDeactivedReture;
+    /**
+     * 工具绘制开始处理事件
+     */
+    protected onDrawStart_(e: OnDrawStartParams<this>): OnDrawStartReture;
+    /**
+     * 工具绘制过程处理事件
+     */
+    protected onDrawMove_(e: OnDrawMoveParams<this>): OnDrawMoveReture;
+    /**
+     * 工具绘制完成处理事件
+     */
+    protected onDrawEnd_(e: OnDrawEndParams<this>): OnDrawEndReture;
+    /**
+     *清理绘制过的图元
+     */
+    clearDrawed(): this;
+    /**
+     * 设置绘制完成图元样式
+     */
+    setDrawedStyle(style: IMapElementSymbol): this;
+    /**
+     * 设置绘制时图元样式
+     */
+    setDrawingStyle(style: IMapElementSymbol): this;
+}
+
+declare type IDrawPointToolOptions = IDrawToolOptions;
+declare type IDrawPointToolEvents = IDrawToolEvents;
+declare class DrawPointTool<T_OPTIONS extends IDrawPointToolOptions = IDrawPointToolOptions, T_EVENTS extends IDrawPointToolEvents = IDrawPointToolEvents> extends DrawTool<T_OPTIONS, T_EVENTS> {
+    private _pointerMoveHandler;
+    constructor(map: IMap, view: IView, onlyOneGraphic?: boolean);
+    protected initAction_(): this;
+    protected onToolDeactived_(e: OnToolDeactivedParams<this>): OnToolDeactivedReture;
+}
+
+declare type IDrawPolygonToolOptions = IDrawToolOptions;
+declare type IDrawPolygonToolEvents = IDrawToolEvents;
+declare class DrawPolygonTool<T_OPTIONS extends IDrawPolygonToolOptions = IDrawPolygonToolOptions, T_EVENTS extends IDrawPolygonToolEvents = IDrawPolygonToolEvents> extends DrawTool<T_OPTIONS, T_EVENTS> {
+    constructor(map: IMap, view: IView, options?: Omit<T_OPTIONS, 'drawType'>);
+    protected initAction_(): this;
+}
+
+declare type IDrawPolylineToolOptions = IDrawToolOptions;
+declare type IDrawPolylineToolEvents = IDrawToolEvents;
+declare class DrawPolylineTool<T_OPTIONS extends IDrawPolylineToolOptions = IDrawPolylineToolOptions, T_EVENTS extends IDrawPolylineToolEvents = IDrawPolylineToolEvents> extends DrawTool<T_OPTIONS, T_EVENTS> {
+    constructor(map: IMap, view: IView, onlyOneGraphic?: boolean);
+    protected initAction_(): this;
+}
+
+interface IMeasureCoordinateToolOptions extends IDrawPointToolOptions {
+}
+interface IMeasureCoordinateToolEvents extends IDrawPointToolEvents {
+}
+declare class MeasureCoordinateTool<T_OPTIONS extends IMeasureCoordinateToolOptions = IMeasureCoordinateToolOptions, T_EVENTS extends IMeasureCoordinateToolEvents = IMeasureCoordinateToolEvents> extends DrawPointTool<T_OPTIONS, T_EVENTS> {
+    private _overlayIds;
+    constructor(map: IMap, view: IView);
+    protected onDrawMove_(e: OnDrawMoveParams<this>): OnDrawMoveReture;
+    protected onToolDeactived_(e: OnToolDeactivedParams<this>): OnToolDeactivedReture;
+    protected onDrawEnd_(e: OnDrawEndParams<this>): OnDrawEndReture;
+    clearMeasure(): this;
+}
+
+interface IMeasureLengthToolOptions extends IDrawPolylineToolOptions {
+}
+interface IMeasureLengthToolEvents extends IDrawPolylineToolEvents {
+}
+declare class MeasureLengthTool<T_OPTIONS extends IMeasureLengthToolOptions = IMeasureLengthToolOptions, T_EVENTS extends IMeasureLengthToolEvents = IMeasureLengthToolEvents> extends DrawPolylineTool<T_OPTIONS, T_EVENTS> {
+    private _overlayIds;
+    unit: __esri.LinearUnits;
+    fixedCount: number;
+    private _unitStrDic;
+    constructor(map: IMap, view: IView);
+    protected onDrawMove_(e: OnDrawMoveParams<this>): OnDrawMoveReture;
+    protected onToolDeactived_(e: OnToolDeactivedParams<this>): OnToolDeactivedReture;
+    protected onDrawEnd_(e: OnDrawEndParams<this>): OnDrawEndReture;
+    clearMeasure(): this;
+}
+
+interface IMeasureAreaToolOptions extends IDrawPolygonToolOptions {
+}
+interface IMeasureAreaToolEvents extends IDrawPolygonToolEvents {
+}
+declare class MeasureAreaTool<T_OPTIONS extends IMeasureAreaToolOptions = IMeasureAreaToolOptions, T_EVENTS extends IMeasureAreaToolEvents = IMeasureAreaToolEvents> extends DrawPolygonTool<T_OPTIONS, T_EVENTS> {
+    private _overlayIds;
+    unit: __esri.ArealUnits;
+    fixedCount: number;
+    private _unitStrDic;
+    constructor(map: IMap, view: IView);
+    protected onDrawMove_(e: OnDrawMoveParams<this>): OnDrawMoveReture;
+    protected onToolDeactived_(e: OnToolDeactivedParams<this>): OnToolDeactivedReture;
+    protected onDrawEnd_(e: OnDrawEndParams<this>): OnDrawEndReture;
+    clearMeasure(): this;
+}
+
+interface IAttributesConfigItem {
+    layerName: string;
+    fields?: {
+        name: string;
+        alias: string;
+        type?: string;
+    }[];
+    exclude?: string[];
+}
+declare type IHitTestToolOptions = IDrawPointToolOptions;
+interface IHitTestToolEvents extends IDrawPointToolEvents {
+    'finshed': {
+        results: __esri.HitTestResultResults[];
+    };
+}
+interface IField {
+    name: string;
+    alias?: string;
+    type?: string;
+    value: unknown;
+}
+declare class HitTestTool<T_OPTIONS extends IHitTestToolOptions = IHitTestToolOptions, T_EVENTS extends IHitTestToolEvents = IHitTestToolEvents> extends DrawPointTool<T_OPTIONS, T_EVENTS> {
+    static getAttributesFromGraphic(graphic: __esri.Graphic): IField[];
+    static parseAttributesFromArcGISServer(attributes: IField[], graphic: __esri.Graphic): IField[];
+    static parseAttributesFromCustomConfig(attributes: IField[], graphic: __esri.Graphic, attributesConfig: IAttributesConfigItem[]): IField[];
+    constructor(map: IMap, view: IView);
+    private _queryWithMapImageLayer;
+    protected onDrawEnd_(e: OnDrawEndParams<this>): OnDrawEndReture;
+    protected finsheHitTest_(result: __esri.HitTestResult): __esri.HitTestResultResults[];
 }
 
 /**
@@ -471,6 +707,7 @@ declare class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEven
      * @param opacity 不透明度
      */
     setLayerOpacity(nameOrId: string, opacity: number): this;
+    forEach(callback: (item: [__esri.Layer, LayerOptions]) => void): Promise<this>;
 }
 
 /**
@@ -1224,4 +1461,4 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     reset(): Promise<this>;
 }
 
-export { Basemap, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, IBasemapEvents, IBasemapOptions, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapModulesEvents, IMapModulesOptions, IMapToolsEvents, IMapToolsOptions, IModuleItem, IMouseTipsEvents, IMouseTipsOptions, IOverlay, IOverlayAddOptions, IOverlaysEvents, IOverlaysOptions, IOwner, ITreeNode, IView, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapModules, MapTools, MouseTips, Overlays, XY, createGeometryFactory, createLayerFactory };
+export { Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, IAttributesConfigItem, IBasemapEvents, IBasemapOptions, IDrawPointToolEvents, IDrawPointToolOptions, IDrawPolygonToolEvents, IDrawPolygonToolOptions, IDrawPolylineToolEvents, IDrawPolylineToolOptions, IField, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, IHitTestToolEvents, IHitTestToolOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapModulesEvents, IMapModulesOptions, IMapToolsEvents, IMapToolsOptions, IMeasureAreaToolEvents, IMeasureAreaToolOptions, IMeasureCoordinateToolEvents, IMeasureCoordinateToolOptions, IMeasureLengthToolEvents, IMeasureLengthToolOptions, IModuleItem, IMouseTipsEvents, IMouseTipsOptions, IOverlay, IOverlayAddOptions, IOverlaysEvents, IOverlaysOptions, IOwner, ITreeNode, IView, IZoomHomeToolEvents, IZoomHomeToolOptions, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, XY, ZoomHomeTool, createGeometryFactory, createLayerFactory };

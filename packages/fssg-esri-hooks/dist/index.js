@@ -1,9 +1,14 @@
+import { getCurrentInstance, onUnmounted, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide, reactive } from 'vue';
 import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement, MapTools, Hawkeye, LayerTree, MapModules, MouseTips, Overlays } from '@fssgis/fssg-esri';
-import { getCurrentInstance, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide, reactive } from 'vue';
 import { whenRightReturn } from '@fssgis/utils';
 import '@fssgis/observable';
 
 /* eslint-disable @typescript-eslint/ban-types */
+function tryOnUnmounted(callback) {
+  if (getCurrentInstance()) {
+    onUnmounted(() => callback());
+  }
+}
 function tryOnBeforeUnmounted(callback) {
   if (getCurrentInstance()) {
     onBeforeUnmount(() => callback());
@@ -757,4 +762,4 @@ function useOverlays(fssgEsri) {
   return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.overlays) ?? inject(SYMBOL_OVERLAYS);
 }
 
-export { createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, createMouseTips, createOverlays, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useOverlays, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, createMouseTips, createOverlays, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useObservableOn, useOverlays, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

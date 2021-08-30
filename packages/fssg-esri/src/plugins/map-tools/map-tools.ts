@@ -10,6 +10,7 @@ import {
   MeasureCoordinateTool,
   MeasureLengthTool,
   MeasureAreaTool,
+  HitTestTool,
 } from './tools'
 import ClearTool from './tools/clear/clear-tool'
 
@@ -82,6 +83,7 @@ export class MapTools extends FssgEsriPlugin<IMapToolsOptions, IMapToolsEvents> 
       .set('measure-coordinate', new MeasureCoordinateTool(this.map_, this.view_))
       .set('measure-length', new MeasureLengthTool(this.map_, this.view_))
       .set('measure-area', new MeasureAreaTool(this.map_, this.view_))
+      .set('hit-test', new HitTestTool(this.map_, this.view_))
     return this
   }
 

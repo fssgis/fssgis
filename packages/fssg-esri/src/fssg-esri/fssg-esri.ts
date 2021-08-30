@@ -204,6 +204,20 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     return this
   }
 
+  private _gotoPromise : Promise<unknown> | undefined
+  private _handleId: NodeJS.Timeout
+  public goto (target: __esri.Geometry | __esri.Graphic | __esri.Geometry[] | __esri.Graphic[] | number[] | __esri.Collection<__esri.Geometry> | __esri.Collection<__esri.Graphic> | { center?: __esri.Point, zoom?: number }, options?: __esri.GoToOptions2D) : this {
+    clearTimeout(this._handleId)
+    const gotoFunc : () => Promise<unknown> = this.view.goTo.bind(this.view, target, options)
+    if (this._gotoPromise) {
+      this._gotoPromise = this._gotoPromise.then(() => gotoFunc())
+    } else {
+      this._gotoPromise = gotoFunc()
+    }
+    this._handleId = setTimeout(() => this._gotoPromise = undefined, 2500)
+    return this
+  }
+
   //#endregion
 
   //#region 公有方法
@@ -228,7 +242,7 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
    */
   public zoomIn (num = 1, options?: __esri.GoToOptions2D) : this {
     const zoom = this.zoom
-    this._view.goTo({ zoom: zoom + Math.round(num) }, options)
+    this.goto({ zoom: zoom + Math.round(num) }, options)
     return this
   }
 
@@ -239,7 +253,7 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
    */
   public zoomOut (num = 1, options?: __esri.GoToOptions2D) : this {
     const zoom = this.zoom
-    this._view.goTo({ zoom: zoom - Math.round(num) }, options)
+    this.goto({ zoom: zoom - Math.round(num) }, options)
     return this
   }
 
@@ -249,7 +263,7 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
    * @param options 配置项
    */
   public zoomTo (zoom: number, options?: __esri.GoToOptions2D) : this {
-    this._view.goTo({ zoom }, options)
+    this.goto({ zoom }, options)
     return this
   }
 
@@ -264,7 +278,7 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     if (options?.isZoomAdd && zoom) {
       zoom = this.zoom + zoom
     }
-    this._view.goTo({ center, zoom }, options)
+    this.goto({ center, zoom }, options)
     return this
   }
 
@@ -279,7 +293,7 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     if (options?.isZoomAdd && zoom) {
       zoom = this.zoom + zoom
     }
-    this._view.goTo({ center }, options)
+    this.goto({ center }, options)
     return this
   }
 

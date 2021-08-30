@@ -55,7 +55,7 @@ export class ZoomHomeTool<
       warn(this, '无定位范围')
       return true
     }
-    this.view_.goTo(this.home)
+    this.$.goto(this.home)
     return true
   }
 

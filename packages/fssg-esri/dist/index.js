@@ -812,6 +812,10 @@ class FssgEsri extends FssgMap {
     _defineProperty(this, "_map", void 0);
 
     _defineProperty(this, "_view", void 0);
+
+    _defineProperty(this, "_gotoPromise", void 0);
+
+    _defineProperty(this, "_handleId", void 0);
   } //#endregion
   //#region 私有方法
 
@@ -870,6 +874,20 @@ class FssgEsri extends FssgMap {
     document.styleSheets[0].addRule('.esri-view .esri-view-surface', 'outline: none !important');
     document.styleSheets[0].addRule('.esri-view .esri-view-surface--inset-outline:focus::after', 'outline: none !important');
     return this;
+  }
+
+  goto(target, options) {
+    clearTimeout(this._handleId);
+    const gotoFunc = this.view.goTo.bind(this.view, target, options);
+
+    if (this._gotoPromise) {
+      this._gotoPromise = this._gotoPromise.then(() => gotoFunc());
+    } else {
+      this._gotoPromise = gotoFunc();
+    }
+
+    this._handleId = setTimeout(() => this._gotoPromise = undefined, 2500);
+    return this;
   } //#endregion
   //#region 公有方法
 
@@ -892,11 +910,9 @@ class FssgEsri extends FssgMap {
 
   zoomIn(num = 1, options) {
     const zoom = this.zoom;
-
-    this._view.goTo({
+    this.goto({
       zoom: zoom + Math.round(num)
     }, options);
-
     return this;
   }
   /**
@@ -908,11 +924,9 @@ class FssgEsri extends FssgMap {
 
   zoomOut(num = 1, options) {
     const zoom = this.zoom;
-
-    this._view.goTo({
+    this.goto({
       zoom: zoom - Math.round(num)
     }, options);
-
     return this;
   }
   /**
@@ -923,10 +937,9 @@ class FssgEsri extends FssgMap {
 
 
   zoomTo(zoom, options) {
-    this._view.goTo({
+    this.goto({
       zoom
     }, options);
-
     return this;
   }
   /**
@@ -944,11 +957,10 @@ class FssgEsri extends FssgMap {
       zoom = this.zoom + zoom;
     }
 
-    this._view.goTo({
+    this.goto({
       center,
       zoom
     }, options);
-
     return this;
   }
   /**
@@ -966,10 +978,9 @@ class FssgEsri extends FssgMap {
       zoom = this.zoom + zoom;
     }
 
-    this._view.goTo({
+    this.goto({
       center
     }, options);
-
     return this;
   }
   /**
@@ -1529,7 +1540,7 @@ class ZoomHomeTool extends FssgEsriBaseTool {
       return true;
     }
 
-    this.view_.goTo(this.home);
+    this.$.goto(this.home);
     return true;
   }
 

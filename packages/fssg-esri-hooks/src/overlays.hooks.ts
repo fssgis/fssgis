@@ -1,6 +1,6 @@
-import { Overlays, FssgEsri, IOverlaysOptions } from '@fssgis/fssg-esri'
+import { Overlays, FssgEsri, IOverlaysOptions, IOverlayAddOptions } from '@fssgis/fssg-esri'
 import { warn } from '@fssgis/fssg-map'
-import { App, inject, InjectionKey, provide } from 'vue'
+import { App, AppContext, Component, createVNode, getCurrentInstance, inject, InjectionKey, provide, render } from 'vue'
 import { useFssgEsri } from './fssg-esri.hooks'
 
 function _getOverlays () : Overlays
@@ -24,6 +24,38 @@ function _getOverlays (arg0?: FssgEsri | Overlays) : Overlays {
   }
   return overlays
 }
+
+export interface IOverlayState {
+  setOverlay<T> (options: Omit<IOverlayAddOptions, 'content'> & { component?: Component<T>, props?: Partial<T> }) : void
+}
+
+export function useSetOverlays () : IOverlayState
+export function useSetOverlays (fssgMap: FssgEsri) : IOverlayState
+export function useSetOverlays (overlays: Overlays) : IOverlayState
+export function useSetOverlays (arg0?: FssgEsri | Overlays) : IOverlayState
+export function useSetOverlays (arg0?: FssgEsri | Overlays) : IOverlayState {
+  const overlays = _getOverlays(arg0)
+  const app = getCurrentInstance()?.appContext as AppContext
+  return {
+    setOverlay (options) {
+      let content : HTMLDivElement | undefined
+      if (options.component) {
+        content = (() => {
+          const dom = document.createElement('div')
+          const vm = createVNode(options.component, options.props)
+          vm.appContext = app
+          render(vm, dom)
+          return dom
+        })()
+      }
+      overlays.add({
+        content: content ?? '',
+        ...options
+      })
+    }
+  }
+}
+
 
 const SYMBOL_OVERLAYS : InjectionKey<Overlays> = Symbol('FssgEsri.Overlays')
 export function createOverlays (options: IOverlaysOptions) : Overlays

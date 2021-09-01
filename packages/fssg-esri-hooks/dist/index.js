@@ -1,4 +1,4 @@
-import { getCurrentInstance, onUnmounted, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide, reactive } from 'vue';
+import { getCurrentInstance, onUnmounted, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide, reactive, createVNode, render } from 'vue';
 import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement, MapTools, Hawkeye, LayerTree, MapModules, MouseTips, Overlays } from '@fssgis/fssg-esri';
 import { whenRightReturn } from '@fssgis/utils';
 import '@fssgis/observable';
@@ -744,6 +744,55 @@ function useMouseTips(fssgEsri) {
   return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mouseTips) ?? inject(SYMBOL_MOUSETIPS);
 }
 
+function _getOverlays(arg0) {
+  let overlays;
+
+  if (!arg0) {
+    const fssgEsri = useFssgEsri();
+    overlays = fssgEsri.overlays;
+
+    if (!overlays) {
+      warn(this, 'Overlays实例未挂载到FssgMap实例');
+    }
+  } else {
+    if (arg0 instanceof FssgEsri) {
+      overlays = arg0.overlays;
+    } else {
+      overlays = arg0;
+    }
+  }
+
+  return overlays;
+}
+
+function useSetOverlays(arg0) {
+  var _getCurrentInstance;
+
+  const overlays = _getOverlays(arg0);
+
+  const app = (_getCurrentInstance = getCurrentInstance()) === null || _getCurrentInstance === void 0 ? void 0 : _getCurrentInstance.appContext;
+  return {
+    setOverlay(options) {
+      let content;
+
+      if (options.component) {
+        content = (() => {
+          const dom = document.createElement('div');
+          const vm = createVNode(options.component, options.props);
+          vm.appContext = app;
+          render(vm, dom);
+          return dom;
+        })();
+      }
+
+      overlays.add({
+        content: content ?? '',
+        ...options
+      });
+    }
+
+  };
+}
 const SYMBOL_OVERLAYS = Symbol('FssgEsri.Overlays');
 function createOverlays(options, fssgEsri, app) {
   const overlays = new Overlays(options);
@@ -762,4 +811,4 @@ function useOverlays(fssgEsri) {
   return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.overlays) ?? inject(SYMBOL_OVERLAYS);
 }
 
-export { controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, createMouseTips, createOverlays, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useObservableOn, useOverlays, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, createMouseTips, createOverlays, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useObservableOn, useOverlays, useSetOverlays, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

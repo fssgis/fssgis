@@ -7,6 +7,7 @@ import MapImageLayer from '@arcgis/core/layers/MapImageLayer'
 import Graphic from '@arcgis/core/Graphic'
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer'
 import { createGuid } from '@fssgis/utils'
+import Field from '@arcgis/core/layers/support/Field'
 
 interface ISqlLayerProperties {
   url: string
@@ -246,6 +247,12 @@ class LayerFactory implements ILayerFactory {
 
     fetch(options.url, { method: 'get', mode:'cors' }).then(res => res.json()).then(result => {
       const graphics : __esri.Graphic[] = []
+      if (result[0]) {
+        layer.fields = [
+          new Field({ name: '$objectId', alias: '$objectId', type: 'oid' }),
+          ...Object.keys(result[0]).map(key => new Field({ name: key, alias: key, type: 'string' }))
+        ]
+      }
       result.forEach(row => {
         if (!row[options.sqlOptions.xField] || !row[options.sqlOptions.yField]) {
           return

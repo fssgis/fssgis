@@ -29,6 +29,7 @@ export default [
       '@arcgis/core/layers/TileLayer',
       '@arcgis/core/layers/MapImageLayer',
       '@arcgis/core/layers/FeatureLayer',
+      '@arcgis/core/layers/support/Field',
       '@arcgis/core/Graphic',
       '@arcgis/core/geometry/Geometry',
       '@arcgis/core/geometry/Point',

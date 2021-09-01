@@ -21,6 +21,7 @@ export default [
       '@arcgis/core/config',
       '@arcgis/core/Basemap',
       '@arcgis/core/views/MapView',
+      '@arcgis/core/views/2d/layers/BaseLayerViewGL2D',
       '@arcgis/core/layers/Layer',
       '@arcgis/core/layers/GraphicsLayer',
       '@arcgis/core/layers/GroupLayer',
@@ -37,6 +38,8 @@ export default [
       '@arcgis/core/geometry/geometryEngineAsync',
       '@arcgis/core/views/draw/Draw',
       '@arcgis/core/views/draw/DrawAction',
+      '@arcgis/core/core/watchUtils',
+      '@arcgis/core/core/promiseUtils',
     ],
     plugins: [
       typescript(),

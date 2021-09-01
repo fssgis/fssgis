@@ -19,6 +19,9 @@ import EsriBasemap from '@arcgis/core/Basemap';
 import Geometry from '@arcgis/core/geometry/Geometry';
 import Draw from '@arcgis/core/views/draw/Draw';
 import { planarLength, planarArea, buffer } from '@arcgis/core/geometry/geometryEngineAsync';
+import BaseLayerViewGL2D from '@arcgis/core/views/2d/layers/BaseLayerViewGL2D';
+import { on } from '@arcgis/core/core/watchUtils';
+import { resolve } from '@arcgis/core/core/promiseUtils';
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -3414,4 +3417,1061 @@ class Overlays extends FssgEsriPlugin {
 
 }
 
-export { Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, ZoomHomeTool, createGeometryFactory, createLayerFactory };
+/**
+ * Common utilities
+ * @module glMatrix
+ */
+// Configuration Constants
+var EPSILON = 0.000001;
+var ARRAY_TYPE = typeof Float32Array !== 'undefined' ? Float32Array : Array;
+if (!Math.hypot) Math.hypot = function () {
+  var y = 0,
+      i = arguments.length;
+
+  while (i--) {
+    y += arguments[i] * arguments[i];
+  }
+
+  return Math.sqrt(y);
+};
+
+/**
+ * 3x3 Matrix
+ * @module mat3
+ */
+
+/**
+ * Creates a new identity mat3
+ *
+ * @returns {mat3} a new 3x3 matrix
+ */
+
+function create$4() {
+  var out = new ARRAY_TYPE(9);
+
+  if (ARRAY_TYPE != Float32Array) {
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[5] = 0;
+    out[6] = 0;
+    out[7] = 0;
+  }
+
+  out[0] = 1;
+  out[4] = 1;
+  out[8] = 1;
+  return out;
+}
+/**
+ * Create a new mat3 with the given values
+ *
+ * @param {Number} m00 Component in column 0, row 0 position (index 0)
+ * @param {Number} m01 Component in column 0, row 1 position (index 1)
+ * @param {Number} m02 Component in column 0, row 2 position (index 2)
+ * @param {Number} m10 Component in column 1, row 0 position (index 3)
+ * @param {Number} m11 Component in column 1, row 1 position (index 4)
+ * @param {Number} m12 Component in column 1, row 2 position (index 5)
+ * @param {Number} m20 Component in column 2, row 0 position (index 6)
+ * @param {Number} m21 Component in column 2, row 1 position (index 7)
+ * @param {Number} m22 Component in column 2, row 2 position (index 8)
+ * @returns {mat3} A new mat3
+ */
+
+function fromValues$2(m00, m01, m02, m10, m11, m12, m20, m21, m22) {
+  var out = new ARRAY_TYPE(9);
+  out[0] = m00;
+  out[1] = m01;
+  out[2] = m02;
+  out[3] = m10;
+  out[4] = m11;
+  out[5] = m12;
+  out[6] = m20;
+  out[7] = m21;
+  out[8] = m22;
+  return out;
+}
+/**
+ * Set a mat3 to the identity matrix
+ *
+ * @param {mat3} out the receiving matrix
+ * @returns {mat3} out
+ */
+
+function identity(out) {
+  out[0] = 1;
+  out[1] = 0;
+  out[2] = 0;
+  out[3] = 0;
+  out[4] = 1;
+  out[5] = 0;
+  out[6] = 0;
+  out[7] = 0;
+  out[8] = 1;
+  return out;
+}
+/**
+ * Translate a mat3 by the given vector
+ *
+ * @param {mat3} out the receiving matrix
+ * @param {ReadonlyMat3} a the matrix to translate
+ * @param {ReadonlyVec2} v vector to translate by
+ * @returns {mat3} out
+ */
+
+function translate(out, a, v) {
+  var a00 = a[0],
+      a01 = a[1],
+      a02 = a[2],
+      a10 = a[3],
+      a11 = a[4],
+      a12 = a[5],
+      a20 = a[6],
+      a21 = a[7],
+      a22 = a[8],
+      x = v[0],
+      y = v[1];
+  out[0] = a00;
+  out[1] = a01;
+  out[2] = a02;
+  out[3] = a10;
+  out[4] = a11;
+  out[5] = a12;
+  out[6] = x * a00 + y * a10 + a20;
+  out[7] = x * a01 + y * a11 + a21;
+  out[8] = x * a02 + y * a12 + a22;
+  return out;
+}
+/**
+ * Rotates a mat3 by the given angle
+ *
+ * @param {mat3} out the receiving matrix
+ * @param {ReadonlyMat3} a the matrix to rotate
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat3} out
+ */
+
+function rotate(out, a, rad) {
+  var a00 = a[0],
+      a01 = a[1],
+      a02 = a[2],
+      a10 = a[3],
+      a11 = a[4],
+      a12 = a[5],
+      a20 = a[6],
+      a21 = a[7],
+      a22 = a[8],
+      s = Math.sin(rad),
+      c = Math.cos(rad);
+  out[0] = c * a00 + s * a10;
+  out[1] = c * a01 + s * a11;
+  out[2] = c * a02 + s * a12;
+  out[3] = c * a10 - s * a00;
+  out[4] = c * a11 - s * a01;
+  out[5] = c * a12 - s * a02;
+  out[6] = a20;
+  out[7] = a21;
+  out[8] = a22;
+  return out;
+}
+/**
+ * Scales the mat3 by the dimensions in the given vec2
+ *
+ * @param {mat3} out the receiving matrix
+ * @param {ReadonlyMat3} a the matrix to rotate
+ * @param {ReadonlyVec2} v the vec2 to scale the matrix by
+ * @returns {mat3} out
+ **/
+
+function scale(out, a, v) {
+  var x = v[0],
+      y = v[1];
+  out[0] = x * a[0];
+  out[1] = x * a[1];
+  out[2] = x * a[2];
+  out[3] = y * a[3];
+  out[4] = y * a[4];
+  out[5] = y * a[5];
+  out[6] = a[6];
+  out[7] = a[7];
+  out[8] = a[8];
+  return out;
+}
+
+/**
+ * 3 Dimensional Vector
+ * @module vec3
+ */
+
+/**
+ * Creates a new, empty vec3
+ *
+ * @returns {vec3} a new 3D vector
+ */
+
+function create$3() {
+  var out = new ARRAY_TYPE(3);
+
+  if (ARRAY_TYPE != Float32Array) {
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
+  }
+
+  return out;
+}
+/**
+ * Calculates the length of a vec3
+ *
+ * @param {ReadonlyVec3} a vector to calculate length of
+ * @returns {Number} length of a
+ */
+
+function length(a) {
+  var x = a[0];
+  var y = a[1];
+  var z = a[2];
+  return Math.hypot(x, y, z);
+}
+/**
+ * Creates a new vec3 initialized with the given values
+ *
+ * @param {Number} x X component
+ * @param {Number} y Y component
+ * @param {Number} z Z component
+ * @returns {vec3} a new 3D vector
+ */
+
+function fromValues$1(x, y, z) {
+  var out = new ARRAY_TYPE(3);
+  out[0] = x;
+  out[1] = y;
+  out[2] = z;
+  return out;
+}
+/**
+ * Normalize a vec3
+ *
+ * @param {vec3} out the receiving vector
+ * @param {ReadonlyVec3} a vector to normalize
+ * @returns {vec3} out
+ */
+
+function normalize$2(out, a) {
+  var x = a[0];
+  var y = a[1];
+  var z = a[2];
+  var len = x * x + y * y + z * z;
+
+  if (len > 0) {
+    //TODO: evaluate use of glm_invsqrt here?
+    len = 1 / Math.sqrt(len);
+  }
+
+  out[0] = a[0] * len;
+  out[1] = a[1] * len;
+  out[2] = a[2] * len;
+  return out;
+}
+/**
+ * Calculates the dot product of two vec3's
+ *
+ * @param {ReadonlyVec3} a the first operand
+ * @param {ReadonlyVec3} b the second operand
+ * @returns {Number} dot product of a and b
+ */
+
+function dot(a, b) {
+  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+/**
+ * Computes the cross product of two vec3's
+ *
+ * @param {vec3} out the receiving vector
+ * @param {ReadonlyVec3} a the first operand
+ * @param {ReadonlyVec3} b the second operand
+ * @returns {vec3} out
+ */
+
+function cross(out, a, b) {
+  var ax = a[0],
+      ay = a[1],
+      az = a[2];
+  var bx = b[0],
+      by = b[1],
+      bz = b[2];
+  out[0] = ay * bz - az * by;
+  out[1] = az * bx - ax * bz;
+  out[2] = ax * by - ay * bx;
+  return out;
+}
+/**
+ * Alias for {@link vec3.length}
+ * @function
+ */
+
+var len = length;
+/**
+ * Perform some operation over an array of vec3s.
+ *
+ * @param {Array} a the array of vectors to iterate over
+ * @param {Number} stride Number of elements between the start of each vec3. If 0 assumes tightly packed
+ * @param {Number} offset Number of elements to skip at the beginning of the array
+ * @param {Number} count Number of vec3s to iterate over. If 0 iterates over entire array
+ * @param {Function} fn Function to call for each vector in the array
+ * @param {Object} [arg] additional argument to pass to fn
+ * @returns {Array} a
+ * @function
+ */
+
+(function () {
+  var vec = create$3();
+  return function (a, stride, offset, count, fn, arg) {
+    var i, l;
+
+    if (!stride) {
+      stride = 3;
+    }
+
+    if (!offset) {
+      offset = 0;
+    }
+
+    if (count) {
+      l = Math.min(count * stride + offset, a.length);
+    } else {
+      l = a.length;
+    }
+
+    for (i = offset; i < l; i += stride) {
+      vec[0] = a[i];
+      vec[1] = a[i + 1];
+      vec[2] = a[i + 2];
+      fn(vec, vec, arg);
+      a[i] = vec[0];
+      a[i + 1] = vec[1];
+      a[i + 2] = vec[2];
+    }
+
+    return a;
+  };
+})();
+
+/**
+ * 4 Dimensional Vector
+ * @module vec4
+ */
+
+/**
+ * Creates a new, empty vec4
+ *
+ * @returns {vec4} a new 4D vector
+ */
+
+function create$2() {
+  var out = new ARRAY_TYPE(4);
+
+  if (ARRAY_TYPE != Float32Array) {
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+  }
+
+  return out;
+}
+/**
+ * Normalize a vec4
+ *
+ * @param {vec4} out the receiving vector
+ * @param {ReadonlyVec4} a vector to normalize
+ * @returns {vec4} out
+ */
+
+function normalize$1(out, a) {
+  var x = a[0];
+  var y = a[1];
+  var z = a[2];
+  var w = a[3];
+  var len = x * x + y * y + z * z + w * w;
+
+  if (len > 0) {
+    len = 1 / Math.sqrt(len);
+  }
+
+  out[0] = x * len;
+  out[1] = y * len;
+  out[2] = z * len;
+  out[3] = w * len;
+  return out;
+}
+/**
+ * Perform some operation over an array of vec4s.
+ *
+ * @param {Array} a the array of vectors to iterate over
+ * @param {Number} stride Number of elements between the start of each vec4. If 0 assumes tightly packed
+ * @param {Number} offset Number of elements to skip at the beginning of the array
+ * @param {Number} count Number of vec4s to iterate over. If 0 iterates over entire array
+ * @param {Function} fn Function to call for each vector in the array
+ * @param {Object} [arg] additional argument to pass to fn
+ * @returns {Array} a
+ * @function
+ */
+
+(function () {
+  var vec = create$2();
+  return function (a, stride, offset, count, fn, arg) {
+    var i, l;
+
+    if (!stride) {
+      stride = 4;
+    }
+
+    if (!offset) {
+      offset = 0;
+    }
+
+    if (count) {
+      l = Math.min(count * stride + offset, a.length);
+    } else {
+      l = a.length;
+    }
+
+    for (i = offset; i < l; i += stride) {
+      vec[0] = a[i];
+      vec[1] = a[i + 1];
+      vec[2] = a[i + 2];
+      vec[3] = a[i + 3];
+      fn(vec, vec, arg);
+      a[i] = vec[0];
+      a[i + 1] = vec[1];
+      a[i + 2] = vec[2];
+      a[i + 3] = vec[3];
+    }
+
+    return a;
+  };
+})();
+
+/**
+ * Quaternion
+ * @module quat
+ */
+
+/**
+ * Creates a new identity quat
+ *
+ * @returns {quat} a new quaternion
+ */
+
+function create$1() {
+  var out = new ARRAY_TYPE(4);
+
+  if (ARRAY_TYPE != Float32Array) {
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
+  }
+
+  out[3] = 1;
+  return out;
+}
+/**
+ * Sets a quat from the given angle and rotation axis,
+ * then returns it.
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {ReadonlyVec3} axis the axis around which to rotate
+ * @param {Number} rad the angle in radians
+ * @returns {quat} out
+ **/
+
+function setAxisAngle(out, axis, rad) {
+  rad = rad * 0.5;
+  var s = Math.sin(rad);
+  out[0] = s * axis[0];
+  out[1] = s * axis[1];
+  out[2] = s * axis[2];
+  out[3] = Math.cos(rad);
+  return out;
+}
+/**
+ * Performs a spherical linear interpolation between two quat
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {ReadonlyQuat} a the first operand
+ * @param {ReadonlyQuat} b the second operand
+ * @param {Number} t interpolation amount, in the range [0-1], between the two inputs
+ * @returns {quat} out
+ */
+
+function slerp(out, a, b, t) {
+  // benchmarks:
+  //    http://jsperf.com/quaternion-slerp-implementations
+  var ax = a[0],
+      ay = a[1],
+      az = a[2],
+      aw = a[3];
+  var bx = b[0],
+      by = b[1],
+      bz = b[2],
+      bw = b[3];
+  var omega, cosom, sinom, scale0, scale1; // calc cosine
+
+  cosom = ax * bx + ay * by + az * bz + aw * bw; // adjust signs (if necessary)
+
+  if (cosom < 0.0) {
+    cosom = -cosom;
+    bx = -bx;
+    by = -by;
+    bz = -bz;
+    bw = -bw;
+  } // calculate coefficients
+
+
+  if (1.0 - cosom > EPSILON) {
+    // standard case (slerp)
+    omega = Math.acos(cosom);
+    sinom = Math.sin(omega);
+    scale0 = Math.sin((1.0 - t) * omega) / sinom;
+    scale1 = Math.sin(t * omega) / sinom;
+  } else {
+    // "from" and "to" quaternions are very close
+    //  ... so we can do a linear interpolation
+    scale0 = 1.0 - t;
+    scale1 = t;
+  } // calculate final values
+
+
+  out[0] = scale0 * ax + scale1 * bx;
+  out[1] = scale0 * ay + scale1 * by;
+  out[2] = scale0 * az + scale1 * bz;
+  out[3] = scale0 * aw + scale1 * bw;
+  return out;
+}
+/**
+ * Creates a quaternion from the given 3x3 rotation matrix.
+ *
+ * NOTE: The resultant quaternion is not normalized, so you should be sure
+ * to renormalize the quaternion yourself where necessary.
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {ReadonlyMat3} m rotation matrix
+ * @returns {quat} out
+ * @function
+ */
+
+function fromMat3(out, m) {
+  // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
+  // article "Quaternion Calculus and Fast Animation".
+  var fTrace = m[0] + m[4] + m[8];
+  var fRoot;
+
+  if (fTrace > 0.0) {
+    // |w| > 1/2, may as well choose w > 1/2
+    fRoot = Math.sqrt(fTrace + 1.0); // 2w
+
+    out[3] = 0.5 * fRoot;
+    fRoot = 0.5 / fRoot; // 1/(4w)
+
+    out[0] = (m[5] - m[7]) * fRoot;
+    out[1] = (m[6] - m[2]) * fRoot;
+    out[2] = (m[1] - m[3]) * fRoot;
+  } else {
+    // |w| <= 1/2
+    var i = 0;
+    if (m[4] > m[0]) i = 1;
+    if (m[8] > m[i * 3 + i]) i = 2;
+    var j = (i + 1) % 3;
+    var k = (i + 2) % 3;
+    fRoot = Math.sqrt(m[i * 3 + i] - m[j * 3 + j] - m[k * 3 + k] + 1.0);
+    out[i] = 0.5 * fRoot;
+    fRoot = 0.5 / fRoot;
+    out[3] = (m[j * 3 + k] - m[k * 3 + j]) * fRoot;
+    out[j] = (m[j * 3 + i] + m[i * 3 + j]) * fRoot;
+    out[k] = (m[k * 3 + i] + m[i * 3 + k]) * fRoot;
+  }
+
+  return out;
+}
+/**
+ * Normalize a quat
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {ReadonlyQuat} a quaternion to normalize
+ * @returns {quat} out
+ * @function
+ */
+
+var normalize = normalize$1;
+/**
+ * Sets a quaternion to represent the shortest rotation from one
+ * vector to another.
+ *
+ * Both vectors are assumed to be unit length.
+ *
+ * @param {quat} out the receiving quaternion.
+ * @param {ReadonlyVec3} a the initial vector
+ * @param {ReadonlyVec3} b the destination vector
+ * @returns {quat} out
+ */
+
+(function () {
+  var tmpvec3 = create$3();
+  var xUnitVec3 = fromValues$1(1, 0, 0);
+  var yUnitVec3 = fromValues$1(0, 1, 0);
+  return function (out, a, b) {
+    var dot$1 = dot(a, b);
+
+    if (dot$1 < -0.999999) {
+      cross(tmpvec3, xUnitVec3, a);
+      if (len(tmpvec3) < 0.000001) cross(tmpvec3, yUnitVec3, a);
+      normalize$2(tmpvec3, tmpvec3);
+      setAxisAngle(out, tmpvec3, Math.PI);
+      return out;
+    } else if (dot$1 > 0.999999) {
+      out[0] = 0;
+      out[1] = 0;
+      out[2] = 0;
+      out[3] = 1;
+      return out;
+    } else {
+      cross(tmpvec3, a, b);
+      out[0] = tmpvec3[0];
+      out[1] = tmpvec3[1];
+      out[2] = tmpvec3[2];
+      out[3] = 1 + dot$1;
+      return normalize(out, out);
+    }
+  };
+})();
+/**
+ * Performs a spherical linear interpolation with two control points
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {ReadonlyQuat} a the first operand
+ * @param {ReadonlyQuat} b the second operand
+ * @param {ReadonlyQuat} c the third operand
+ * @param {ReadonlyQuat} d the fourth operand
+ * @param {Number} t interpolation amount, in the range [0-1], between the two inputs
+ * @returns {quat} out
+ */
+
+(function () {
+  var temp1 = create$1();
+  var temp2 = create$1();
+  return function (out, a, b, c, d, t) {
+    slerp(temp1, a, d, t);
+    slerp(temp2, b, c, t);
+    slerp(out, temp1, temp2, 2 * t * (1 - t));
+    return out;
+  };
+})();
+/**
+ * Sets the specified quaternion with values corresponding to the given
+ * axes. Each axis is a vec3 and is expected to be unit length and
+ * perpendicular to all other specified axes.
+ *
+ * @param {ReadonlyVec3} view  the vector representing the viewing direction
+ * @param {ReadonlyVec3} right the vector representing the local "right" direction
+ * @param {ReadonlyVec3} up    the vector representing the local "up" direction
+ * @returns {quat} out
+ */
+
+(function () {
+  var matr = create$4();
+  return function (out, view, right, up) {
+    matr[0] = right[0];
+    matr[3] = right[1];
+    matr[6] = right[2];
+    matr[1] = up[0];
+    matr[4] = up[1];
+    matr[7] = up[2];
+    matr[2] = -view[0];
+    matr[5] = -view[1];
+    matr[8] = -view[2];
+    return normalize(out, fromMat3(out, matr));
+  };
+})();
+
+/**
+ * 2 Dimensional Vector
+ * @module vec2
+ */
+
+/**
+ * Creates a new, empty vec2
+ *
+ * @returns {vec2} a new 2D vector
+ */
+
+function create() {
+  var out = new ARRAY_TYPE(2);
+
+  if (ARRAY_TYPE != Float32Array) {
+    out[0] = 0;
+    out[1] = 0;
+  }
+
+  return out;
+}
+/**
+ * Creates a new vec2 initialized with the given values
+ *
+ * @param {Number} x X component
+ * @param {Number} y Y component
+ * @returns {vec2} a new 2D vector
+ */
+
+function fromValues(x, y) {
+  var out = new ARRAY_TYPE(2);
+  out[0] = x;
+  out[1] = y;
+  return out;
+}
+/**
+ * Subtracts vector b from vector a
+ *
+ * @param {vec2} out the receiving vector
+ * @param {ReadonlyVec2} a the first operand
+ * @param {ReadonlyVec2} b the second operand
+ * @returns {vec2} out
+ */
+
+function subtract(out, a, b) {
+  out[0] = a[0] - b[0];
+  out[1] = a[1] - b[1];
+  return out;
+}
+/**
+ * Alias for {@link vec2.subtract}
+ * @function
+ */
+
+var sub = subtract;
+/**
+ * Perform some operation over an array of vec2s.
+ *
+ * @param {Array} a the array of vectors to iterate over
+ * @param {Number} stride Number of elements between the start of each vec2. If 0 assumes tightly packed
+ * @param {Number} offset Number of elements to skip at the beginning of the array
+ * @param {Number} count Number of vec2s to iterate over. If 0 iterates over entire array
+ * @param {Function} fn Function to call for each vector in the array
+ * @param {Object} [arg] additional argument to pass to fn
+ * @returns {Array} a
+ * @function
+ */
+
+(function () {
+  var vec = create();
+  return function (a, stride, offset, count, fn, arg) {
+    var i, l;
+
+    if (!stride) {
+      stride = 2;
+    }
+
+    if (!offset) {
+      offset = 0;
+    }
+
+    if (count) {
+      l = Math.min(count * stride + offset, a.length);
+    } else {
+      l = a.length;
+    }
+
+    for (i = offset; i < l; i += stride) {
+      vec[0] = a[i];
+      vec[1] = a[i + 1];
+      fn(vec, vec, arg);
+      a[i] = vec[0];
+      a[i + 1] = vec[1];
+    }
+
+    return a;
+  };
+})();
+
+// @ts-ignore
+
+const RippleLayerView = BaseLayerViewGL2D.createSubclass({
+  // Locations of the two vertex attributes that we use. They
+  // will be bound to the shader program before linking.
+  aPosition: 0,
+  aOffset: 1,
+  constructor: function () {
+    // Geometrical transformations that must be recomputed
+    // from scratch at every frame.
+    this.transform = create$4();
+    this.translationToCenter = create();
+    this.screenTranslation = create(); // Geometrical transformations whose only a few elements
+    // must be updated per frame. Those elements are marked
+    // with NaN.
+
+    this.display = fromValues$2(NaN, 0, 0, 0, NaN, 0, -1, 1, 1);
+    this.screenScaling = fromValues$1(NaN, NaN, 1); // Whether the vertex and index buffers need to be updated
+    // due to a change in the layer data.
+
+    this.needsUpdate = false; // We listen for changes to the graphics collection of the layer
+    // and trigger the generation of new frames. A frame rendered while
+    // `needsUpdate` is true may cause an update of the vertex and
+    // index buffers.
+
+    const requestUpdate = () => {
+      this.needsUpdate = true;
+      this.requestRender();
+    };
+
+    this.watcher = on(this, 'layer.graphics', 'change', requestUpdate, requestUpdate, requestUpdate);
+  },
+  // Called once a custom layer is added to the map.layers collection and this layer view is instantiated.
+  attach: function () {
+    const gl = this.context;
+    const rippleOptions = this.layer.rippleOptions;
+    const color = (rippleOptions === null || rippleOptions === void 0 ? void 0 : rippleOptions.color) ?? '0.23, 0.43, 0.70';
+    const size = ((rippleOptions === null || rippleOptions === void 0 ? void 0 : rippleOptions.size) ?? 70.0).toFixed(2);
+    const freq = ((rippleOptions === null || rippleOptions === void 0 ? void 0 : rippleOptions.freq) ?? 1.0).toFixed(2);
+    const rings = ((rippleOptions === null || rippleOptions === void 0 ? void 0 : rippleOptions.rings) ?? 3.0).toFixed(2); // Define and compile shaders.
+
+    const vertexSource = `
+      precision highp float;
+      uniform mat3 u_transform;
+      uniform mat3 u_display;
+      attribute vec2 a_position;
+      attribute vec2 a_offset;
+      varying vec2 v_offset;
+      const float SIZE = ${size};
+      void main(void) {
+          gl_Position.xy = (u_display * (u_transform * vec3(a_position, 1.0) + vec3(a_offset * SIZE, 0.0))).xy;
+          gl_Position.zw = vec2(0.0, 1.0);
+          v_offset = a_offset;
+      }`;
+    const fragmentSource = `
+      precision highp float;
+      uniform float u_current_time;
+      varying vec2 v_offset;
+      const float PI = 3.14159;
+      const float N_RINGS = ${rings};
+      const vec3 COLOR = vec3(${color});
+      const float FREQ = ${freq};
+      void main(void) {
+          float l = length(v_offset);
+          float intensity = clamp(cos(l * PI), 0.0, 1.0) * clamp(cos(2.0 * PI * (l * 2.0 * N_RINGS - FREQ * u_current_time)), 0.0, 1.0);
+          gl_FragColor = vec4(COLOR * intensity, intensity);
+      }`;
+    console.log(vertexSource);
+    console.log(fragmentSource);
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vertexShader, vertexSource);
+    gl.compileShader(vertexShader);
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragmentShader, fragmentSource);
+    gl.compileShader(fragmentShader); // Create the shader program.
+
+    this.program = gl.createProgram();
+    gl.attachShader(this.program, vertexShader);
+    gl.attachShader(this.program, fragmentShader); // Bind attributes.
+
+    gl.bindAttribLocation(this.program, this.aPosition, 'a_position');
+    gl.bindAttribLocation(this.program, this.aOffset, 'a_offset'); // Link.
+
+    gl.linkProgram(this.program); // Shader objects are not needed anymore.
+
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragmentShader); // Retrieve uniform locations once and for all.
+
+    this.uTransform = gl.getUniformLocation(this.program, 'u_transform');
+    this.uDisplay = gl.getUniformLocation(this.program, 'u_display');
+    this.uCurrentTime = gl.getUniformLocation(this.program, 'u_current_time'); // Create the vertex and index buffer. They are initially empty. We need to track the
+    // size of the index buffer because we use indexed drawing.
+
+    this.vertexBuffer = gl.createBuffer();
+    this.indexBuffer = gl.createBuffer(); // Number of indices in the index buffer.
+
+    this.indexBufferSize = 0; // When certain conditions occur, we update the buffers and re-compute and re-encode
+    // all the attributes. When buffer update occurs, we also take note of the current center
+    // of the view state, and we reset a vector called `translationToCenter` to [0, 0], meaning that the
+    // current center is the same as it was when the attributes were recomputed.
+
+    this.centerAtLastUpdate = fromValues(this.view.state.center[0], this.view.state.center[1]);
+  },
+  // Called once a custom layer is removed from the map.layers collection and this layer view is destroyed.
+  detach: function () {
+    // Stop watching the `layer.graphics` collection.
+    this.watcher.remove();
+    const gl = this.context; // Delete buffers and programs.
+
+    gl.deleteBuffer(this.vertexBuffer);
+    gl.deleteBuffer(this.indexBuffer);
+    gl.deleteProgram(this.program);
+  },
+  // Called every time a frame is rendered.
+  render: function (renderParameters) {
+    const gl = renderParameters.context;
+    const state = renderParameters.state; // Update vertex positions. This may trigger an update of
+    // the vertex coordinates contained in the vertex buffer.
+    // There are three kinds of updates:
+    //  - Modification of the layer.graphics collection ==> Buffer update
+    //  - The view state becomes non-stationary ==> Only view update, no buffer update
+    //  - The view state becomes stationary ==> Buffer update
+
+    this.updatePositions(renderParameters); // If there is nothing to render we return.
+
+    if (this.indexBufferSize === 0) {
+      return;
+    } // Update view `transform` matrix; it converts from map units to pixels.
+
+
+    identity(this.transform);
+    this.screenTranslation[0] = state.pixelRatio * state.size[0] / 2;
+    this.screenTranslation[1] = state.pixelRatio * state.size[1] / 2;
+    translate(this.transform, this.transform, this.screenTranslation);
+    rotate(this.transform, this.transform, Math.PI * state.rotation / 180);
+    this.screenScaling[0] = state.pixelRatio / state.resolution;
+    this.screenScaling[1] = -state.pixelRatio / state.resolution;
+    scale(this.transform, this.transform, this.screenScaling);
+    translate(this.transform, this.transform, this.translationToCenter); // Update view `display` matrix; it converts from pixels to normalized device coordinates.
+
+    this.display[0] = 2 / (state.pixelRatio * state.size[0]);
+    this.display[4] = -2 / (state.pixelRatio * state.size[1]); // Draw.
+
+    gl.useProgram(this.program);
+    gl.uniformMatrix3fv(this.uTransform, false, this.transform);
+    gl.uniformMatrix3fv(this.uDisplay, false, this.display);
+    gl.uniform1f(this.uCurrentTime, performance.now() / 1000.0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    gl.enableVertexAttribArray(this.aPosition);
+    gl.enableVertexAttribArray(this.aOffset);
+    gl.vertexAttribPointer(this.aPosition, 2, gl.FLOAT, false, 16, 0);
+    gl.vertexAttribPointer(this.aOffset, 2, gl.FLOAT, false, 16, 8);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.drawElements(gl.TRIANGLES, this.indexBufferSize, gl.UNSIGNED_SHORT, 0); // Request new render because markers are animated.
+
+    this.requestRender();
+  },
+  // Called by the map view or the popup view when hit testing is required.
+  hitTest: function (x, y) {
+    // The map view.
+    const view = this.view;
+
+    if (this.layer.graphics.length === 0) {
+      // Nothing to do.
+      return resolve(null);
+    } // Compute screen distance between each graphic and the test point.
+
+
+    const distances = this.layer.graphics.map(graphic => {
+      const graphicPoint = view.toScreen(graphic.geometry);
+      return Math.sqrt((graphicPoint.x - x) * (graphicPoint.x - x) + (graphicPoint.y - y) * (graphicPoint.y - y));
+    }); // Find the minimum distance.
+
+    let minIndex = 0;
+    distances.forEach((distance, i) => {
+      if (distance < distances.getItemAt(minIndex)) {
+        minIndex = i;
+      }
+    });
+    const minDistance = distances.getItemAt(minIndex); // If the minimum distance is more than 35 pixel then nothing was hit.
+
+    if (minDistance > 35) {
+      return resolve(null);
+    } // Otherwise it is a hit; We set the layer as the source layer for the graphic
+    // (required for the popup view to work) and we return a resolving promise to
+    // the graphic.
+
+
+    const graphic = this.layer.graphics.getItemAt(minIndex);
+    graphic.sourceLayer = this.layer;
+    return resolve(graphic);
+  },
+  // Called internally from render().
+  updatePositions: function (renderParameters) {
+    const gl = renderParameters.context;
+    const stationary = renderParameters.stationary;
+    const state = renderParameters.state; // If we are not stationary we simply update the `translationToCenter` vector.
+
+    if (!stationary) {
+      sub(this.translationToCenter, this.centerAtLastUpdate, state.center);
+      this.requestRender();
+      return;
+    } // If we are stationary, the `layer.graphics` collection has not changed, and
+    // we are centered on the `centerAtLastUpdate`, we do nothing.
+
+
+    if (!this.needsUpdate && this.translationToCenter[0] === 0 && this.translationToCenter[1] === 0) {
+      return;
+    } // Otherwise, we record the new encoded center, which imply a reset of the `translationToCenter` vector,
+    // we record the update time, and we proceed to update the buffers.
+
+
+    this.centerAtLastUpdate.set(state.center);
+    this.translationToCenter[0] = 0;
+    this.translationToCenter[1] = 0;
+    this.needsUpdate = false;
+    const graphics = this.layer.graphics; // Generate vertex data.
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+    const vertexData = new Float32Array(16 * graphics.length);
+    let i = 0;
+    graphics.forEach(graphic => {
+      const point = graphic.geometry; // The (x, y) position is relative to the encoded center.
+
+      const x = point.x - this.centerAtLastUpdate[0];
+      const y = point.y - this.centerAtLastUpdate[1];
+      vertexData[i * 16 + 0] = x;
+      vertexData[i * 16 + 1] = y;
+      vertexData[i * 16 + 2] = -0.5;
+      vertexData[i * 16 + 3] = -0.5;
+      vertexData[i * 16 + 4] = x;
+      vertexData[i * 16 + 5] = y;
+      vertexData[i * 16 + 6] = 0.5;
+      vertexData[i * 16 + 7] = -0.5;
+      vertexData[i * 16 + 8] = x;
+      vertexData[i * 16 + 9] = y;
+      vertexData[i * 16 + 10] = -0.5;
+      vertexData[i * 16 + 11] = 0.5;
+      vertexData[i * 16 + 12] = x;
+      vertexData[i * 16 + 13] = y;
+      vertexData[i * 16 + 14] = 0.5;
+      vertexData[i * 16 + 15] = 0.5;
+      ++i;
+    });
+    gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW); // Generates index data.
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    const indexData = new Uint16Array(6 * graphics.length);
+
+    for (let i = 0; i < graphics.length; ++i) {
+      indexData[i * 6 + 0] = i * 4 + 0;
+      indexData[i * 6 + 1] = i * 4 + 1;
+      indexData[i * 6 + 2] = i * 4 + 2;
+      indexData[i * 6 + 3] = i * 4 + 1;
+      indexData[i * 6 + 4] = i * 4 + 3;
+      indexData[i * 6 + 5] = i * 4 + 2;
+    }
+
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW); // Record number of indices.
+
+    this.indexBufferSize = indexData.length;
+  }
+});
+
+// @ts-ignore
+
+const RippleGraphicsLayer = GraphicsLayer.createSubclass({
+  createLayerView: function (view) {
+    // We only support MapView, so we only need to return a
+    // custom layer view for the `2d` case.
+    if (view.type === '2d') {
+      return new RippleLayerView({
+        view: view,
+        layer: this
+      });
+    }
+  }
+});
+
+export { Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, ZoomHomeTool, createGeometryFactory, createLayerFactory };

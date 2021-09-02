@@ -940,6 +940,7 @@ interface IOverlaysOptions extends IFssgEsriPluginOptions {
 interface IOverlaysEvents extends IFssgEsriPluginEvents {
 }
 interface IOverlayAddOptions {
+    id?: string;
     point: __esri.Point;
     content: string | HTMLDivElement;
     offsetX?: number;
@@ -948,6 +949,7 @@ interface IOverlayAddOptions {
     bezierCurveSymbol?: __esri.LineSymbolProperties;
 }
 interface IOverlay {
+    id: string;
     container: HTMLDivElement;
     mapXY: __esri.Point;
     offsetX: number;

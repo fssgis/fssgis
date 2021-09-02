@@ -3388,10 +3388,11 @@ class Overlays extends FssgEsriPlugin {
       bezierCurve = this.view_.$owner.mapElement.add(createGeometryFactory(this.$).createBezierCurve(options.point, mapPt), options.bezierCurveSymbol);
     }
 
-    const id = createGuid();
+    const id = options.id ?? createGuid();
     overlay.id = id;
 
     this._overlayPool.set(id, {
+      id,
       container: overlay,
       mapXY: options.point,
       offsetX: options.offsetX ?? 0,

@@ -12,6 +12,7 @@ export interface IOverlaysEvents extends IFssgEsriPluginEvents { // eslint-disab
 }
 
 export interface IOverlayAddOptions {
+  id?: string
   point: __esri.Point
   content: string | HTMLDivElement
   offsetX?: number
@@ -21,6 +22,7 @@ export interface IOverlayAddOptions {
 }
 
 export interface IOverlay {
+  id: string
   container: HTMLDivElement
   mapXY: __esri.Point
   offsetX: number
@@ -116,9 +118,10 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
       )
     }
 
-    const id = createGuid()
+    const id = options.id ?? createGuid()
     overlay.id = id
     this._overlayPool.set(id, {
+      id,
       container: overlay,
       mapXY: options.point,
       offsetX: options.offsetX ?? 0,

@@ -36,7 +36,7 @@ declare abstract class FssgEsriPlugin<T_OPTIONS extends IFssgEsriPluginOptions =
      * 安装插件
      * @param FssgEsri 地图应用实例
      */
-    installPlugin(fssgEsri: FssgEsri): this;
+    installPlugin(fssgEsri: FssgEsri): this | Promise<this>;
 }
 
 /**
@@ -117,7 +117,7 @@ declare class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
      * @returns this
      */
     private _createTianDiTu;
-    installPlugin(fssgEsri: FssgEsri): this;
+    installPlugin(fssgEsri: FssgEsri): this | Promise<this>;
     /**
      * 创建底图项
      * @param key 底图项Key值
@@ -185,7 +185,7 @@ declare class MapElement extends FssgEsriPlugin<IMapElementOptions, IMapElementE
     private _getSymbol;
     private _addGraphics;
     private _addHighlight;
-    installPlugin(fssgEsri: FssgEsri): this;
+    installPlugin(fssgEsri: FssgEsri): this | Promise<this>;
     add(geometry: __esri.Geometry, symbol?: __esri.SymbolProperties): __esri.Graphic;
     add(geometries: __esri.Geometry[], symbol?: __esri.SymbolProperties): __esri.Graphic[];
     add(arg0: __esri.Geometry[] | __esri.Geometry, symbol?: __esri.SymbolProperties): __esri.Graphic[] | __esri.Graphic;
@@ -294,7 +294,7 @@ declare class MapTools extends FssgEsriPlugin<IMapToolsOptions, IMapToolsEvents>
     /**
      * 安装插件
      */
-    installPlugin(fssgEsri: FssgEsri): this;
+    installPlugin(fssgEsri: FssgEsri): this | Promise<this>;
     /**
      * 设置工具
      * @param toolKey 工具Key
@@ -602,7 +602,7 @@ declare class MapCursor extends FssgEsriPlugin<IMapCursorOptions, IMapCursorEven
     /**
      * 安装插件
      */
-    installPlugin(fssgEsri: FssgEsri): this;
+    installPlugin(fssgEsri: FssgEsri): this | Promise<this>;
 }
 
 /**
@@ -684,7 +684,7 @@ declare class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEven
      * 安装插件
      * @param fssgEsri 地图应用
      */
-    installPlugin(fssgEsri: FssgEsri): this;
+    installPlugin(fssgEsri: FssgEsri): this | Promise<this>;
     /**
      * 通过图层Id查找图层
      * @param nameOrId 图层名或Id
@@ -747,7 +747,7 @@ declare class Hawkeye extends FssgEsriPlugin<IHawkeyeOptions, IHawkeyeEvents> {
      * 安装插件
      * @param fssgEsri 地图应用
      */
-    installPlugin(fssgEsri: FssgEsri): this;
+    installPlugin(fssgEsri: FssgEsri): this | Promise<this>;
 }
 
 /**
@@ -823,7 +823,7 @@ declare class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEven
      * @param fssgEsri 地图应用
      * @returns this
      */
-    installPlugin(fssgEsri: FssgEsri): this;
+    installPlugin(fssgEsri: FssgEsri): this | Promise<this>;
     /**
      * 通过树节点Id查找图层
      * @param nodeId 树节点Id
@@ -908,6 +908,12 @@ declare class MapModules extends FssgEsriPlugin<IMapModulesOptions, IMapModulesE
     */
     constructor(options?: IMapModulesOptions);
     /**
+     * 安装插件
+     * @param fssgEsri 地图应用
+     * @returns this
+     */
+    installPlugin(fssgEsri: FssgEsri): this | Promise<this>;
+    /**
     * 选择地图模块
     * @param moduleId 模块Id
     * @returns this
@@ -930,7 +936,7 @@ declare class MouseTips extends FssgEsriPlugin<IMouseTipsOptions, IMouseTipsEven
     private _tipsDom;
     constructor(options?: IMouseTipsOptions);
     private _init;
-    installPlugin(fssgEsri: FssgEsri): this;
+    installPlugin(fssgEsri: FssgEsri): this | Promise<this>;
     showTips(tips: string): this;
     cancelTips(): this;
 }
@@ -962,7 +968,7 @@ declare class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents>
     private _overlayContainer;
     constructor(options?: IOverlaysOptions);
     private _init;
-    installPlugin(fssgEsri: FssgEsri): this;
+    installPlugin(fssgEsri: FssgEsri): this | Promise<this>;
     add(options: IOverlayAddOptions): string;
     removeById(id: string): this;
     clear(): this;

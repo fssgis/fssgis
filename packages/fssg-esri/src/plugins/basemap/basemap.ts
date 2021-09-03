@@ -177,9 +177,9 @@ export class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
     return this
   }
 
-  public override installPlugin (fssgEsri: FssgEsri) : this {
-    return super.installPlugin(fssgEsri)
-      ._init()
+  public override installPlugin (fssgEsri: FssgEsri) : this | Promise<this> {
+    super.installPlugin(fssgEsri)
+    return this._init()
   }
 
   /**

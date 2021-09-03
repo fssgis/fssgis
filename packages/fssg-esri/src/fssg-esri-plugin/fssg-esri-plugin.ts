@@ -51,7 +51,7 @@ export abstract class FssgEsriPlugin<
    * 安装插件
    * @param FssgEsri 地图应用实例
    */
-  public installPlugin (fssgEsri: FssgEsri) : this {
+  public installPlugin (fssgEsri: FssgEsri) : this | Promise<this> {
     this.map_ = fssgEsri.map
     this.view_ = fssgEsri.view
     return this

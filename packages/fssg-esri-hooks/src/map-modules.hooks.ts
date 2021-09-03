@@ -13,15 +13,15 @@ function _getMapModules (arg0?: FssgEsri | MapModules) : MapModules {
   if (!arg0) {
     const fssgEsri = useFssgEsri()
     mapModules = fssgEsri.mapModules
-    if (!mapModules) {
-      warn(this, 'MapModules实例未挂载到FssgMap实例')
-    }
   } else {
     if (arg0 instanceof FssgEsri) {
       mapModules = arg0.mapModules
     } else {
       mapModules = arg0
     }
+  }
+  if (!mapModules) {
+    warn(this, 'MapModules实例未挂载到FssgMap实例')
   }
   return mapModules
 }

@@ -78,7 +78,7 @@ export abstract class FssgMapPlugin<
    * 安装插件
    * @param fssgMap 地图应用实例
    */
-  public abstract installPlugin (fssgMap: FssgMap<any, any>) : this // eslint-disable-line
+  public abstract installPlugin (fssgMap: FssgMap<any, any>) : this | Promise<this> // eslint-disable-line
 
   //#endregion
 

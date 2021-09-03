@@ -1,3 +1,4 @@
+import FssgEsri from '../../fssg-esri'
 import FssgEsriPlugin, { IFssgEsriPluginEvents, IFssgEsriPluginOptions } from '../../fssg-esri-plugin'
 
 /**
@@ -77,6 +78,16 @@ export class MapModules extends FssgEsriPlugin<IMapModulesOptions, IMapModulesEv
   //#endregion
 
   //#region 公有方法
+
+  /**
+   * 安装插件
+   * @param fssgEsri 地图应用
+   * @returns this
+   */
+   public override installPlugin (fssgEsri: FssgEsri) : this | Promise<this> {
+    super.installPlugin(fssgEsri)
+    return this.$.layerTree.when().then(() => this)
+  }
 
   /**
   * 选择地图模块

@@ -77,6 +77,56 @@ class BaseClass extends Observable {
 }
 
 /**
+ * 地图应用插件类（抽象类）
+ */
+
+class FssgMapPlugin extends BaseClass {
+  /**
+   * 从地图应用实例中获取地图应用插件实例
+   * @param fssgMap 地图应用
+   * @returns 地图应用插件
+   */
+  static getFrom(fssgMap) {
+    const name = this.name;
+    return fssgMap[name.replace(name[0], name[0].toLowerCase())];
+  } //#region 保护属性
+
+  /**
+   * 插件名
+   */
+
+
+  //#endregion
+  //#region getter setter
+
+  /**
+   * 插件名
+   */
+  get pluginName() {
+    return this.pluginName_;
+  } //#endregion
+  //#region 构造函数
+
+  /**
+   *构造地图应用插件实例
+   * @param pluginName 插件名
+   * @param options 配置项
+   * @param defaultOptions 默认配置项
+   */
+
+
+  constructor(options, defaultOptions) {
+    super(options, defaultOptions);
+
+    _defineProperty(this, "pluginName_", void 0);
+
+    const name = this.constructor.name;
+    this.pluginName_ = name.replace(name[0], name[0].toLowerCase());
+  }
+
+}
+
+/**
  * 地图应用类（抽象类）
  */
 
@@ -141,62 +191,17 @@ class FssgMap extends BaseClass {
 
 
   use(plugin) {
+    this[plugin.pluginName] = plugin;
     this.when().then(() => {
-      this[plugin.pluginName] = plugin.installPlugin(this); // eslint-disable-line
+      const ret = plugin.installPlugin(this);
 
-      plugin.fire('loaded');
+      if (ret instanceof FssgMapPlugin) {
+        plugin.fire('loaded');
+      } else {
+        ret.then(_plugin => _plugin.fire('loaded'));
+      }
     });
     return this;
-  }
-
-}
-
-/**
- * 地图应用插件类（抽象类）
- */
-
-class FssgMapPlugin extends BaseClass {
-  /**
-   * 从地图应用实例中获取地图应用插件实例
-   * @param fssgMap 地图应用
-   * @returns 地图应用插件
-   */
-  static getFrom(fssgMap) {
-    const name = this.name;
-    return fssgMap[name.replace(name[0], name[0].toLowerCase())];
-  } //#region 保护属性
-
-  /**
-   * 插件名
-   */
-
-
-  //#endregion
-  //#region getter setter
-
-  /**
-   * 插件名
-   */
-  get pluginName() {
-    return this.pluginName_;
-  } //#endregion
-  //#region 构造函数
-
-  /**
-   *构造地图应用插件实例
-   * @param pluginName 插件名
-   * @param options 配置项
-   * @param defaultOptions 默认配置项
-   */
-
-
-  constructor(options, defaultOptions) {
-    super(options, defaultOptions);
-
-    _defineProperty(this, "pluginName_", void 0);
-
-    const name = this.constructor.name;
-    this.pluginName_ = name.replace(name[0], name[0].toLowerCase());
   }
 
 }

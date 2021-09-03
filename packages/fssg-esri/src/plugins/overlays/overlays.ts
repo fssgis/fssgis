@@ -80,10 +80,9 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
     return this
   }
 
-  public override installPlugin (fssgEsri: FssgEsri) : this {
-    return super.installPlugin(fssgEsri)
-      ._init()
-      .fire('loaded')
+  public override installPlugin (fssgEsri: FssgEsri) : this | Promise<this> {
+    super.installPlugin(fssgEsri)
+    return this._init()
   }
 
   public add (options: IOverlayAddOptions) : string {

@@ -84,9 +84,14 @@ export abstract class FssgMap<
    * @returns this
    */
   public use <T extends IFssgMapPluginOptions, K extends IFssgMapPluginEvents> (plugin: FssgMapPlugin<T, K>) : this {
+    this[plugin.pluginName] = plugin
     this.when().then(() => {
-      this[plugin.pluginName] = plugin.installPlugin(this as any) // eslint-disable-line
-      plugin.fire('loaded')
+      const ret = plugin.installPlugin(this)
+      if (ret instanceof FssgMapPlugin) {
+        plugin.fire('loaded')
+      } else {
+        ret.then(_plugin => _plugin.fire('loaded'))
+      }
     })
     return this
   }

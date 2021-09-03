@@ -136,10 +136,9 @@ export class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEvent
    * @param fssgEsri 地图应用
    * @returns this
    */
-  public override installPlugin (fssgEsri: FssgEsri) : this {
-    return super.installPlugin(fssgEsri)
-      ._init()
-      .fire('loaded')
+  public override installPlugin (fssgEsri: FssgEsri) : this | Promise<this> {
+    super.installPlugin(fssgEsri)
+    return this.$.mapLayers.when().then(() => this._init())
   }
 
   /**

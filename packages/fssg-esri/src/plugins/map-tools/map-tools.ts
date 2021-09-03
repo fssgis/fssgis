@@ -90,9 +90,9 @@ export class MapTools extends FssgEsriPlugin<IMapToolsOptions, IMapToolsEvents> 
   /**
    * 安装插件
    */
-  public override installPlugin (fssgEsri: FssgEsri) : this {
-    return super.installPlugin(fssgEsri)
-      ._init()
+  public override installPlugin (fssgEsri: FssgEsri) : this | Promise<this> {
+    super.installPlugin(fssgEsri)
+    return this._init()
   }
 
   /**

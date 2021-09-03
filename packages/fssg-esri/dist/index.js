@@ -1194,7 +1194,8 @@ class Basemap extends FssgEsriPlugin {
   }
 
   installPlugin(fssgEsri) {
-    return super.installPlugin(fssgEsri)._init();
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
   /**
    * 创建底图项
@@ -1386,7 +1387,8 @@ class MapElement extends FssgEsriPlugin {
   }
 
   installPlugin(fssgEsri) {
-    return super.installPlugin(fssgEsri)._init();
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
 
   add(arg0, arg1) {
@@ -2471,7 +2473,8 @@ class MapTools extends FssgEsriPlugin {
 
 
   installPlugin(fssgEsri) {
-    return super.installPlugin(fssgEsri)._init();
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
   /**
    * 设置工具
@@ -2648,7 +2651,8 @@ class MapCursor extends FssgEsriPlugin {
 
 
   installPlugin(fssgEsri) {
-    return super.installPlugin(fssgEsri)._init();
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
 
 }
@@ -2778,7 +2782,8 @@ class MapLayers extends FssgEsriPlugin {
 
 
   installPlugin(fssgEsri) {
-    return super.installPlugin(fssgEsri)._init();
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
   /**
    * 通过图层Id查找图层
@@ -2924,7 +2929,8 @@ class Hawkeye extends FssgEsriPlugin {
 
 
   installPlugin(fssgEsri) {
-    return super.installPlugin(fssgEsri)._init();
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
 
 }
@@ -3044,7 +3050,8 @@ class LayerTree extends FssgEsriPlugin {
 
 
   installPlugin(fssgEsri) {
-    return super.installPlugin(fssgEsri)._init().fire('loaded');
+    super.installPlugin(fssgEsri);
+    return this.$.mapLayers.when().then(() => this._init());
   }
   /**
    * 通过树节点Id查找图层
@@ -3177,6 +3184,17 @@ class MapModules extends FssgEsriPlugin {
   //#region 公有方法
 
   /**
+   * 安装插件
+   * @param fssgEsri 地图应用
+   * @returns this
+   */
+
+
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this.$.layerTree.when().then(() => this);
+  }
+  /**
   * 选择地图模块
   * @param moduleId 模块Id
   * @returns this
@@ -3254,7 +3272,8 @@ class MouseTips extends FssgEsriPlugin {
   }
 
   installPlugin(fssgEsri) {
-    return super.installPlugin(fssgEsri)._init();
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
 
   showTips(tips) {
@@ -3360,7 +3379,8 @@ class Overlays extends FssgEsriPlugin {
   }
 
   installPlugin(fssgEsri) {
-    return super.installPlugin(fssgEsri)._init().fire('loaded');
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
 
   add(options) {

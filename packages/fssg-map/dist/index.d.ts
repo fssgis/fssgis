@@ -78,7 +78,7 @@ declare abstract class FssgMapPlugin<T_OPTIONS extends IFssgMapPluginOptions = I
      * 安装插件
      * @param fssgMap 地图应用实例
      */
-    abstract installPlugin(fssgMap: FssgMap<any, any>): this;
+    abstract installPlugin(fssgMap: FssgMap<any, any>): this | Promise<this>;
 }
 
 /**

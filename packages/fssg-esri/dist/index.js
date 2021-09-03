@@ -2912,7 +2912,7 @@ class Hawkeye extends FssgEsriPlugin {
       sourceView.watch(['zoom', 'center'], throttle(() => {
         this._fssgEsri.mapElement.set(sourceView.extent);
 
-        hawkeyeView.goTo({
+        this._fssgEsri.goto({
           zoom: sourceView.zoom - 4,
           center: sourceView.center
         }, {

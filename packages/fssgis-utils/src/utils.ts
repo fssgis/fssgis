@@ -1,5 +1,3 @@
-import { Optional } from '@fssgis/generic'
-
 /**
  * 深度复制（采用JSON解析方式）
  * @param obj 复制对象
@@ -82,12 +80,24 @@ export function loadCss (cssUrl: string) : void {
 /**
   * 加载js
   * @param jsUrl JS路径
+  * @param success 加载成功完成回调事件
+  * @param error 加载错误回调事件
   */
 /* istanbul ignore next */
-export function loadJs (jsUrl: string) : void {
-  const script = document.createElement('script')
-  script.src = jsUrl
-  document.head.appendChild(script)
+export function loadJs (jsUrl: string, success?: () => void, error?: () => void) : Promise<void> {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.src = jsUrl
+    document.head.appendChild(script)
+    script.onload = () => {
+      success?.()
+      resolve()
+    }
+    script.onerror = () => {
+      error?.()
+      reject()
+    }
+  })
 }
 
 /**

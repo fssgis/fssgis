@@ -87,14 +87,28 @@ function loadCss(cssUrl) {
 /**
   * 加载js
   * @param jsUrl JS路径
+  * @param success 加载成功完成回调事件
+  * @param error 加载错误回调事件
   */
 
 /* istanbul ignore next */
 
-function loadJs(jsUrl) {
-  const script = document.createElement('script');
-  script.src = jsUrl;
-  document.head.appendChild(script);
+function loadJs(jsUrl, success, error) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = jsUrl;
+    document.head.appendChild(script);
+
+    script.onload = () => {
+      success();
+      resolve();
+    };
+
+    script.onerror = () => {
+      error();
+      reject();
+    };
+  });
 }
 /**
   * 对象扩展（JQuery $.extend 实现代码）

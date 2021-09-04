@@ -36,8 +36,10 @@ declare function loadCss(cssUrl: string): void;
 /**
   * 加载js
   * @param jsUrl JS路径
+  * @param success 加载成功完成回调事件
+  * @param error 加载错误回调事件
   */
-declare function loadJs(jsUrl: string): void;
+declare function loadJs(jsUrl: string, success: () => void, error: () => void): Promise<void>;
 /**
   * 对象扩展（JQuery $.extend 实现代码）
   * @param _ 深度复制

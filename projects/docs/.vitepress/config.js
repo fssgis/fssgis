@@ -23,6 +23,9 @@ module.exports = {
           text: '便捷工具',
           children: [
             { text: 'Guid Generator', link: '/else/guid-generator' },
+            { text: 'PNG to Base64', link: '/else/png-to-base64' },
+            { text: 'EPSG IO', link: '/else/epsg-io' },
+            { text: 'Chrome Plugins', link: '/else/chrome-plugins' },
           ],
         },
       ],

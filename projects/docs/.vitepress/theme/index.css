@@ -1,0 +1,5 @@
+main.page > .container {
+  margin: 0;
+  padding: 0 32px;
+  max-width: none;
+}

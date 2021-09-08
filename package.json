@@ -12,6 +12,8 @@
   "scripts": {
     "publish": "lerna publish --amend --conventional-commits --no-push",
     "dev:docs": "npx vitepress dev ./projects/fssgis-docs/docs --host=0.0.0.0",
+    "dev:docs.next": "npx vitepress dev ./projects/docs",
+    "build:docs.next": "npx vitepress build ./projects/docs",
     "dev:sszhpsythpt": "vite --config ./projects/sszhpsythpt/vite.config.js",
     "build:sszhpsythpt": "vite build --config ./projects/sszhpsythpt/vite.config.js",
     "dev:sszhpsythpt-psyzt": "vite --config ./projects/sszhpsythpt-psyzt/vite.config.js",
@@ -23,11 +25,12 @@
     "build:ext": "npx rollup --config ./build/build.fssgis-ext.js -w",
     "build:observable": "npx rollup --config ./build/build.fssgis-observable.js -w",
     "build:utils": "npx rollup --config ./build/build.fssgis-utils.js -w",
+    "build-api:utils": "npx typedoc --hideGenerator --disableSources --out ./projects/docs/public/api-docs/fssgis-utils ./packages/fssgis-utils/src/index.ts",
     "build:watcher": "npx rollup --config ./build/build.fssgis-watcher.js -w",
     "build:leaflet": "npx rollup --config ./build/build.fssg-leaflet.js -w",
     "build:map": "npx rollup --config ./build/build.fssg-map.js -w",
     "build:esri": "npx rollup --config ./build/build.fssg-esri.js -w",
-    "build-docs:esri": "npx typedoc --hideGenerator --disableSources --out ./projects/fssgis-docs/docs/public/api-docs/fssg-esri ./packages/fssg-esri/src/index.ts",
+    "build-api:esri": "npx typedoc --hideGenerator --disableSources --out ./projects/fssgis-docs/docs/public/api-docs/fssg-esri ./packages/fssg-esri/src/index.ts",
     "build:esri-hooks": "npx rollup --config ./build/build.fssg-esri-hooks.js -w",
     "build:grid": "npx rollup --config ./build/build.fssgis-grid.js -w",
     "build:ui": "npx rollup --config ./build/build.fssgis-ui.js -w",
@@ -68,7 +71,9 @@
     "typedoc": "^0.21.6",
     "typescript": "^4.3.4",
     "vite": "^2.4.4",
-    "vitepress": "^0.16.1"
+    "vite-plugin-windicss": "^1.4.2",
+    "vitepress": "^0.16.1",
+    "windicss": "^3.1.7"
   },
   "dependencies": {
     "vue": "^3.2.3"

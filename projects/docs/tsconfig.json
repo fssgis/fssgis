@@ -18,12 +18,10 @@
     "noImplicitOverride": true
   },
   "include": [
-    "./packages/*/src",
-    "./projects/*/src",
+    "./",
   ],
   "exclude": [
     "./**/*.test.ts",
     "./**/dist",
-    "./projects/sszhpsythpt-psyzt",
   ],
 }

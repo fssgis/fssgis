@@ -78,8 +78,6 @@ export const RippleLayerView = BaseLayerViewGL2D.createSubclass({
           float intensity = clamp(cos(l * PI), 0.0, 1.0) * clamp(cos(2.0 * PI * (l * 2.0 * N_RINGS - FREQ * u_current_time)), 0.0, 1.0);
           gl_FragColor = vec4(COLOR * intensity, intensity);
       }`
-    console.log(vertexSource)
-    console.log(fragmentSource)
 
     const vertexShader = gl.createShader(gl.VERTEX_SHADER)
     gl.shaderSource(vertexShader, vertexSource)

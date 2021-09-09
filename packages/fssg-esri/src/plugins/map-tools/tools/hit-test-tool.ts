@@ -84,7 +84,7 @@ export class HitTestTool<
     const fssgMap = this.$
     const ret : __esri.Graphic[] = []
     await fssgMap.mapLayers.forEach(async ([layer, options]) => {
-      if (!['mapimagelayer', 'dynaimclayer'].includes(options.layerType)) {
+      if (!['mapimagelayer', 'dynamiclayer'].includes(options.layerType)) {
         return
       }
       if (!options.isQuery) {
@@ -138,7 +138,6 @@ export class HitTestTool<
       })
       this.finsheHitTest_(hitTestResult)
     })
-    this._queryWithMapImageLayer(point)
     return graphic
   }
 

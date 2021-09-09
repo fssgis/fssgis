@@ -663,6 +663,10 @@ declare class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEven
      */
     get layersWhichCantQuery(): [__esri.Layer, LayerOptions][];
     /**
+     * 图层容器，唯一存储
+     */
+    private get _layerPoolUnique();
+    /**
      * 构造图层控制插件
      * @param options 配置项
      */

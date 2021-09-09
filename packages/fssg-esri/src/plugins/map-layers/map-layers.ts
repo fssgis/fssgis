@@ -62,7 +62,7 @@ export class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEvent
    * 可查询的图层集合
    */
   public get layersWhichCanQuery () : [__esri.Layer, LayerOptions][] {
-    return [...new Set([...this._layerPool.values()])]
+    return [...this._layerPoolUnique.values()]
       .filter(([_, options]) => options.isQuery)
   }
 
@@ -70,8 +70,18 @@ export class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEvent
    * 不可查询的图层集合
    */
   public get layersWhichCantQuery () : [__esri.Layer, LayerOptions][] {
-    return [...new Set([...this._layerPool.values()])]
+    return [...this._layerPoolUnique.values()]
       .filter(([_, options]) => !options.isQuery)
+  }
+
+  /**
+   * 图层容器，唯一存储
+   */
+  private get _layerPoolUnique () : Map<string, [__esri.Layer, LayerOptions]> {
+    const set = new Set([...this._layerPool.values()])
+    const map = new Map<string, [__esri.Layer, LayerOptions]>()
+    set.forEach(item => map.set(item[0].id, item))
+    return map
   }
 
   /**
@@ -189,7 +199,7 @@ export class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEvent
   }
 
   public async forEach (callback: (item: [__esri.Layer, LayerOptions]) => void) : Promise<this> {
-    const values = [...this._layerPool.values()]
+    const values = [...this._layerPoolUnique.values()]
     for (let i = 0; i < values.length; i++) {
       await callback(values[i])
     }

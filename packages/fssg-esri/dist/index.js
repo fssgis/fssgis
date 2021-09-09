@@ -2293,7 +2293,7 @@ class HitTestTool extends DrawPointTool {
     const fssgMap = this.$;
     const ret = [];
     await fssgMap.mapLayers.forEach(async ([layer, options]) => {
-      if (!['mapimagelayer', 'dynaimclayer'].includes(options.layerType)) {
+      if (!['mapimagelayer', 'dynamiclayer'].includes(options.layerType)) {
         return;
       }
 
@@ -2356,9 +2356,6 @@ class HitTestTool extends DrawPointTool {
       });
       this.finsheHitTest_(hitTestResult);
     });
-
-    this._queryWithMapImageLayer(point);
-
     return graphic;
   }
 
@@ -2674,7 +2671,7 @@ class MapLayers extends FssgEsriPlugin {
    * 可查询的图层集合
    */
   get layersWhichCanQuery() {
-    return [...new Set([...this._layerPool.values()])].filter(([_, options]) => options.isQuery);
+    return [...this._layerPoolUnique.values()].filter(([_, options]) => options.isQuery);
   }
   /**
    * 不可查询的图层集合
@@ -2682,7 +2679,18 @@ class MapLayers extends FssgEsriPlugin {
 
 
   get layersWhichCantQuery() {
-    return [...new Set([...this._layerPool.values()])].filter(([_, options]) => !options.isQuery);
+    return [...this._layerPoolUnique.values()].filter(([_, options]) => !options.isQuery);
+  }
+  /**
+   * 图层容器，唯一存储
+   */
+
+
+  get _layerPoolUnique() {
+    const set = new Set([...this._layerPool.values()]);
+    const map = new Map();
+    set.forEach(item => map.set(item[0].id, item));
+    return map;
   }
   /**
    * 构造图层控制插件
@@ -2833,7 +2841,7 @@ class MapLayers extends FssgEsriPlugin {
   }
 
   async forEach(callback) {
-    const values = [...this._layerPool.values()];
+    const values = [...this._layerPoolUnique.values()];
 
     for (let i = 0; i < values.length; i++) {
       await callback(values[i]);

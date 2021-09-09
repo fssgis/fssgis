@@ -405,6 +405,9 @@ class LayerFactory {
         return this.createSqlLayer2(options);
       // eslint-disable-line
 
+      case 'featurelayer':
+        return this.createFeatureLayer(options);
+
       default:
         return new Layer(options);
     }
@@ -565,7 +568,7 @@ class LayerFactory {
       url,
       ...others
     } = options;
-    const layer = new FeatureLayer({
+    const layer = this.createFeatureLayer({
       spatialReference: options.spatialReference,
       source: [],
       objectIdField: '$objectId',
@@ -628,6 +631,20 @@ class LayerFactory {
       });
     });
     return layer;
+  }
+  /**
+   * 创建FeatureLayer
+   * @param options 配置项
+   * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html
+   * @example
+   * ```ts
+   * createLayerFactory().createFeatureLayer({ \/* xxx *\/ })
+   * ```
+   */
+
+
+  createFeatureLayer(options) {
+    return new FeatureLayer(options);
   }
 
 }

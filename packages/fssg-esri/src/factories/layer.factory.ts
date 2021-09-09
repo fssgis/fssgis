@@ -32,6 +32,7 @@ export interface ILayerFactory {
   createLayer (options: { layerType: 'mapimagelayer' } & __esri.MapImageLayerProperties) : __esri.MapImageLayer
   createLayer (options: { layerType: 'sqllayer' } & __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer
   createLayer (options: { layerType: 'sqllayer2' } & __esri.FeatureLayerProperties & ISqlLayerProperties) : __esri.FeatureLayer
+  createLayer (options: { layerType: 'featurelayer' } & __esri.FeatureLayerProperties) : __esri.FeatureLayer
   createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer
   createGraphicsLayer (options: __esri.GraphicsLayerProperties) : __esri.GraphicsLayer
   createGroupLayer (options: __esri.GroupLayerProperties) : __esri.GroupLayer
@@ -41,6 +42,7 @@ export interface ILayerFactory {
   createMapImageLayer (options: __esri.MapImageLayerProperties) : __esri.MapImageLayer
   createSqlLayer (options: __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer
   createSqlLayer2 (options: __esri.FeatureLayerProperties & ISqlLayerProperties) : __esri.FeatureLayer
+  createFeatureLayer (options: __esri.FeatureLayerProperties) : __esri.FeatureLayer
 }
 
 /**
@@ -73,6 +75,7 @@ class LayerFactory implements ILayerFactory {
   public createLayer (options: { layerType: 'mapimagelayer' } & __esri.MapImageLayerProperties) : __esri.MapImageLayer
   public createLayer (options: { layerType: 'sqllayer' } & __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer
   public createLayer (options: { layerType: 'sqllayer2' } & __esri.FeatureLayerProperties & ISqlLayerProperties) : __esri.FeatureLayer
+  public createLayer (options: { layerType: 'featurelayer' } & __esri.FeatureLayerProperties) : __esri.FeatureLayer
   public createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer
   public createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer {
     switch (options.layerType) {
@@ -92,6 +95,8 @@ class LayerFactory implements ILayerFactory {
         return this.createSqlLayer(options as any) // eslint-disable-line
       case 'sqllayer2':
         return this.createSqlLayer2(options as any) // eslint-disable-line
+      case 'featurelayer':
+        return this.createFeatureLayer(options)
       default:
         return new Layer(options)
     }
@@ -226,7 +231,7 @@ class LayerFactory implements ILayerFactory {
    */
   public createSqlLayer2 (options: __esri.FeatureLayerProperties & ISqlLayerProperties) : __esri.FeatureLayer {
     const { url, ...others } = options
-    const layer = new FeatureLayer({
+    const layer = this.createFeatureLayer({
       spatialReference: options.spatialReference,
       source: [],
       objectIdField: '$objectId',
@@ -278,6 +283,19 @@ class LayerFactory implements ILayerFactory {
       })
     })
     return layer
+  }
+
+  /**
+   * 创建FeatureLayer
+   * @param options 配置项
+   * @link https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html
+   * @example
+   * ```ts
+   * createLayerFactory().createFeatureLayer({ \/* xxx *\/ })
+   * ```
+   */
+  public createFeatureLayer (options?: __esri.FeatureLayerProperties) : __esri.FeatureLayer {
+    return new FeatureLayer(options)
   }
 
 }

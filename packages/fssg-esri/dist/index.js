@@ -694,6 +694,14 @@ class FssgEsriPlugin extends FssgMapPlugin {
 
 }
 
+/**
+ * 深度复制（采用JSON解析方式）
+ * @param obj 复制对象
+ */
+function isNullOrUndefined(obj) {
+  return obj === null || obj === undefined;
+}
+
 esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S';
 /**
  * 地图应用
@@ -910,6 +918,27 @@ class FssgEsri extends FssgMap {
     return this;
   }
 
+  _initBeginCenter() {
+    const {
+      centerX,
+      centerY
+    } = this.options_;
+
+    if (isNullOrUndefined(centerX) || isNullOrUndefined(centerY)) {
+      return this;
+    }
+
+    this.when().then(() => {
+      const point = createGeometryFactory(this).createPoint({
+        x: centerX,
+        y: centerY,
+        spatialReference: this.sr
+      });
+      this.view.center = point;
+    });
+    return this;
+  }
+
   goto(target, options) {
     clearTimeout(this._handleId);
     const gotoFunc = this.view.goTo.bind(this.view, target, options);
@@ -931,7 +960,7 @@ class FssgEsri extends FssgMap {
 
 
   mount() {
-    this._initAssetsPath()._initMap()._initView()._initRemoveOnlineStyle().fire('loaded');
+    this._initAssetsPath()._initMap()._initView()._initRemoveOnlineStyle()._initBeginCenter().fire('loaded');
 
     return this;
   }
@@ -1187,8 +1216,14 @@ class Basemap extends FssgEsriPlugin {
       }
     });
 
-    this._createTianDiTu();
+    this._createTianDiTu(); // eslint-disable-next-line
+    // @ts-ignore
 
+
+    this._visible = void 0; // eslint-disable-next-line
+    // @ts-ignore
+
+    this._selectedKey = void 0;
     this.visible = !!this.options_.visible;
     this.selectedKey = this.options_.selectedKey ?? '天地图矢量3857';
     return this;
@@ -2997,7 +3032,7 @@ class LayerTree extends FssgEsriPlugin {
 
 
   get checkedIds() {
-    return this._checkedIds;
+    return [...this._checkedIds];
   } //#endregion
 
   /**
@@ -3019,7 +3054,7 @@ class LayerTree extends FssgEsriPlugin {
 
     this._list = options.items ?? [];
     this._tree = listToTree(this._list);
-    this._checkedIds = [];
+    this._checkedIds = new Set();
   } //#region 私有方法
 
   /**
@@ -3043,6 +3078,13 @@ class LayerTree extends FssgEsriPlugin {
       const layer = this.$.mapLayers.findLayer(id);
       layer && (layer.visible = checked);
     });
+
+    if (checked) {
+      this._checkedIds.add(node.id);
+    } else {
+      this._checkedIds.delete(node.id);
+    }
+
     return this.fire('change:checked', {
       node,
       checked
@@ -3058,7 +3100,7 @@ class LayerTree extends FssgEsriPlugin {
       this._list.forEach(item => {
         this._setNodeChecked(item, item.defaultChecked);
 
-        item.defaultChecked && this._checkedIds.push(item.id);
+        item.defaultChecked && this._checkedIds.add(item.id);
       });
     }); // this.on('change:checked', e => {
     // })

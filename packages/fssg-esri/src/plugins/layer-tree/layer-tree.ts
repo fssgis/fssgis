@@ -1,4 +1,5 @@
 import { listToTree } from '@fssgis/utils'
+import { ext } from '@fssgis/ext'
 import FssgEsri from '../../fssg-esri'
 import FssgEsriPlugin, { IFssgEsriPluginEvents, IFssgEsriPluginOptions } from '../../fssg-esri-plugin'
 
@@ -50,7 +51,7 @@ export class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEvent
   /**
   * 选中的树节点Id
   */
-  private _checkedIds: string[]
+  private _checkedIds: Set<string>
 
   //#endregion
 
@@ -74,7 +75,7 @@ export class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEvent
   * 选中的树节点Id
   */
   public get checkedIds () : string[] {
-    return this._checkedIds
+    return [...this._checkedIds]
   }
 
   //#endregion
@@ -87,7 +88,7 @@ export class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEvent
     super(options, { items: [] })
     this._list = options.items ?? []
     this._tree = listToTree(this._list)
-    this._checkedIds = []
+    this._checkedIds = new Set()
   }
 
   //#region 私有方法
@@ -108,6 +109,11 @@ export class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEvent
       const layer = this.$.mapLayers.findLayer(id)
       layer && (layer.visible = checked)
     })
+    if (checked) {
+      this._checkedIds.add(node.id)
+    } else {
+      this._checkedIds.delete(node.id)
+    }
     return this.fire('change:checked', { node, checked })
   }
 
@@ -118,7 +124,7 @@ export class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEvent
     this.$.mapLayers.when().then(() => {
       this._list.forEach(item => {
         this._setNodeChecked(item, item.defaultChecked)
-        item.defaultChecked && this._checkedIds.push(item.id)
+        item.defaultChecked && this._checkedIds.add(item.id)
       })
     })
     // this.on('change:checked', e => {

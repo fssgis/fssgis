@@ -26,6 +26,7 @@ declare abstract class BaseClass<T_OPTIONS extends IBaseClassOptions = IBaseClas
      * 实例配置项
      */
     protected options_: T_OPTIONS;
+    get loaded(): boolean;
     /**
      * 构造基类
      * @param options 配置项

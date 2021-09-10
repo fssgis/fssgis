@@ -6,6 +6,7 @@ import { Basemap, Hawkeye, LayerTree, MapCursor, MapElement, MapLayers, MapModul
 import { error } from '@fssgis/fssg-map'
 import { createGeometryFactory, LonLat, XY } from '../factories'
 import FssgEsriPlugin from '../fssg-esri-plugin'
+import { isNullOrUndefined } from '@fssgis/utils/src'
 
 esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S'
 
@@ -13,6 +14,8 @@ esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_
  * 地图应用配置项
  */
 export interface IFssgEsriOptions extends IFssgMapOptions {
+  centerX?: number
+  centerY?: number
   mapOptions?: __esri.MapProperties
   viewOptions?: __esri.MapViewProperties
   assetsPath?: string
@@ -204,6 +207,22 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     return this
   }
 
+  private _initBeginCenter () : this {
+    const { centerX, centerY } = this.options_
+    if (isNullOrUndefined(centerX) || isNullOrUndefined(centerY)) {
+      return this
+    }
+    this.when().then(() => {
+      const point = createGeometryFactory(this).createPoint({
+        x: centerX,
+        y: centerY,
+        spatialReference: this.sr,
+      })
+      this.view.center = point
+    })
+    return this
+  }
+
   private _gotoPromise : Promise<unknown> | undefined
   private _handleId: NodeJS.Timeout
   public goto (target: __esri.Geometry | __esri.Graphic | __esri.Geometry[] | __esri.Graphic[] | number[] | __esri.Collection<__esri.Geometry> | __esri.Collection<__esri.Graphic> | { center?: __esri.Point, zoom?: number }, options?: __esri.GoToOptions2D) : this {
@@ -231,6 +250,7 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
       ._initMap()
       ._initView()
       ._initRemoveOnlineStyle()
+      ._initBeginCenter()
       .fire('loaded')
     return this
   }

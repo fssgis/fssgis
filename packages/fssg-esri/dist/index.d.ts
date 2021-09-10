@@ -1355,6 +1355,8 @@ declare function createLayerFactory(): LayerFactory;
  * 地图应用配置项
  */
 interface IFssgEsriOptions extends IFssgMapOptions {
+    centerX?: number;
+    centerY?: number;
     mapOptions?: __esri.MapProperties;
     viewOptions?: __esri.MapViewProperties;
     assetsPath?: string;
@@ -1366,6 +1368,7 @@ interface IFssgEsriEvents extends IFssgMapEvents {
     'center-ready': {
         center: __esri.Point;
     };
+    'reset': void;
 }
 interface IOwner {
     $owner: FssgEsri;
@@ -1444,6 +1447,7 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
      * 初始化地图容器样式（移除focus时的边框样式）
      */
     private _initRemoveOnlineStyle;
+    private _initBeginCenter;
     private _gotoPromise;
     private _handleId;
     goto(target: __esri.Geometry | __esri.Graphic | __esri.Geometry[] | __esri.Graphic[] | number[] | __esri.Collection<__esri.Geometry> | __esri.Collection<__esri.Graphic> | {

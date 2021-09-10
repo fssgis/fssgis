@@ -14,6 +14,7 @@ export default [
       { format: 'esm', file: resolve('packages', 'fssg-esri', 'dist/index.js') },
     ],
     external:[
+      '@fssgis/ext',
       '@fssgis/fssg-map',
       '@fssgis/observable',
       '@fssgis/utils',

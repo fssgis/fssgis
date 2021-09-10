@@ -155,6 +155,13 @@ export class Basemap extends FssgEsriPlugin<IBasemapOptions, IBasemapEvents> {
       }
     })
     this._createTianDiTu()
+
+    // eslint-disable-next-line
+    // @ts-ignore
+    this._visible = void 0
+    // eslint-disable-next-line
+    // @ts-ignore
+    this._selectedKey = void 0
     this.visible = !!this.options_.visible
     this.selectedKey = this.options_.selectedKey ?? '天地图矢量3857'
     return this

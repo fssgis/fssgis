@@ -33,13 +33,17 @@ class BaseClass extends Observable {
    * 实例配置项
    */
   //#endregion
-  //#region 构造函数
+  get loaded() {
+    return this._loaded;
+  } //#region 构造函数
 
   /**
    * 构造基类
    * @param options 配置项
    * @param defaultOptions 默认配置项
    */
+
+
   constructor(options = {}, defaultOptions = {}) {
     super();
 

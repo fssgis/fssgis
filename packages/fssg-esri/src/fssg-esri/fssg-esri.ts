@@ -205,9 +205,9 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
    * 初始化地图容器样式（移除focus时的边框样式）
    */
   private _initRemoveOnlineStyle () : this {
-    document.styleSheets[0].addRule('.esri-view', 'outline: none !important')
-    document.styleSheets[0].addRule('.esri-view .esri-view-surface', 'outline: none !important')
-    document.styleSheets[0].addRule('.esri-view .esri-view-surface--inset-outline:focus::after', 'outline: none !important')
+    document.styleSheets[0].insertRule(`.esri-view { outline: none !important }`)
+    document.styleSheets[0].insertRule(`.esri-view .esri-view-surface { outline: none !important }`)
+    document.styleSheets[0].insertRule(`.esri-view .esri-view-surface--inset-outline:focus::after { outline: none !important }`)
     return this
   }
 

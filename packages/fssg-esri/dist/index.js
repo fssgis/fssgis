@@ -921,9 +921,9 @@ class FssgEsri extends FssgMap {
 
 
   _initRemoveOnlineStyle() {
-    document.styleSheets[0].addRule('.esri-view', 'outline: none !important');
-    document.styleSheets[0].addRule('.esri-view .esri-view-surface', 'outline: none !important');
-    document.styleSheets[0].addRule('.esri-view .esri-view-surface--inset-outline:focus::after', 'outline: none !important');
+    document.styleSheets[0].insertRule(`.esri-view { outline: none !important }`);
+    document.styleSheets[0].insertRule(`.esri-view .esri-view-surface { outline: none !important }`);
+    document.styleSheets[0].insertRule(`.esri-view .esri-view-surface--inset-outline:focus::after { outline: none !important }`);
     return this;
   }
 

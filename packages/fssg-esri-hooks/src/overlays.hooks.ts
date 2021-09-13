@@ -45,7 +45,7 @@ export function useSetOverlays (arg0?: FssgEsri | Overlays) : IOverlayState {
           const vm = createVNode(options.component, options.props)
           vm.appContext = app
           render(vm, dom)
-          return dom
+          return dom.firstElementChild as HTMLDivElement
         })()
       }
       overlays.add({

@@ -781,7 +781,7 @@ function useSetOverlays(arg0) {
           const vm = createVNode(options.component, options.props);
           vm.appContext = app;
           render(vm, dom);
-          return dom;
+          return dom.firstElementChild;
         })();
       }
 

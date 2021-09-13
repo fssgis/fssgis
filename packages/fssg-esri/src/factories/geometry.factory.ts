@@ -3,12 +3,19 @@ import Point from '@arcgis/core/geometry/Point'
 import Polyline from '@arcgis/core/geometry/Polyline'
 import Polygon from '@arcgis/core/geometry/Polygon'
 import Extent from '@arcgis/core/geometry/Extent'
-import { FssgMap } from '../../../fssg-map/dist'
 
 /**
  * 坐标XY
  */
 export type XY = { x: number, y: number } | [number, number] | number[]
+
+export function getXfromXY (xy: XY) : number {
+  return Array.isArray(xy) ? xy[0] : xy.x
+}
+
+export function getYfromXY (xy: XY) : number {
+  return Array.isArray(xy) ? xy[1] : xy.y
+}
 
 /**
  * 经纬度
@@ -19,6 +26,18 @@ export type LonLat = [number, number] | number[] | {
   lng: number, lat: number
 } | {
   longitude: number, latitude: number
+}
+
+export function getLonfromLonLat (lonLat: LonLat) : number {
+  // eslint-disable-next-line
+  // @ts-ignore
+  return Array.isArray(lonLat) ? lonLat[0] : lonLat.lon ?? lonLat.lng ?? lonLat.longitude
+}
+
+export function getLatfromLonLat (lonLat: LonLat) : number {
+  // eslint-disable-next-line
+  // @ts-ignore
+  return Array.isArray(lonLat) ? lonLat[1] : lonLat.lat ?? lonLat.latitude
 }
 
 /**
@@ -165,8 +184,8 @@ export class GeometryFacory implements IGeometryFactory {
       return this.createPoint({ x, y })
     } else {
       const xy = args[0]
-      const x = Array.isArray(xy) ? xy[0] : xy.x
-      const y = Array.isArray(xy) ? xy[1] : xy.y
+      const x = getXfromXY(xy)
+      const y = getYfromXY(xy)
       return this.createPoint({ x, y })
     }
   }
@@ -189,12 +208,8 @@ export class GeometryFacory implements IGeometryFactory {
       return this.createPoint({ longitude, latitude })
     } else {
       const lonlat = args[0]
-      // eslint-disable-next-line
-      // @ts-ignore
-      const longitude = Array.isArray(lonlat) ? lonlat[0] : (lonlat.lon ?? lonlat.lng ?? lonlat.longitude)
-      // eslint-disable-next-line
-      // @ts-ignore
-      const latitude = Array.isArray(lonlat) ? lonlat[1] : (lonlat.lat ?? lonlat.latitude)
+      const longitude = getLonfromLonLat(lonlat)
+      const latitude = getLatfromLonLat(lonlat)
       return this.createPoint({ longitude, latitude })
     }
   }

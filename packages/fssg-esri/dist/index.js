@@ -39,6 +39,22 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
+function getXfromXY(xy) {
+  return Array.isArray(xy) ? xy[0] : xy.x;
+}
+function getYfromXY(xy) {
+  return Array.isArray(xy) ? xy[1] : xy.y;
+}
+function getLonfromLonLat(lonLat) {
+  // eslint-disable-next-line
+  // @ts-ignore
+  return Array.isArray(lonLat) ? lonLat[0] : lonLat.lon ?? lonLat.lng ?? lonLat.longitude;
+}
+function getLatfromLonLat(lonLat) {
+  // eslint-disable-next-line
+  // @ts-ignore
+  return Array.isArray(lonLat) ? lonLat[1] : lonLat.lat ?? lonLat.latitude;
+}
 /**
  * 几何工厂类（条件单例模式）
  * @private
@@ -169,8 +185,8 @@ class GeometryFacory {
       });
     } else {
       const xy = args[0];
-      const x = Array.isArray(xy) ? xy[0] : xy.x;
-      const y = Array.isArray(xy) ? xy[1] : xy.y;
+      const x = getXfromXY(xy);
+      const y = getYfromXY(xy);
       return this.createPoint({
         x,
         y
@@ -199,13 +215,9 @@ class GeometryFacory {
         latitude
       });
     } else {
-      const lonlat = args[0]; // eslint-disable-next-line
-      // @ts-ignore
-
-      const longitude = Array.isArray(lonlat) ? lonlat[0] : lonlat.lon ?? lonlat.lng ?? lonlat.longitude; // eslint-disable-next-line
-      // @ts-ignore
-
-      const latitude = Array.isArray(lonlat) ? lonlat[1] : lonlat.lat ?? lonlat.latitude;
+      const lonlat = args[0];
+      const longitude = getLonfromLonLat(lonlat);
+      const latitude = getLatfromLonLat(lonlat);
       return this.createPoint({
         longitude,
         latitude
@@ -4622,4 +4634,4 @@ const RippleGraphicsLayer = GraphicsLayer.createSubclass({
   }
 });
 
-export { Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, ViewCliper, ZoomHomeTool, createGeometryFactory, createLayerFactory };
+export { Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, ViewCliper, ZoomHomeTool, createGeometryFactory, createLayerFactory, getLatfromLonLat, getLonfromLonLat, getXfromXY, getYfromXY };

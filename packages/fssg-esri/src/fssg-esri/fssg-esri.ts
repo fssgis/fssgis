@@ -9,6 +9,7 @@ import FssgEsriPlugin from '../fssg-esri-plugin'
 import { isNullOrUndefined } from '@fssgis/utils'
 import { project, load as projectionLoad } from '@arcgis/core/geometry/projection'
 import SpatialReference from '@arcgis/core/geometry/SpatialReference'
+import { goto as _goto } from '../utils/goto'
 
 projectionLoad()
 esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S'
@@ -227,17 +228,8 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     return this
   }
 
-  private _gotoPromise : Promise<unknown> | undefined
-  private _handleId: NodeJS.Timeout
   public goto (target: __esri.Geometry | __esri.Graphic | __esri.Geometry[] | __esri.Graphic[] | number[] | __esri.Collection<__esri.Geometry> | __esri.Collection<__esri.Graphic> | { center?: __esri.Point, zoom?: number }, options?: __esri.GoToOptions2D) : this {
-    clearTimeout(this._handleId)
-    const gotoFunc : () => Promise<unknown> = this.view.goTo.bind(this.view, target, options)
-    if (this._gotoPromise) {
-      this._gotoPromise = this._gotoPromise.then(() => gotoFunc())
-    } else {
-      this._gotoPromise = gotoFunc()
-    }
-    this._handleId = setTimeout(() => this._gotoPromise = undefined, 2500)
+    _goto(this.view, target, options)
     return this
   }
 

@@ -708,6 +708,23 @@ class FssgEsriPlugin extends FssgMapPlugin {
 
 }
 
+let _gotoPromise;
+
+let _handleId;
+
+function goto(view, target, options) {
+  clearTimeout(_handleId);
+  const gotoFunc = view.goTo.bind(view, target, options);
+
+  if (_gotoPromise) {
+    _gotoPromise = _gotoPromise.then(() => gotoFunc());
+  } else {
+    _gotoPromise = gotoFunc();
+  }
+
+  _handleId = setTimeout(() => _gotoPromise = undefined, 2500);
+}
+
 load();
 esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S';
 /**
@@ -863,10 +880,6 @@ class FssgEsri extends FssgMap {
     _defineProperty(this, "_map", void 0);
 
     _defineProperty(this, "_view", void 0);
-
-    _defineProperty(this, "_gotoPromise", void 0);
-
-    _defineProperty(this, "_handleId", void 0);
   } //#endregion
   //#region 私有方法
 
@@ -949,16 +962,8 @@ class FssgEsri extends FssgMap {
   }
 
   goto(target, options) {
-    clearTimeout(this._handleId);
-    const gotoFunc = this.view.goTo.bind(this.view, target, options);
+    goto(this.view, target, options);
 
-    if (this._gotoPromise) {
-      this._gotoPromise = this._gotoPromise.then(() => gotoFunc());
-    } else {
-      this._gotoPromise = gotoFunc();
-    }
-
-    this._handleId = setTimeout(() => this._gotoPromise = undefined, 2500);
     return this;
   } //#endregion
   //#region 公有方法

@@ -1466,8 +1466,6 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
      */
     private _initRemoveOnlineStyle;
     private _initBeginCenter;
-    private _gotoPromise;
-    private _handleId;
     goto(target: __esri.Geometry | __esri.Graphic | __esri.Geometry[] | __esri.Graphic[] | number[] | __esri.Collection<__esri.Geometry> | __esri.Collection<__esri.Graphic> | {
         center?: __esri.Point;
         zoom?: number;

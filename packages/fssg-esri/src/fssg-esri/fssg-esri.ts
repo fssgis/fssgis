@@ -4,10 +4,13 @@ import MapView from '@arcgis/core/views/MapView'
 import esriConfig from '@arcgis/core/config'
 import { Basemap, Hawkeye, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MouseTips, Overlays, ViewCliper } from '../plugins'
 import { error } from '@fssgis/fssg-map'
-import { createGeometryFactory, LonLat, XY } from '../factories'
+import { createGeometryFactory, LonLat, XY, getLonfromLonLat, getLatfromLonLat, getXfromXY, getYfromXY } from '../factories'
 import FssgEsriPlugin from '../fssg-esri-plugin'
-import { isNullOrUndefined } from '@fssgis/utils/src'
+import { isNullOrUndefined } from '@fssgis/utils'
+import { project, load as projectionLoad } from '@arcgis/core/geometry/projection'
+import SpatialReference from '@arcgis/core/geometry/SpatialReference'
 
+projectionLoad()
 esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S'
 
 /**
@@ -332,6 +335,36 @@ export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
       }
       resolve(this)
     })
+  }
+
+  /**
+   * 经纬度转投影坐标
+   * @param lonLat 经纬度
+   * @param sr 投影坐标系
+   */
+  public lonLatToXY (lonLat: LonLat, sr: __esri.SpatialReference = this.sr) : [number, number] {
+    const longitude = getLonfromLonLat(lonLat)
+    const latitude = getLatfromLonLat(lonLat)
+    const point = createGeometryFactory(this).createPoint({
+      longitude, latitude, spatialReference: new SpatialReference({ wkid: 4326 })
+    })
+    const { x, y } = project(point, sr) as __esri.Point
+    return [x, y]
+  }
+
+  /**
+   * 投影坐标转经纬度
+   * @param xy 投影坐标
+   * @param sr 投影坐标系
+   */
+  public xyToLonLat (xy: XY, sr: __esri.SpatialReference = this.sr) : [number, number] {
+    const x = getXfromXY(xy)
+    const y = getYfromXY(xy)
+    const point = createGeometryFactory(this).createPoint({
+      x, y, spatialReference: sr
+    })
+    const { longitude, latitude } = project(point, new SpatialReference({ wkid: 4326 })) as __esri.Point
+    return [longitude, latitude]
   }
 
   //#endregion

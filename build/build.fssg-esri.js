@@ -38,6 +38,8 @@ export default [
       '@arcgis/core/geometry/Polygon',
       '@arcgis/core/geometry/Extent',
       '@arcgis/core/geometry/geometryEngineAsync',
+      '@arcgis/core/geometry/projection',
+      '@arcgis/core/geometry/SpatialReference',
       '@arcgis/core/views/draw/Draw',
       '@arcgis/core/views/draw/DrawAction',
       '@arcgis/core/core/watchUtils',

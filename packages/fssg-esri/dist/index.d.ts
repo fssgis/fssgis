@@ -1516,6 +1516,18 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
      * 重置地图应用
      */
     reset(): Promise<this>;
+    /**
+     * 经纬度转投影坐标
+     * @param lonLat 经纬度
+     * @param sr 投影坐标系
+     */
+    lonLatToXY(lonLat: LonLat, sr?: __esri.SpatialReference): [number, number];
+    /**
+     * 投影坐标转经纬度
+     * @param xy 投影坐标
+     * @param sr 投影坐标系
+     */
+    xyToLonLat(xy: XY, sr?: __esri.SpatialReference): [number, number];
 }
 
 declare const RippleGraphicsLayer: any;

@@ -14,8 +14,10 @@ import TileLayer from '@arcgis/core/layers/TileLayer';
 import MapImageLayer from '@arcgis/core/layers/MapImageLayer';
 import Graphic from '@arcgis/core/Graphic';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
-import { createGuid, deepCopyJSON, $extend, whenRightReturn, throttle, listToTree } from '@fssgis/utils';
+import { createGuid, isNullOrUndefined, deepCopyJSON, $extend, whenRightReturn, throttle, listToTree } from '@fssgis/utils';
 import Field from '@arcgis/core/layers/support/Field';
+import { load, project } from '@arcgis/core/geometry/projection';
+import SpatialReference from '@arcgis/core/geometry/SpatialReference';
 import EsriBasemap from '@arcgis/core/Basemap';
 import Geometry from '@arcgis/core/geometry/Geometry';
 import Draw from '@arcgis/core/views/draw/Draw';
@@ -706,14 +708,7 @@ class FssgEsriPlugin extends FssgMapPlugin {
 
 }
 
-/**
- * 深度复制（采用JSON解析方式）
- * @param obj 复制对象
- */
-function isNullOrUndefined(obj) {
-  return obj === null || obj === undefined;
-}
-
+load();
 esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S';
 /**
  * 地图应用
@@ -1079,6 +1074,52 @@ class FssgEsri extends FssgMap {
 
       resolve(this);
     });
+  }
+  /**
+   * 经纬度转投影坐标
+   * @param lonLat 经纬度
+   * @param sr 投影坐标系
+   */
+
+
+  lonLatToXY(lonLat, sr = this.sr) {
+    const longitude = getLonfromLonLat(lonLat);
+    const latitude = getLatfromLonLat(lonLat);
+    const point = createGeometryFactory(this).createPoint({
+      longitude,
+      latitude,
+      spatialReference: new SpatialReference({
+        wkid: 4326
+      })
+    });
+    const {
+      x,
+      y
+    } = project(point, sr);
+    return [x, y];
+  }
+  /**
+   * 投影坐标转经纬度
+   * @param xy 投影坐标
+   * @param sr 投影坐标系
+   */
+
+
+  xyToLonLat(xy, sr = this.sr) {
+    const x = getXfromXY(xy);
+    const y = getYfromXY(xy);
+    const point = createGeometryFactory(this).createPoint({
+      x,
+      y,
+      spatialReference: sr
+    });
+    const {
+      longitude,
+      latitude
+    } = project(point, new SpatialReference({
+      wkid: 4326
+    }));
+    return [longitude, latitude];
   }
 
 }

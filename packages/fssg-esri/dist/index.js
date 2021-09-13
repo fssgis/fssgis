@@ -851,6 +851,8 @@ class FssgEsri extends FssgMap {
 
     _defineProperty(this, "overlays", void 0);
 
+    _defineProperty(this, "viewCliper", void 0);
+
     _defineProperty(this, "_map", void 0);
 
     _defineProperty(this, "_view", void 0);
@@ -3519,6 +3521,52 @@ class Overlays extends FssgEsriPlugin {
 
 }
 
+class ViewCliper extends FssgEsriPlugin {
+  constructor(options) {
+    super(options, {});
+
+    _defineProperty(this, "_cliperLayer", void 0);
+  }
+
+  get cliperLayer() {
+    return this._cliperLayer;
+  }
+
+  _init() {
+    this._cliperLayer = new GraphicsLayer({
+      blendMode: 'destination-in',
+      effect: 'bloom(200%)'
+    });
+    return this;
+  }
+
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
+  }
+
+  clip(graphic) {
+    if (!this.map_.findLayerById(this._cliperLayer.id)) {
+      this.map_.add(this._cliperLayer);
+    }
+
+    this._cliperLayer.graphics.removeAll();
+
+    this._cliperLayer.graphics.add(graphic);
+
+    return this;
+  }
+
+  restore() {
+    if (this.map_.findLayerById(this._cliperLayer.id)) {
+      this.map_.remove(this._cliperLayer);
+    }
+
+    return this;
+  }
+
+}
+
 /**
  * Common utilities
  * @module glMatrix
@@ -4574,4 +4622,4 @@ const RippleGraphicsLayer = GraphicsLayer.createSubclass({
   }
 });
 
-export { Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, ZoomHomeTool, createGeometryFactory, createLayerFactory };
+export { Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, ViewCliper, ZoomHomeTool, createGeometryFactory, createLayerFactory };

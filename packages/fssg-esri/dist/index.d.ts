@@ -978,6 +978,20 @@ declare class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents>
     clear(): this;
 }
 
+interface IViewCliperEvents extends IFssgEsriPluginEvents {
+}
+interface IViewCliperOptions extends IFssgEsriPluginOptions {
+}
+declare class ViewCliper extends FssgEsriPlugin<IViewCliperOptions, IViewCliperEvents> {
+    constructor(options?: IViewCliperOptions);
+    private _cliperLayer;
+    get cliperLayer(): __esri.GraphicsLayer;
+    private _init;
+    installPlugin(fssgEsri: FssgEsri): this | Promise<this>;
+    clip(graphic: __esri.Graphic): this;
+    restore(): this;
+}
+
 /**
  * 坐标XY
  */
@@ -1368,7 +1382,6 @@ interface IFssgEsriEvents extends IFssgMapEvents {
     'center-ready': {
         center: __esri.Point;
     };
-    'reset': void;
 }
 interface IOwner {
     $owner: FssgEsri;
@@ -1389,6 +1402,7 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     mapModules: MapModules;
     mouseTips: MouseTips;
     overlays: Overlays;
+    viewCliper: ViewCliper;
     /**
      * 地图对象
      */
@@ -1504,4 +1518,4 @@ declare const RippleGraphicsLayer: any;
 
 declare const RippleLayerView: any;
 
-export { Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, IAttributesConfigItem, IBasemapEvents, IBasemapOptions, IDrawPointToolEvents, IDrawPointToolOptions, IDrawPolygonToolEvents, IDrawPolygonToolOptions, IDrawPolylineToolEvents, IDrawPolylineToolOptions, IField, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, IHitTestToolEvents, IHitTestToolOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapModulesEvents, IMapModulesOptions, IMapToolsEvents, IMapToolsOptions, IMeasureAreaToolEvents, IMeasureAreaToolOptions, IMeasureCoordinateToolEvents, IMeasureCoordinateToolOptions, IMeasureLengthToolEvents, IMeasureLengthToolOptions, IModuleItem, IMouseTipsEvents, IMouseTipsOptions, IOverlay, IOverlayAddOptions, IOverlaysEvents, IOverlaysOptions, IOwner, ITreeNode, IView, IZoomHomeToolEvents, IZoomHomeToolOptions, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, XY, ZoomHomeTool, createGeometryFactory, createLayerFactory };
+export { Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, IAttributesConfigItem, IBasemapEvents, IBasemapOptions, IDrawPointToolEvents, IDrawPointToolOptions, IDrawPolygonToolEvents, IDrawPolygonToolOptions, IDrawPolylineToolEvents, IDrawPolylineToolOptions, IField, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, IHitTestToolEvents, IHitTestToolOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapModulesEvents, IMapModulesOptions, IMapToolsEvents, IMapToolsOptions, IMeasureAreaToolEvents, IMeasureAreaToolOptions, IMeasureCoordinateToolEvents, IMeasureCoordinateToolOptions, IMeasureLengthToolEvents, IMeasureLengthToolOptions, IModuleItem, IMouseTipsEvents, IMouseTipsOptions, IOverlay, IOverlayAddOptions, IOverlaysEvents, IOverlaysOptions, IOwner, ITreeNode, IView, IViewCliperEvents, IViewCliperOptions, IZoomHomeToolEvents, IZoomHomeToolOptions, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, ViewCliper, XY, ZoomHomeTool, createGeometryFactory, createLayerFactory };

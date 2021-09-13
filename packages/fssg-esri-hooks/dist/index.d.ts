@@ -1,6 +1,6 @@
 import { WatchSource, WatchCallback, WatchOptions, Ref, App, Component } from 'vue';
 import { IHandle } from '@fssgis/observable';
-import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement, MapTools, IMapToolsOptions, IHawkeyeOptions, Hawkeye, ILayerTreeOptions, LayerTree, ITreeNode, MapModules, IMapModulesOptions, IMouseTipsOptions, MouseTips, IOverlayAddOptions, Overlays, IOverlaysOptions } from '@fssgis/fssg-esri';
+import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement, MapTools, IMapToolsOptions, IHawkeyeOptions, Hawkeye, ILayerTreeOptions, LayerTree, ITreeNode, MapModules, IMapModulesOptions, IMouseTipsOptions, MouseTips, IOverlayAddOptions, Overlays, IOverlaysOptions, IViewCliperOptions, ViewCliper } from '@fssgis/fssg-esri';
 
 declare type MapSources<T> = {
     [K in keyof T]: T[K] extends WatchSource<infer V> ? V : never;
@@ -201,4 +201,10 @@ declare function useOverlays(): Overlays;
 declare function useOverlays(fssgEsri: FssgEsri): Overlays;
 declare function useOverlays(fssgEsri?: FssgEsri): Overlays;
 
-export { EsriWatchCallback, IOverlayState, MapOldSources, MapSources, controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, createMouseTips, createOverlays, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useObservableOn, useOverlays, useSetOverlays, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+declare function createViewCliper(options: IViewCliperOptions): ViewCliper;
+declare function createViewCliper(options: IViewCliperOptions, fssgEsri: FssgEsri, app?: App): ViewCliper;
+declare function useViewCliper(): ViewCliper;
+declare function useViewCliper(fssgEsri: FssgEsri): ViewCliper;
+declare function useViewCliper(fssgEsri?: FssgEsri): ViewCliper;
+
+export { EsriWatchCallback, IOverlayState, MapOldSources, MapSources, controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, createMouseTips, createOverlays, createViewCliper, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useObservableOn, useOverlays, useSetOverlays, useViewCliper, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

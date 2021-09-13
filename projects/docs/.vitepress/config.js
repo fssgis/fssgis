@@ -54,6 +54,12 @@ module.exports = {
             { text: 'extNumber', link: '/guide/fssgis-ext/ext-number' },
           ],
         },
+        {
+          text: '@fssgis/esri',
+          children: [
+            { text: 'use to @fssgis/esri', link: '/guide/fssgis-esri/index' },
+          ],
+        },
       ],
     },
   },

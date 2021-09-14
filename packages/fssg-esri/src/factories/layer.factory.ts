@@ -6,7 +6,7 @@ import TileLayer from '@arcgis/core/layers/TileLayer'
 import MapImageLayer from '@arcgis/core/layers/MapImageLayer'
 import Graphic from '@arcgis/core/Graphic'
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer'
-import { createGuid } from '@fssgis/utils'
+import { createGuid, isNullOrUndefined } from '@fssgis/utils'
 import Field from '@arcgis/core/layers/support/Field'
 
 interface ISqlLayerProperties {
@@ -234,8 +234,9 @@ class LayerFactory implements ILayerFactory {
     const layer = this.createFeatureLayer({
       spatialReference: options.spatialReference,
       source: [],
-      objectIdField: '$objectId',
+      objectIdField: 'oidoid',
       geometryType: 'point',
+      outFields: ['*'],
       ...others,
     })
     if (options.sqlOptions.iconUrl) {
@@ -254,20 +255,31 @@ class LayerFactory implements ILayerFactory {
       const graphics : __esri.Graphic[] = []
       if (result[0]) {
         layer.fields = [
-          new Field({ name: '$objectId', alias: '$objectId', type: 'oid' }),
-          ...Object.keys(result[0]).map(key => new Field({ name: key, alias: key, type: 'string' }))
+          new Field({ name: 'oidoid', alias: 'oidoid', type: 'oid' }),
+          ...Object.keys(result[0]).map(key => new Field({
+            name: key,
+            alias: key,
+            type: [options.sqlOptions.xField, options.sqlOptions.yField].includes(key) ? 'double' : 'string'
+          }))
         ]
       }
-      result.forEach(row => {
+      result.forEach((row, index) => {
         if (!row[options.sqlOptions.xField] || !row[options.sqlOptions.yField]) {
           return
         }
         const attributes = row
+        attributes.oidoid = index + 1
+        Object.keys(attributes).forEach(key => {
+          if (isNullOrUndefined(attributes[key])) {
+            attributes[key] = ''
+          } else if (![options.sqlOptions.xField, options.sqlOptions.yField].includes(key)) {
+            attributes[key] = String(attributes[key])
+          }
+        })
         const props : __esri.GraphicProperties = {
-          attributes: {
-            ...attributes,
-            $objectId: createGuid(),
-          },
+          attributes: Object.fromEntries(layer.fields.map(item => {
+            return [item.name, attributes[item.name]]
+          })),
           geometry: {
             type: 'point',
             x: row[options.sqlOptions.xField],

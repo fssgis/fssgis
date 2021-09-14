@@ -121,14 +121,15 @@ export class HitTestTool<
     this.clearDrawed()
     const point = graphic.geometry as Point
     const screen = this.view_.toScreen(point)
-    const { mapElement, mapLayers } = this.$
+    const { mapElement, mapLayers, viewCliper } = this.$
     Promise.all([
       this._queryWithMapImageLayer(point),
       this.view_.hitTest(screen, {
         exclude: [
-          mapElement.graphicsLayer,
-          mapElement.highlightLayer,
-          ...mapLayers.layersWhichCantQuery.map(([layer]) => layer),
+          mapElement?.graphicsLayer,
+          mapElement?.highlightLayer,
+          ...mapLayers?.layersWhichCantQuery.map(([layer]) => layer),
+          viewCliper?.cliperLayer,
         ],
       })
     ]).then(([queryResult, hitTestResult]) => {

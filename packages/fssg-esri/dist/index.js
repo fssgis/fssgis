@@ -2452,10 +2452,11 @@ class HitTestTool extends DrawPointTool {
     const screen = this.view_.toScreen(point);
     const {
       mapElement,
-      mapLayers
+      mapLayers,
+      viewCliper
     } = this.$;
     Promise.all([this._queryWithMapImageLayer(point), this.view_.hitTest(screen, {
-      exclude: [mapElement.graphicsLayer, mapElement.highlightLayer, ...mapLayers.layersWhichCantQuery.map(([layer]) => layer)]
+      exclude: [mapElement === null || mapElement === void 0 ? void 0 : mapElement.graphicsLayer, mapElement === null || mapElement === void 0 ? void 0 : mapElement.highlightLayer, ...(mapLayers === null || mapLayers === void 0 ? void 0 : mapLayers.layersWhichCantQuery.map(([layer]) => layer)), viewCliper === null || viewCliper === void 0 ? void 0 : viewCliper.cliperLayer]
     })]).then(([queryResult, hitTestResult]) => {
       var _hitTestResult$result, _hitTestResult$result2;
 
@@ -3603,9 +3604,17 @@ class ViewCliper extends FssgEsriPlugin {
     return this._init();
   }
 
-  clip(graphic) {
+  clip(arg0) {
     if (!this.map_.findLayerById(this._cliperLayer.id)) {
       this.map_.add(this._cliperLayer);
+    }
+
+    let graphic = arg0.clone();
+
+    if (graphic instanceof Geometry) {
+      graphic = new Graphic({
+        geometry: graphic
+      });
     }
 
     this._cliperLayer.graphics.removeAll();

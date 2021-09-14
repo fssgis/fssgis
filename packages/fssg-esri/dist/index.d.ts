@@ -988,7 +988,9 @@ declare class ViewCliper extends FssgEsriPlugin<IViewCliperOptions, IViewCliperE
     get cliperLayer(): __esri.GraphicsLayer;
     private _init;
     installPlugin(fssgEsri: FssgEsri): this | Promise<this>;
+    clip(geometry: __esri.Geometry): this;
     clip(graphic: __esri.Graphic): this;
+    clip(arg0: __esri.Graphic | __esri.Geometry): this;
     restore(): this;
 }
 

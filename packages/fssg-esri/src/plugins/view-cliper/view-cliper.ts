@@ -1,6 +1,8 @@
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer'
 import FssgEsri from '../../fssg-esri'
 import FssgEsriPlugin, { IFssgEsriPluginEvents, IFssgEsriPluginOptions } from '../../fssg-esri-plugin'
+import Geometry from '@arcgis/core/geometry/Geometry'
+import Graphic from '@arcgis/core/Graphic'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IViewCliperEvents extends IFssgEsriPluginEvents {
@@ -32,9 +34,16 @@ export class ViewCliper extends FssgEsriPlugin<IViewCliperOptions, IViewCliperEv
     return this._init()
   }
 
-  public clip (graphic: __esri.Graphic) : this {
+  public clip (geometry: __esri.Geometry) : this
+  public clip (graphic: __esri.Graphic) : this
+  public clip (arg0: __esri.Graphic | __esri.Geometry) : this
+  public clip (arg0: __esri.Graphic | __esri.Geometry) : this {
     if (!this.map_.findLayerById(this._cliperLayer.id)) {
       this.map_.add(this._cliperLayer)
+    }
+    let graphic = arg0.clone()
+    if (graphic instanceof Geometry) {
+      graphic = new Graphic({ geometry: graphic })
     }
     this._cliperLayer.graphics.removeAll()
     this._cliperLayer.graphics.add(graphic)

@@ -189,7 +189,7 @@ interface IOverlayState {
     setOverlay<T>(options: Omit<IOverlayAddOptions, 'content'> & {
         component?: Component<T>;
         props?: Partial<T>;
-    }): void;
+    }): string;
 }
 declare function useSetOverlays(): IOverlayState;
 declare function useSetOverlays(fssgMap: FssgEsri): IOverlayState;

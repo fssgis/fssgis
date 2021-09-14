@@ -1,6 +1,6 @@
 import { getCurrentInstance, onUnmounted, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide, reactive, createVNode, render } from 'vue';
 import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement, MapTools, Hawkeye, LayerTree, MapModules, MouseTips, Overlays, ViewCliper } from '@fssgis/fssg-esri';
-import { whenRightReturn } from '@fssgis/utils';
+import { whenRightReturn, createGuid } from '@fssgis/utils';
 import '@fssgis/observable';
 
 /* eslint-disable @typescript-eslint/ban-types */
@@ -774,6 +774,7 @@ function useSetOverlays(arg0) {
   return {
     setOverlay(options) {
       let content;
+      const id = options.id ?? createGuid();
 
       if (options.component) {
         content = (() => {
@@ -787,8 +788,10 @@ function useSetOverlays(arg0) {
 
       overlays.add({
         content: content ?? '',
-        ...options
+        ...options,
+        id
       });
+      return id;
     }
 
   };

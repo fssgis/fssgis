@@ -1,5 +1,6 @@
 import { Overlays, FssgEsri, IOverlaysOptions, IOverlayAddOptions } from '@fssgis/fssg-esri'
 import { warn } from '@fssgis/fssg-map'
+import { createGuid } from '@fssgis/utils'
 import { App, AppContext, Component, createVNode, getCurrentInstance, inject, InjectionKey, provide, render } from 'vue'
 import { useFssgEsri } from './fssg-esri.hooks'
 
@@ -26,7 +27,7 @@ function _getOverlays (arg0?: FssgEsri | Overlays) : Overlays {
 }
 
 export interface IOverlayState {
-  setOverlay<T> (options: Omit<IOverlayAddOptions, 'content'> & { component?: Component<T>, props?: Partial<T> }) : void
+  setOverlay<T> (options: Omit<IOverlayAddOptions, 'content'> & { component?: Component<T>, props?: Partial<T> }) : string
 }
 
 export function useSetOverlays () : IOverlayState
@@ -39,6 +40,7 @@ export function useSetOverlays (arg0?: FssgEsri | Overlays) : IOverlayState {
   return {
     setOverlay (options) {
       let content : HTMLDivElement | undefined
+      const id = options.id ?? createGuid()
       if (options.component) {
         content = (() => {
           const dom = document.createElement('div')
@@ -50,8 +52,10 @@ export function useSetOverlays (arg0?: FssgEsri | Overlays) : IOverlayState {
       }
       overlays.add({
         content: content ?? '',
-        ...options
+        ...options,
+        id,
       })
+      return id
     }
   }
 }

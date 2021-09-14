@@ -6,7 +6,7 @@ import TileLayer from '@arcgis/core/layers/TileLayer'
 import MapImageLayer from '@arcgis/core/layers/MapImageLayer'
 import Graphic from '@arcgis/core/Graphic'
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer'
-import { createGuid } from '@fssgis/utils'
+import { createGuid, isNullOrUndefined } from '@fssgis/utils'
 import Field from '@arcgis/core/layers/support/Field'
 
 interface ISqlLayerProperties {
@@ -263,6 +263,11 @@ class LayerFactory implements ILayerFactory {
           return
         }
         const attributes = row
+        Object.keys(attributes).forEach(key => {
+          if (isNullOrUndefined(attributes[key])) {
+            attributes[key] = ''
+          }
+        })
         const props : __esri.GraphicProperties = {
           attributes: {
             ...attributes,
@@ -281,6 +286,9 @@ class LayerFactory implements ILayerFactory {
       layer.applyEdits({
         addFeatures: graphics
       })
+      // eslint-disable-next-line
+      // @ts-ignore
+      layer.source = graphics
     })
     return layer
   }

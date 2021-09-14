@@ -14,7 +14,7 @@ import TileLayer from '@arcgis/core/layers/TileLayer';
 import MapImageLayer from '@arcgis/core/layers/MapImageLayer';
 import Graphic from '@arcgis/core/Graphic';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
-import { createGuid, isNullOrUndefined, deepCopyJSON, $extend, whenRightReturn, throttle, listToTree } from '@fssgis/utils';
+import { isNullOrUndefined, createGuid, deepCopyJSON, $extend, whenRightReturn, throttle, listToTree } from '@fssgis/utils';
 import Field from '@arcgis/core/layers/support/Field';
 import { load, project } from '@arcgis/core/geometry/projection';
 import SpatialReference from '@arcgis/core/geometry/SpatialReference';
@@ -626,6 +626,11 @@ class LayerFactory {
         }
 
         const attributes = row;
+        Object.keys(attributes).forEach(key => {
+          if (isNullOrUndefined(attributes[key])) {
+            attributes[key] = '';
+          }
+        });
         const props = {
           attributes: { ...attributes,
             $objectId: createGuid()
@@ -642,7 +647,10 @@ class LayerFactory {
       });
       layer.applyEdits({
         addFeatures: graphics
-      });
+      }); // eslint-disable-next-line
+      // @ts-ignore
+
+      layer.source = graphics;
     });
     return layer;
   }

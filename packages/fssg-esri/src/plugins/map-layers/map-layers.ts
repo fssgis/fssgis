@@ -1,4 +1,5 @@
 import { error } from '@fssgis/fssg-map'
+import MapImageLayer from '@arcgis/core/layers/MapImageLayer'
 import { createLayerFactory } from '../../factories'
 import FssgEsri from '../../fssg-esri'
 import FssgEsriPlugin, { IFssgEsriPluginOptions, IFssgEsriPluginEvents } from '../../fssg-esri-plugin'
@@ -174,6 +175,19 @@ export class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEvent
    */
   public findLayerOptions (nameOrIdOrLayer: string | __esri.Layer) : LayerOptions | undefined {
     return this._findItem(nameOrIdOrLayer)?.[1]
+  }
+
+  /**
+   * 查找动态图层
+   * @param nameOrId 图层名或Id
+   */
+  public findDynaLayer (nameOrId: string) : __esri.Sublayer | undefined {
+    const [layer, options] = this._findItem(nameOrId)
+    if (options.layerType === 'dynamiclayer' && layer instanceof MapImageLayer) {
+      return layer.sublayers.getItemAt(0)
+    } else {
+      throw error(this, `图层${nameOrId}为非动态图层`)
+    }
   }
 
   /**

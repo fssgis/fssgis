@@ -2929,6 +2929,21 @@ class MapLayers extends FssgEsriPlugin {
     return (_this$_findItem2 = this._findItem(nameOrIdOrLayer)) === null || _this$_findItem2 === void 0 ? void 0 : _this$_findItem2[1];
   }
   /**
+   * 查找动态图层
+   * @param nameOrId 图层名或Id
+   */
+
+
+  findDynaLayer(nameOrId) {
+    const [layer, options] = this._findItem(nameOrId);
+
+    if (options.layerType === 'dynamiclayer' && layer instanceof MapImageLayer) {
+      return layer.sublayers.getItemAt(0);
+    } else {
+      throw error(this, `图层${nameOrId}为非动态图层`);
+    }
+  }
+  /**
    * 设置图层可见性
    * @param nameOrId 图层名或Id
    * @param visible 可见性，默认为true

@@ -700,6 +700,11 @@ declare class MapLayers extends FssgEsriPlugin<IMapLayersOptions, IMapLayersEven
      */
     findLayerOptions(nameOrIdOrLayer: string | __esri.Layer): LayerOptions | undefined;
     /**
+     * 查找动态图层
+     * @param nameOrId 图层名或Id
+     */
+    findDynaLayer(nameOrId: string): __esri.Sublayer | undefined;
+    /**
      * 设置图层可见性
      * @param nameOrId 图层名或Id
      * @param visible 可见性，默认为true

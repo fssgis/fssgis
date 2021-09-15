@@ -651,7 +651,10 @@ class LayerFactory {
       });
       layer.applyEdits({
         addFeatures: graphics
-      });
+      }); // eslint-disable-next-line
+      // @ts-ignore
+
+      layer.source = graphics;
     });
     return layer;
   }

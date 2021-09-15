@@ -22,7 +22,7 @@ declare const FssgIcon: vue.DefineComponent<{
     height: string | number;
     width: string | number;
     url: string;
-} & {}>, {
+} & {}> & {}, {
     height: string | number;
     width: string | number;
     url: string;
@@ -49,7 +49,7 @@ declare const FssgIconFont: vue.DefineComponent<{
     name: string;
     size: string | number;
     color: string;
-} & {}>, {
+} & {}> & {}, {
     size: string | number;
     color: string;
 }>;
@@ -85,7 +85,7 @@ declare const FssgGrid: vue.DefineComponent<{
     inline: boolean;
     options: IFssgGridOptions;
     margin: string;
-} & {}>, {
+} & {}> & {}, {
     inline: boolean;
     options: IFssgGridOptions;
     margin: string;
@@ -151,7 +151,7 @@ declare const FssgBox: vue.DefineComponent<{
     valueStyle: CSSProperties;
     unitStyle: CSSProperties;
     unit: string;
-} & {}>, {
+} & {}> & {}, {
     value: string | number;
     grid: Grid;
     title: string;
@@ -270,7 +270,7 @@ declare const FssgBoxV1: vue.DefineComponent<{
     valueStyle: vue.CSSProperties;
     unitStyle: vue.CSSProperties;
     unit: string;
-} & {}>, {
+} & {}> & {}, {
     value: string | number;
     values: IStatistics[];
     title: string;
@@ -333,7 +333,7 @@ declare const FssgBoxV2: vue.DefineComponent<{
     valueStyle: vue.CSSProperties;
     unitStyle: vue.CSSProperties;
     unit: string;
-} & {}>, {
+} & {}> & {}, {
     value: string | number;
     title: string;
     iconUrl: string;
@@ -395,7 +395,7 @@ declare const FssgBoxV3: vue.DefineComponent<{
     valueStyle: vue.CSSProperties;
     unitStyle: vue.CSSProperties;
     unit: string;
-} & {}>, {
+} & {}> & {}, {
     value: string | number;
     title: string;
     iconUrl: string;
@@ -457,7 +457,7 @@ declare const FssgBoxV4: vue.DefineComponent<{
     valueStyle: vue.CSSProperties;
     unitStyle: vue.CSSProperties;
     unit: string;
-} & {}>, {
+} & {}> & {}, {
     value: string | number;
     title: string;
     iconUrl: string;
@@ -519,7 +519,7 @@ declare const FssgBoxV5: vue.DefineComponent<{
     valueStyle: vue.CSSProperties;
     unitStyle: vue.CSSProperties;
     unit: string;
-} & {}>, {
+} & {}> & {}, {
     value: string | number;
     title: string;
     iconUrl: string;
@@ -581,7 +581,7 @@ declare const FssgBoxV6: vue.DefineComponent<{
     valueStyle: vue.CSSProperties;
     unitStyle: vue.CSSProperties;
     unit: string;
-} & {}>, {
+} & {}> & {}, {
     value: string | number;
     title: string;
     iconUrl: string;

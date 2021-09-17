@@ -960,6 +960,8 @@ interface IOverlayAddOptions {
     content: string | HTMLDivElement;
     offsetX?: number;
     offsetY?: number;
+    screenX?: number;
+    screenY?: number;
     showBezierCurve?: boolean;
     bezierCurveSymbol?: __esri.LineSymbolProperties;
 }
@@ -969,6 +971,8 @@ interface IOverlay {
     mapXY: __esri.Point;
     offsetX: number;
     offsetY: number;
+    screenX?: number;
+    screenY?: number;
     bezierCurve?: __esri.Graphic;
     bezierCurveSymbol?: __esri.LineSymbolProperties;
 }

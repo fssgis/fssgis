@@ -3516,6 +3516,12 @@ class Overlays extends FssgEsriPlugin {
       this.view_.watch('extent', throttle(() => {
         [...this._overlayPool.values()].forEach(item => {
           const screenPt = this.view_.toScreen(item.mapXY);
+
+          if (item.screenX && item.screenY) {
+            screenPt.x = item.screenX;
+            screenPt.y = item.screenY;
+          }
+
           item.container.style.top = `${screenPt.y + item.offsetY}px`;
           item.container.style.left = `${screenPt.x + item.offsetX}px`;
           const mapPt = this.view_.toMap({
@@ -3551,6 +3557,12 @@ class Overlays extends FssgEsriPlugin {
     overlay.style.transition = 'all .1s ease-in-out';
     typeof options.content === 'string' ? overlay.innerHTML = options.content : overlay.append(options.content);
     const screenPt = this.view_.toScreen(options.point);
+
+    if (options.screenX && options.screenY) {
+      screenPt.x = options.screenX;
+      screenPt.y = options.screenY;
+    }
+
     overlay.style.top = `${screenPt.y + (options.offsetY ?? 0)}px`;
     overlay.style.left = `${screenPt.x + (options.offsetX ?? 0)}px`;
     const mapPt = this.view_.toMap({
@@ -3572,6 +3584,8 @@ class Overlays extends FssgEsriPlugin {
       mapXY: options.point,
       offsetX: options.offsetX ?? 0,
       offsetY: options.offsetY ?? 0,
+      screenX: options.screenX,
+      screenY: options.screenY,
       bezierCurve: bezierCurve,
       bezierCurveSymbol: options.bezierCurveSymbol
     });

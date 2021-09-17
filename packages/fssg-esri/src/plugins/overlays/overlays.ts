@@ -17,6 +17,8 @@ export interface IOverlayAddOptions {
   content: string | HTMLDivElement
   offsetX?: number
   offsetY?: number
+  screenX?: number
+  screenY?: number
   showBezierCurve?: boolean
   bezierCurveSymbol?: __esri.LineSymbolProperties
 }
@@ -27,6 +29,8 @@ export interface IOverlay {
   mapXY: __esri.Point
   offsetX: number
   offsetY: number
+  screenX?: number
+  screenY?: number
   bezierCurve?: __esri.Graphic
   bezierCurveSymbol?: __esri.LineSymbolProperties
 }
@@ -59,6 +63,10 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
       this.view_.watch('extent', throttle(() => {
         [...this._overlayPool.values()].forEach(item => {
           const screenPt = this.view_.toScreen(item.mapXY)
+          if (item.screenX && item.screenY) {
+            screenPt.x = item.screenX
+            screenPt.y = item.screenY
+          }
           item.container.style.top = `${screenPt.y + item.offsetY}px`
           item.container.style.left = `${screenPt.x + item.offsetX}px`
 
@@ -101,6 +109,10 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
       : overlay.append(options.content)
 
     const screenPt = this.view_.toScreen(options.point)
+    if (options.screenX && options.screenY) {
+      screenPt.x = options.screenX
+      screenPt.y = options.screenY
+    }
     overlay.style.top = `${screenPt.y + (options.offsetY ?? 0)}px`
     overlay.style.left = `${screenPt.x + (options.offsetX ?? 0)}px`
 
@@ -125,6 +137,8 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
       mapXY: options.point,
       offsetX: options.offsetX ?? 0,
       offsetY: options.offsetY ?? 0,
+      screenX: options.screenX,
+      screenY: options.screenY,
       bezierCurve: bezierCurve,
       bezierCurveSymbol: options.bezierCurveSymbol
     })

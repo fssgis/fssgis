@@ -1,61 +1,61 @@
-import { FssgMapPlugin, FssgMap, error, warn, BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseTool, MAP_CURSOR_DIC } from '@fssgis/fssg-map'
-import ArcGISMap from '@arcgis/core/Map'
-import MapView from '@arcgis/core/views/MapView'
-import esriConfig from '@arcgis/core/config'
-import Point from '@arcgis/core/geometry/Point'
-import Polyline from '@arcgis/core/geometry/Polyline'
-import Polygon from '@arcgis/core/geometry/Polygon'
-import Extent from '@arcgis/core/geometry/Extent'
-import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer'
-import GroupLayer from '@arcgis/core/layers/GroupLayer'
-import WebTileLayer from '@arcgis/core/layers/WebTileLayer'
-import Layer from '@arcgis/core/layers/Layer'
-import TileLayer from '@arcgis/core/layers/TileLayer'
-import MapImageLayer from '@arcgis/core/layers/MapImageLayer'
-import Graphic from '@arcgis/core/Graphic'
-import FeatureLayer from '@arcgis/core/layers/FeatureLayer'
-import { isNullOrUndefined, deepCopyJSON, $extend, whenRightReturn, throttle, listToTree, createGuid } from '@fssgis/utils'
-import Field from '@arcgis/core/layers/support/Field'
-import { load, project } from '@arcgis/core/geometry/projection'
-import SpatialReference from '@arcgis/core/geometry/SpatialReference'
-import EsriBasemap from '@arcgis/core/Basemap'
-import Geometry from '@arcgis/core/geometry/Geometry'
-import Draw from '@arcgis/core/views/draw/Draw'
-import { planarLength, planarArea, buffer } from '@arcgis/core/geometry/geometryEngineAsync'
-import BaseLayerViewGL2D from '@arcgis/core/views/2d/layers/BaseLayerViewGL2D'
-import { on } from '@arcgis/core/core/watchUtils'
-import { resolve } from '@arcgis/core/core/promiseUtils'
+import { FssgMapPlugin, FssgMap, error, warn, BASEMAP_TIAN_DI_TU_3857, BASEMAP_TIAN_DI_TU_4326, BaseTool, MAP_CURSOR_DIC } from '@fssgis/fssg-map';
+import ArcGISMap from '@arcgis/core/Map';
+import MapView from '@arcgis/core/views/MapView';
+import esriConfig from '@arcgis/core/config';
+import Point from '@arcgis/core/geometry/Point';
+import Polyline from '@arcgis/core/geometry/Polyline';
+import Polygon from '@arcgis/core/geometry/Polygon';
+import Extent from '@arcgis/core/geometry/Extent';
+import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
+import GroupLayer from '@arcgis/core/layers/GroupLayer';
+import WebTileLayer from '@arcgis/core/layers/WebTileLayer';
+import Layer from '@arcgis/core/layers/Layer';
+import TileLayer from '@arcgis/core/layers/TileLayer';
+import MapImageLayer from '@arcgis/core/layers/MapImageLayer';
+import Graphic from '@arcgis/core/Graphic';
+import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
+import { isNullOrUndefined, deepCopyJSON, $extend, whenRightReturn, throttle, listToTree, createGuid } from '@fssgis/utils';
+import Field from '@arcgis/core/layers/support/Field';
+import { load, project } from '@arcgis/core/geometry/projection';
+import SpatialReference from '@arcgis/core/geometry/SpatialReference';
+import EsriBasemap from '@arcgis/core/Basemap';
+import Geometry from '@arcgis/core/geometry/Geometry';
+import Draw from '@arcgis/core/views/draw/Draw';
+import { planarLength, planarArea, buffer } from '@arcgis/core/geometry/geometryEngineAsync';
+import BaseLayerViewGL2D from '@arcgis/core/views/2d/layers/BaseLayerViewGL2D';
+import { on } from '@arcgis/core/core/watchUtils';
+import { resolve } from '@arcgis/core/core/promiseUtils';
 
-function _defineProperty (obj, key, value) {
+function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
       value: value,
       enumerable: true,
       configurable: true,
       writable: true
-    })
+    });
   } else {
-    obj[key] = value
+    obj[key] = value;
   }
 
-  return obj
+  return obj;
 }
 
-function getXfromXY (xy) {
-  return Array.isArray(xy) ? xy[0] : xy.x
+function getXfromXY(xy) {
+  return Array.isArray(xy) ? xy[0] : xy.x;
 }
-function getYfromXY (xy) {
-  return Array.isArray(xy) ? xy[1] : xy.y
+function getYfromXY(xy) {
+  return Array.isArray(xy) ? xy[1] : xy.y;
 }
-function getLonfromLonLat (lonLat) {
+function getLonfromLonLat(lonLat) {
   // eslint-disable-next-line
   // @ts-ignore
-  return Array.isArray(lonLat) ? lonLat[0] : lonLat.lon ?? lonLat.lng ?? lonLat.longitude
+  return Array.isArray(lonLat) ? lonLat[0] : lonLat.lon ?? lonLat.lng ?? lonLat.longitude;
 }
-function getLatfromLonLat (lonLat) {
+function getLatfromLonLat(lonLat) {
   // eslint-disable-next-line
   // @ts-ignore
-  return Array.isArray(lonLat) ? lonLat[1] : lonLat.lat ?? lonLat.latitude
+  return Array.isArray(lonLat) ? lonLat[1] : lonLat.lat ?? lonLat.latitude;
 }
 /**
  * 几何工厂类（条件单例模式）
@@ -74,8 +74,8 @@ class GeometryFacory {
   /**
    * 实例容器绑定的地图应用空间坐标系
    */
-  get _spatialReference () {
-    return this._fssgEsri.sr
+  get _spatialReference() {
+    return this._fssgEsri.sr;
   }
   /**
    * 构造几何工厂实例
@@ -83,20 +83,20 @@ class GeometryFacory {
    */
 
 
-  constructor (fssgEsri) {
-    _defineProperty(this, '_fssgEsri', void 0)
+  constructor(fssgEsri) {
+    _defineProperty(this, "_fssgEsri", void 0);
 
-    const instance = GeometryFacory._instanceMap.get(fssgEsri)
+    const instance = GeometryFacory._instanceMap.get(fssgEsri);
 
     if (instance) {
-      return instance
+      return instance;
     }
 
-    this._fssgEsri = fssgEsri
+    this._fssgEsri = fssgEsri;
 
-    GeometryFacory._instanceMap.set(fssgEsri, this)
+    GeometryFacory._instanceMap.set(fssgEsri, this);
 
-    return this
+    return this;
   }
   /**
    * 创建Esri点
@@ -109,11 +109,11 @@ class GeometryFacory {
    */
 
 
-  createPoint (options) {
+  createPoint(options) {
     return new Point({
       spatialReference: this._spatialReference,
       ...options
-    })
+    });
   }
   /**
    * 创建Esri线
@@ -126,11 +126,11 @@ class GeometryFacory {
    */
 
 
-  createPolyline (options) {
+  createPolyline(options) {
     return new Polyline({
       spatialReference: this._spatialReference,
       ...options
-    })
+    });
   }
   /**
    * 创建Esri面
@@ -143,11 +143,11 @@ class GeometryFacory {
    */
 
 
-  createPolygon (options) {
+  createPolygon(options) {
     return new Polygon({
       spatialReference: this._spatialReference,
       ...options
-    })
+    });
   }
   /**
    * 创建Esri范围
@@ -160,11 +160,11 @@ class GeometryFacory {
    */
 
 
-  createExtent (options) {
+  createExtent(options) {
     return new Extent({
       spatialReference: this._spatialReference,
       ...options
-    })
+    });
   }
   /**
    * 根据XY坐标创建Esri点
@@ -178,21 +178,21 @@ class GeometryFacory {
    */
 
 
-  createPointFromXY (...args) {
+  createPointFromXY(...args) {
     if (args.length === 2) {
-      const [x, y] = args
+      const [x, y] = args;
       return this.createPoint({
         x,
         y
-      })
+      });
     } else {
-      const xy = args[0]
-      const x = getXfromXY(xy)
-      const y = getYfromXY(xy)
+      const xy = args[0];
+      const x = getXfromXY(xy);
+      const y = getYfromXY(xy);
       return this.createPoint({
         x,
         y
-      })
+      });
     }
   }
   /**
@@ -209,21 +209,21 @@ class GeometryFacory {
    */
 
 
-  createPointFromLonLat (...args) {
+  createPointFromLonLat(...args) {
     if (args.length === 2) {
-      const [longitude, latitude] = args
+      const [longitude, latitude] = args;
       return this.createPoint({
         longitude,
         latitude
-      })
+      });
     } else {
-      const lonlat = args[0]
-      const longitude = getLonfromLonLat(lonlat)
-      const latitude = getLatfromLonLat(lonlat)
+      const lonlat = args[0];
+      const longitude = getLonfromLonLat(lonlat);
+      const latitude = getLatfromLonLat(lonlat);
       return this.createPoint({
         longitude,
         latitude
-      })
+      });
     }
   }
   /**
@@ -233,12 +233,12 @@ class GeometryFacory {
    */
 
 
-  createPolylineFromPoints (points) {
+  createPolylineFromPoints(points) {
     const polyline = this.createPolyline({
       paths: []
-    })
-    polyline.addPath(points)
-    return polyline
+    });
+    polyline.addPath(points);
+    return polyline;
   }
   /**
    * 根据XY坐标集创建Esri线
@@ -247,9 +247,9 @@ class GeometryFacory {
    */
 
 
-  createPolylineFromXYs (xys) {
-    const points = xys.map(xy => this.createPointFromXY(xy))
-    return this.createPolylineFromPoints(points)
+  createPolylineFromXYs(xys) {
+    const points = xys.map(xy => this.createPointFromXY(xy));
+    return this.createPolylineFromPoints(points);
   }
   /**
    * 根据经纬度集创建Esri线
@@ -258,9 +258,9 @@ class GeometryFacory {
    */
 
 
-  createPolylineFromLonLats (lonLats) {
-    const points = lonLats.map(lonLat => this.createPointFromLonLat(lonLat))
-    return this.createPolylineFromPoints(points)
+  createPolylineFromLonLats(lonLats) {
+    const points = lonLats.map(lonLat => this.createPointFromLonLat(lonLat));
+    return this.createPolylineFromPoints(points);
   }
   /**
    * 根据Esri点集创建Esri面
@@ -269,12 +269,12 @@ class GeometryFacory {
    */
 
 
-  createPolygonFromPoints (points) {
+  createPolygonFromPoints(points) {
     const polygon = this.createPolygon({
       rings: []
-    })
-    polygon.addRing(points)
-    return polygon
+    });
+    polygon.addRing(points);
+    return polygon;
   }
   /**
    * 根据Esri线创建Esri点集
@@ -284,10 +284,10 @@ class GeometryFacory {
    */
 
 
-  createPointsFromPolyline (polyline, pathIndex = 0) {
-    const count = polyline.paths[pathIndex]
-    const points = Array(count).map((_, i) => polyline.getPoint(pathIndex, i))
-    return points
+  createPointsFromPolyline(polyline, pathIndex = 0) {
+    const count = polyline.paths[pathIndex];
+    const points = Array(count).map((_, i) => polyline.getPoint(pathIndex, i));
+    return points;
   }
   /**
    * 根据Esri线创建Esri面
@@ -296,15 +296,15 @@ class GeometryFacory {
    */
 
 
-  createPolygonFromPolyline (polyline) {
+  createPolygonFromPolyline(polyline) {
     const polygon = this.createPolygon({
       rings: []
-    })
+    });
     polyline.paths.forEach((_, i) => {
-      const points = this.createPointsFromPolyline(polyline, i)
-      polygon.addRing(points)
-    })
-    return polygon
+      const points = this.createPointsFromPolyline(polyline, i);
+      polygon.addRing(points);
+    });
+    return polygon;
   }
   /**
    * 根据XY坐标集创建Esri面
@@ -313,10 +313,10 @@ class GeometryFacory {
    */
 
 
-  createPolygonFromXYs (xys) {
-    const points = xys.map(xy => this.createPointFromXY(xy))
-    const polygon = this.createPolygonFromPoints(points)
-    return polygon
+  createPolygonFromXYs(xys) {
+    const points = xys.map(xy => this.createPointFromXY(xy));
+    const polygon = this.createPolygonFromPoints(points);
+    return polygon;
   }
   /**
    * 根据经纬度集创建Esri面
@@ -325,10 +325,10 @@ class GeometryFacory {
    */
 
 
-  createPolygonFromLonLats (lonLats) {
-    const points = lonLats.map(lonLat => this.createPointFromLonLat(lonLat))
-    const polygon = this.createPolygonFromPoints(points)
-    return polygon
+  createPolygonFromLonLats(lonLats) {
+    const points = lonLats.map(lonLat => this.createPointFromLonLat(lonLat));
+    const polygon = this.createPolygonFromPoints(points);
+    return polygon;
   }
   /**
    * 创建贝塞尔曲线（二阶） Second-order
@@ -337,24 +337,24 @@ class GeometryFacory {
    */
 
 
-  createBezierCurve (pt1, pt2) {
-    const xys = []
-    const [x1, y1] = [pt1.x, pt1.y]
-    const [x2, y2] = [pt2.x, pt2.y]
-    const cx = x1 + (x2 - x1) / 2
-    const cy = y2
-    let t = 0
-    const num = 100
+  createBezierCurve(pt1, pt2) {
+    const xys = [];
+    const [x1, y1] = [pt1.x, pt1.y];
+    const [x2, y2] = [pt2.x, pt2.y];
+    const cx = x1 + (x2 - x1) / 2;
+    const cy = y2;
+    let t = 0;
+    const num = 100;
 
     for (let i = 1; i < num + 1; i++) {
       //用i当作t，算出点坐标，放入数组
-      t = i / num
-      const x = Math.pow(1 - t, 2) * x1 + 2 * t * (1 - t) * cx + Math.pow(t, 2) * x2
-      const y = Math.pow(1 - t, 2) * y1 + 2 * t * (1 - t) * cy + Math.pow(t, 2) * y2
-      xys.push([x, y])
+      t = i / num;
+      const x = Math.pow(1 - t, 2) * x1 + 2 * t * (1 - t) * cx + Math.pow(t, 2) * x2;
+      const y = Math.pow(1 - t, 2) * y1 + 2 * t * (1 - t) * cy + Math.pow(t, 2) * y2;
+      xys.push([x, y]);
     }
 
-    return this.createPolylineFromXYs(xys)
+    return this.createPolylineFromXYs(xys);
   }
 
 }
@@ -363,10 +363,10 @@ class GeometryFacory {
  * @param fssgEsri 地图应用
  */
 
-_defineProperty(GeometryFacory, '_instanceMap', new Map())
+_defineProperty(GeometryFacory, "_instanceMap", new Map());
 
-function createGeometryFactory (fssgEsri) {
-  return new GeometryFacory(fssgEsri)
+function createGeometryFactory(fssgEsri) {
+  return new GeometryFacory(fssgEsri);
 }
 
 /**
@@ -382,48 +382,48 @@ class LayerFactory {
   /**
    * 构造图层工厂实例
    */
-  constructor () {
+  constructor() {
     if (LayerFactory._instance) {
-      return LayerFactory._instance
+      return LayerFactory._instance;
     }
 
-    LayerFactory._instance = this
-    return this
+    LayerFactory._instance = this;
+    return this;
   }
 
-  createLayer (options) {
+  createLayer(options) {
     switch (options.layerType) {
       case 'graphicslayer':
-        return this.createGraphicsLayer(options)
+        return this.createGraphicsLayer(options);
 
       case 'grouplayer':
-        return this.createGroupLayer(options)
+        return this.createGroupLayer(options);
 
       case 'webtilelayer':
-        return this.createWebTileLayer(options)
+        return this.createWebTileLayer(options);
 
       case 'tilelayer':
-        return this.createTileLayer(options)
+        return this.createTileLayer(options);
 
       case 'dynamiclayer':
-        return this.createDynamicLayer(options)
+        return this.createDynamicLayer(options);
 
       case 'mapimagelayer':
-        return this.createMapImageLayer(options)
+        return this.createMapImageLayer(options);
 
       case 'sqllayer':
-        return this.createSqlLayer(options)
+        return this.createSqlLayer(options);
       // eslint-disable-line
 
       case 'sqllayer2':
-        return this.createSqlLayer2(options)
+        return this.createSqlLayer2(options);
       // eslint-disable-line
 
       case 'featurelayer':
-        return this.createFeatureLayer(options)
+        return this.createFeatureLayer(options);
 
       default:
-        return new Layer(options)
+        return new Layer(options);
     }
   }
   /**
@@ -437,8 +437,8 @@ class LayerFactory {
    */
 
 
-  createGraphicsLayer (options) {
-    return new GraphicsLayer(options)
+  createGraphicsLayer(options) {
+    return new GraphicsLayer(options);
   }
   /**
    * 创建GroupLayer
@@ -451,8 +451,8 @@ class LayerFactory {
    */
 
 
-  createGroupLayer (options) {
-    return new GroupLayer(options)
+  createGroupLayer(options) {
+    return new GroupLayer(options);
   }
   /**
    * 创建WebTileLayer
@@ -465,8 +465,8 @@ class LayerFactory {
    */
 
 
-  createWebTileLayer (options) {
-    return new WebTileLayer(options)
+  createWebTileLayer(options) {
+    return new WebTileLayer(options);
   }
   /**
    * 创建TileLayer
@@ -479,8 +479,8 @@ class LayerFactory {
    */
 
 
-  createTileLayer (options) {
-    return new TileLayer(options)
+  createTileLayer(options) {
+    return new TileLayer(options);
   }
   /**
    * 创建动态图层
@@ -488,24 +488,24 @@ class LayerFactory {
    */
 
 
-  createDynamicLayer (options) {
+  createDynamicLayer(options) {
     const layer = new MapImageLayer({ ...options,
       sublayers: []
-    })
+    });
     fetch(`${options === null || options === void 0 ? void 0 : options.url}?f=pjson`, {
       method: 'get'
     }).then(res => res.json()).then(result => {
-      let _result$layers$find
+      var _result$layers$find;
 
-      const serverName = (options === null || options === void 0 ? void 0 : options.serverName) ?? (options === null || options === void 0 ? void 0 : options.name) ?? ''
-      const id = (_result$layers$find = result.layers.find(item => item.name === serverName)) === null || _result$layers$find === void 0 ? void 0 : _result$layers$find.id // eslint-disable-next-line
+      const serverName = (options === null || options === void 0 ? void 0 : options.serverName) ?? (options === null || options === void 0 ? void 0 : options.name) ?? '';
+      const id = (_result$layers$find = result.layers.find(item => item.name === serverName)) === null || _result$layers$find === void 0 ? void 0 : _result$layers$find.id; // eslint-disable-next-line
       // @ts-ignore
 
       layer.sublayers = [{
         id
-      }]
-    })
-    return layer
+      }];
+    });
+    return layer;
   }
   /**
    * 创建MapImageLayer
@@ -513,8 +513,8 @@ class LayerFactory {
    */
 
 
-  createMapImageLayer (options) {
-    return new MapImageLayer(options)
+  createMapImageLayer(options) {
+    return new MapImageLayer(options);
   }
   /**
    * 创建SQL图层
@@ -522,24 +522,24 @@ class LayerFactory {
    */
 
 
-  createSqlLayer (options) {
-    const layer = this.createGraphicsLayer(options)
+  createSqlLayer(options) {
+    const layer = this.createGraphicsLayer(options);
     fetch(options.url, {
       method: 'get',
       mode: 'cors'
     }).then(res => res.json()).then(result => {
       result.forEach(row => {
         if (!row[options.sqlOptions.xField] || !row[options.sqlOptions.yField]) {
-          return
+          return;
         }
 
-        const attributes = row
-        let iconUrl
+        const attributes = row;
+        let iconUrl;
 
         if (options.sqlOptions.iconUrl) {
-          iconUrl = options.sqlOptions.iconUrl
+          iconUrl = options.sqlOptions.iconUrl;
         } else if (options.sqlOptions.iconUrlFuncStr) {
-          iconUrl = eval(options.sqlOptions.iconUrlFuncStr)
+          iconUrl = eval(options.sqlOptions.iconUrlFuncStr);
         }
 
         const props = {
@@ -554,7 +554,7 @@ class LayerFactory {
             type: 'simple-marker',
             color: '#4FAFEF'
           }
-        }
+        };
 
         if (iconUrl) {
           props['symbol'] = {
@@ -562,14 +562,14 @@ class LayerFactory {
             url: iconUrl,
             width: '32px',
             height: '32px'
-          }
+          };
         }
 
-        const graphic = new Graphic(props)
-        layer.graphics.add(graphic)
-      })
-    })
-    return layer
+        const graphic = new Graphic(props);
+        layer.graphics.add(graphic);
+      });
+    });
+    return layer;
   }
   /**
    * 创建SQL图层
@@ -577,11 +577,11 @@ class LayerFactory {
    */
 
 
-  createSqlLayer2 (options) {
+  createSqlLayer2(options) {
     const {
       url,
       ...others
-    } = options
+    } = options;
     const layer = this.createFeatureLayer({
       spatialReference: options.spatialReference,
       source: [],
@@ -589,7 +589,7 @@ class LayerFactory {
       geometryType: 'point',
       outFields: ['*'],
       ...others
-    })
+    });
 
     if (options.sqlOptions.iconUrl) {
       layer.renderer = {
@@ -600,14 +600,14 @@ class LayerFactory {
           width: '32px',
           height: '32px'
         }
-      }
+      };
     }
 
     fetch(options.url, {
       method: 'get',
       mode: 'cors'
     }).then(res => res.json()).then(result => {
-      const graphics = []
+      const graphics = [];
 
       if (result[0]) {
         layer.fields = [new Field({
@@ -618,26 +618,26 @@ class LayerFactory {
           name: key,
           alias: key,
           type: [options.sqlOptions.xField, options.sqlOptions.yField].includes(key) ? 'double' : 'string'
-        }))]
+        }))];
       }
 
       result.forEach((row, index) => {
         if (!row[options.sqlOptions.xField] || !row[options.sqlOptions.yField]) {
-          return
+          return;
         }
 
-        const attributes = row
-        attributes.oidoid = index + 1
+        const attributes = row;
+        attributes.oidoid = index + 1;
         Object.keys(attributes).forEach(key => {
           if (isNullOrUndefined(attributes[key])) {
-            attributes[key] = ''
+            attributes[key] = '';
           } else if (![options.sqlOptions.xField, options.sqlOptions.yField].includes(key)) {
-            attributes[key] = String(attributes[key])
+            attributes[key] = String(attributes[key]);
           }
-        })
+        });
         const props = {
           attributes: Object.fromEntries(layer.fields.map(item => {
-            return [item.name, attributes[item.name]]
+            return [item.name, attributes[item.name]];
           })),
           geometry: {
             type: 'point',
@@ -645,18 +645,18 @@ class LayerFactory {
             y: row[options.sqlOptions.yField],
             spatialReference: options.spatialReference
           }
-        }
-        const graphic = new Graphic(props)
-        graphics.push(graphic)
-      })
+        };
+        const graphic = new Graphic(props);
+        graphics.push(graphic);
+      });
       layer.applyEdits({
         addFeatures: graphics
-      }) // eslint-disable-next-line
+      }); // eslint-disable-next-line
       // @ts-ignore
 
-      layer.source = graphics
-    })
-    return layer
+      layer.source = graphics;
+    });
+    return layer;
   }
   /**
    * 创建FeatureLayer
@@ -669,8 +669,8 @@ class LayerFactory {
    */
 
 
-  createFeatureLayer (options) {
-    return new FeatureLayer(options)
+  createFeatureLayer(options) {
+    return new FeatureLayer(options);
   }
 
 }
@@ -679,10 +679,10 @@ class LayerFactory {
  */
 
 
-_defineProperty(LayerFactory, '_instance', void 0)
+_defineProperty(LayerFactory, "_instance", void 0);
 
-function createLayerFactory () {
-  return new LayerFactory()
+function createLayerFactory() {
+  return new LayerFactory();
 }
 
 /**
@@ -690,12 +690,12 @@ function createLayerFactory () {
  */
 
 class FssgEsriPlugin extends FssgMapPlugin {
-  constructor (...args) {
-    super(...args)
+  constructor(...args) {
+    super(...args);
 
-    _defineProperty(this, 'map_', void 0)
+    _defineProperty(this, "map_", void 0);
 
-    _defineProperty(this, 'view_', void 0)
+    _defineProperty(this, "view_", void 0);
   }
 
   //#endregion
@@ -703,8 +703,8 @@ class FssgEsriPlugin extends FssgMapPlugin {
   /**
    * 绑定的地图应用实例
    */
-  get $ () {
-    return this.map_.$owner
+  get $() {
+    return this.map_.$owner;
   }
   /**
    * 安装插件
@@ -712,33 +712,33 @@ class FssgEsriPlugin extends FssgMapPlugin {
    */
 
 
-  installPlugin (fssgEsri) {
-    this.map_ = fssgEsri.map
-    this.view_ = fssgEsri.view
-    return this
+  installPlugin(fssgEsri) {
+    this.map_ = fssgEsri.map;
+    this.view_ = fssgEsri.view;
+    return this;
   }
 
 }
 
-let _gotoPromise
+let _gotoPromise;
 
-let _handleId
+let _handleId;
 
-function goto (view, target, options) {
-  clearTimeout(_handleId)
-  const gotoFunc = view.goTo.bind(view, target, options)
+function goto(view, target, options) {
+  clearTimeout(_handleId);
+  const gotoFunc = view.goTo.bind(view, target, options);
 
   if (_gotoPromise) {
-    _gotoPromise = _gotoPromise.then(() => gotoFunc())
+    _gotoPromise = _gotoPromise.then(() => gotoFunc());
   } else {
-    _gotoPromise = gotoFunc()
+    _gotoPromise = gotoFunc();
   }
 
-  _handleId = setTimeout(() => _gotoPromise = undefined, 2500)
+  _handleId = setTimeout(() => _gotoPromise = undefined, 2500);
 }
 
-load()
-esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S'
+load();
+esriConfig.apiKey = 'AAPKb95001bcb6a34be7a32b3fcb75eb27d1ujL7yX9tcvWSbUPoKwptBe_57mwGWOpklkdWrPt3L3OaW96gkJLjRctcOo1OvJ1S';
 /**
  * 地图应用
  */
@@ -759,84 +759,84 @@ class FssgEsri extends FssgMap {
   /**
     * 地图对象
     */
-  get map () {
-    return this._map
+  get map() {
+    return this._map;
   }
   /**
     * 视图对象
     */
 
 
-  get view () {
-    return this._view
+  get view() {
+    return this._view;
   }
   /**
    * 配置项
    */
 
 
-  get options () {
-    return this.options_
+  get options() {
+    return this.options_;
   }
   /**
    * 空间坐标系
    */
 
 
-  get sr () {
-    let _this$_view
+  get sr() {
+    var _this$_view;
 
     if (!this._view) {
-      error(this, `_view未实例无法获取spatialReference属性`)
+      error(this, `_view未实例无法获取spatialReference属性`);
     }
 
-    const sr = this === null || this === void 0 ? void 0 : (_this$_view = this._view) === null || _this$_view === void 0 ? void 0 : _this$_view.spatialReference
-    return sr
+    const sr = this === null || this === void 0 ? void 0 : (_this$_view = this._view) === null || _this$_view === void 0 ? void 0 : _this$_view.spatialReference;
+    return sr;
   }
   /**
    * 视图中心点
    */
 
 
-  get center () {
-    let _this$_view2
+  get center() {
+    var _this$_view2;
 
     if (!this._view) {
-      error(this, `_view未实例无法获取center属性`)
+      error(this, `_view未实例无法获取center属性`);
     }
 
-    const center = this === null || this === void 0 ? void 0 : (_this$_view2 = this._view) === null || _this$_view2 === void 0 ? void 0 : _this$_view2.center
-    return center
+    const center = this === null || this === void 0 ? void 0 : (_this$_view2 = this._view) === null || _this$_view2 === void 0 ? void 0 : _this$_view2.center;
+    return center;
   }
   /**
    * 视图范围
    */
 
 
-  get extent () {
-    let _this$_view3
+  get extent() {
+    var _this$_view3;
 
     if (!this._view) {
-      error(this, `_view未实例无法获取extent属性`)
+      error(this, `_view未实例无法获取extent属性`);
     }
 
-    const extent = this === null || this === void 0 ? void 0 : (_this$_view3 = this._view) === null || _this$_view3 === void 0 ? void 0 : _this$_view3.extent
-    return extent
+    const extent = this === null || this === void 0 ? void 0 : (_this$_view3 = this._view) === null || _this$_view3 === void 0 ? void 0 : _this$_view3.extent;
+    return extent;
   }
   /**
    * 缩放等级
    */
 
 
-  get zoom () {
-    let _this$_view4
+  get zoom() {
+    var _this$_view4;
 
     if (!this._view) {
-      error(this, `_view未实例无法获取zoom属性`)
+      error(this, `_view未实例无法获取zoom属性`);
     }
 
-    const zoom = this === null || this === void 0 ? void 0 : (_this$_view4 = this._view) === null || _this$_view4 === void 0 ? void 0 : _this$_view4.zoom
-    return zoom
+    const zoom = this === null || this === void 0 ? void 0 : (_this$_view4 = this._view) === null || _this$_view4 === void 0 ? void 0 : _this$_view4.zoom;
+    return zoom;
   } //#endregion
   //#region 构造函数
 
@@ -847,7 +847,7 @@ class FssgEsri extends FssgMap {
    */
 
 
-  constructor (container, options) {
+  constructor(container, options) {
     super(container, options, {
       viewOptions: {
         center: [0, 0],
@@ -865,33 +865,33 @@ class FssgEsri extends FssgMap {
       mapOptions: {},
       debug: false,
       debugName: 'fssgEsri'
-    })
+    });
 
-    _defineProperty(this, 'basemap', void 0)
+    _defineProperty(this, "basemap", void 0);
 
-    _defineProperty(this, 'mapElement', void 0)
+    _defineProperty(this, "mapElement", void 0);
 
-    _defineProperty(this, 'mapTools', void 0)
+    _defineProperty(this, "mapTools", void 0);
 
-    _defineProperty(this, 'mapCursor', void 0)
+    _defineProperty(this, "mapCursor", void 0);
 
-    _defineProperty(this, 'mapLayers', void 0)
+    _defineProperty(this, "mapLayers", void 0);
 
-    _defineProperty(this, 'hawkeye', void 0)
+    _defineProperty(this, "hawkeye", void 0);
 
-    _defineProperty(this, 'layerTree', void 0)
+    _defineProperty(this, "layerTree", void 0);
 
-    _defineProperty(this, 'mapModules', void 0)
+    _defineProperty(this, "mapModules", void 0);
 
-    _defineProperty(this, 'mouseTips', void 0)
+    _defineProperty(this, "mouseTips", void 0);
 
-    _defineProperty(this, 'overlays', void 0)
+    _defineProperty(this, "overlays", void 0);
 
-    _defineProperty(this, 'viewCliper', void 0)
+    _defineProperty(this, "viewCliper", void 0);
 
-    _defineProperty(this, '_map', void 0)
+    _defineProperty(this, "_map", void 0);
 
-    _defineProperty(this, '_view', void 0)
+    _defineProperty(this, "_view", void 0);
   } //#endregion
   //#region 私有方法
 
@@ -900,66 +900,66 @@ class FssgEsri extends FssgMap {
    */
 
 
-  _initMap () {
+  _initMap() {
     const {
       mapOptions
-    } = this.options_
-    const map = new ArcGISMap(mapOptions)
+    } = this.options_;
+    const map = new ArcGISMap(mapOptions);
     this._map = Object.assign(map, {
       $owner: this
-    })
-    return this
+    });
+    return this;
   }
   /**
    * 初始化视图
    */
 
 
-  _initView () {
+  _initView() {
     const {
       viewOptions
-    } = this.options_
+    } = this.options_;
     const view = new MapView({ ...viewOptions,
       map: this._map,
       container: this.container
-    })
+    });
     this._view = Object.assign(view, {
       $owner: this
-    })
-    return this
+    });
+    return this;
   }
   /**
    * 初始化静态资源
    */
 
 
-  _initAssetsPath () {
+  _initAssetsPath() {
     const {
       assetsPath
-    } = this.options_
-    assetsPath && (esriConfig.assetsPath = assetsPath)
-    return this
+    } = this.options_;
+    assetsPath && (esriConfig.assetsPath = assetsPath);
+    return this;
   }
   /**
    * 初始化地图容器样式（移除focus时的边框样式）
    */
 
 
-  _initRemoveOnlineStyle () {
-    document.styleSheets[0].insertRule(`.esri-view { outline: none !important }`)
-    document.styleSheets[0].insertRule(`.esri-view .esri-view-surface { outline: none !important }`)
-    document.styleSheets[0].insertRule(`.esri-view .esri-view-surface--inset-outline:focus::after { outline: none !important }`)
-    return this
+  _initRemoveOnlineStyle() {
+    document.styleSheets[0].insertRule(`.esri-view { outline: none !important }`);
+    document.styleSheets[0].insertRule(`.esri-view .esri-view-surface { outline: none !important }`);
+    document.styleSheets[0].insertRule(`.esri-view .esri-view-surface--inset-outline:focus::after { outline: none !important }`);
+    return this;
   }
 
-  _initBeginCenter () {
+  _initBeginCenter() {
     const {
       centerX,
       centerY
-    } = this.options_
+    } = this.options_;
 
     if (isNullOrUndefined(centerX) || isNullOrUndefined(centerY)) {
-      return this
+      return this;
     }
 
     this.when().then(() => {
@@ -967,16 +967,16 @@ class FssgEsri extends FssgMap {
         x: centerX,
         y: centerY,
         spatialReference: this.sr
-      })
-      this.view.center = point
-    })
-    return this
+      });
+      this.view.center = point;
+    });
+    return this;
   }
 
-  goto (target, options) {
-    goto(this.view, target, options)
+  goto(target, options) {
+    goto(this.view, target, options);
 
-    return this
+    return this;
   } //#endregion
   //#region 公有方法
 
@@ -985,10 +985,10 @@ class FssgEsri extends FssgMap {
    */
 
 
-  mount () {
-    this._initAssetsPath()._initMap()._initView()._initRemoveOnlineStyle()._initBeginCenter().fire('loaded')
+  mount() {
+    this._initAssetsPath()._initMap()._initView()._initRemoveOnlineStyle()._initBeginCenter().fire('loaded');
 
-    return this
+    return this;
   }
   /**
    * 缩放
@@ -997,12 +997,12 @@ class FssgEsri extends FssgMap {
    */
 
 
-  zoomIn (num = 1, options) {
-    const zoom = this.zoom
+  zoomIn(num = 1, options) {
+    const zoom = this.zoom;
     this.goto({
       zoom: zoom + Math.round(num)
-    }, options)
-    return this
+    }, options);
+    return this;
   }
   /**
    * 缩放
@@ -1011,12 +1011,12 @@ class FssgEsri extends FssgMap {
    */
 
 
-  zoomOut (num = 1, options) {
-    const zoom = this.zoom
+  zoomOut(num = 1, options) {
+    const zoom = this.zoom;
     this.goto({
       zoom: zoom - Math.round(num)
-    }, options)
-    return this
+    }, options);
+    return this;
   }
   /**
    * 缩放至
@@ -1025,11 +1025,11 @@ class FssgEsri extends FssgMap {
    */
 
 
-  zoomTo (zoom, options) {
+  zoomTo(zoom, options) {
     this.goto({
       zoom
-    }, options)
-    return this
+    }, options);
+    return this;
   }
   /**
    * 定位
@@ -1039,18 +1039,18 @@ class FssgEsri extends FssgMap {
    */
 
 
-  locateToXY (xy, zoom, options) {
-    const center = createGeometryFactory(this).createPointFromXY(xy)
+  locateToXY(xy, zoom, options) {
+    const center = createGeometryFactory(this).createPointFromXY(xy);
 
     if (options !== null && options !== void 0 && options.isZoomAdd && zoom) {
-      zoom = this.zoom + zoom
+      zoom = this.zoom + zoom;
     }
 
     this.goto({
       center,
       zoom
-    }, options)
-    return this
+    }, options);
+    return this;
   }
   /**
    * 定位
@@ -1060,28 +1060,28 @@ class FssgEsri extends FssgMap {
    */
 
 
-  locateToLonlat (lonLat, zoom, options) {
-    const center = createGeometryFactory(this).createPointFromLonLat(lonLat)
+  locateToLonlat(lonLat, zoom, options) {
+    const center = createGeometryFactory(this).createPointFromLonLat(lonLat);
 
     if (options !== null && options !== void 0 && options.isZoomAdd && zoom) {
-      zoom = this.zoom + zoom
+      zoom = this.zoom + zoom;
     }
 
     this.goto({
       center
-    }, options)
-    return this
+    }, options);
+    return this;
   }
   /**
    * 重置地图应用
    */
 
 
-  reset () {
+  reset() {
     return new Promise(resolve => {
-      this._view.destroy()
+      this._view.destroy();
 
-      this.mount()
+      this.mount();
 
       for (const prop in this) {
         if (this[prop] instanceof FssgEsriPlugin) {
@@ -1089,8 +1089,8 @@ class FssgEsri extends FssgMap {
         }
       }
 
-      resolve(this)
-    })
+      resolve(this);
+    });
   }
   /**
    * 经纬度转投影坐标
@@ -1099,21 +1099,21 @@ class FssgEsri extends FssgMap {
    */
 
 
-  lonLatToXY (lonLat, sr = this.sr) {
-    const longitude = getLonfromLonLat(lonLat)
-    const latitude = getLatfromLonLat(lonLat)
+  lonLatToXY(lonLat, sr = this.sr) {
+    const longitude = getLonfromLonLat(lonLat);
+    const latitude = getLatfromLonLat(lonLat);
     const point = createGeometryFactory(this).createPoint({
       longitude,
       latitude,
       spatialReference: new SpatialReference({
         wkid: 4326
       })
-    })
+    });
     const {
       x,
       y
-    } = project(point, sr)
-    return [x, y]
+    } = project(point, sr);
+    return [x, y];
   }
   /**
    * 投影坐标转经纬度
@@ -1122,21 +1122,21 @@ class FssgEsri extends FssgMap {
    */
 
 
-  xyToLonLat (xy, sr = this.sr) {
-    const x = getXfromXY(xy)
-    const y = getYfromXY(xy)
+  xyToLonLat(xy, sr = this.sr) {
+    const x = getXfromXY(xy);
+    const y = getYfromXY(xy);
     const point = createGeometryFactory(this).createPoint({
       x,
       y,
       spatialReference: sr
-    })
+    });
     const {
       longitude,
       latitude
     } = project(point, new SpatialReference({
       wkid: 4326
-    }))
-    return [longitude, latitude]
+    }));
+    return [longitude, latitude];
   }
 
 }
@@ -1161,59 +1161,59 @@ class Basemap extends FssgEsriPlugin {
   /**
    * 底图可见性
    */
-  get visible () {
-    return this._visible
+  get visible() {
+    return this._visible;
   }
   /**
    * 底图可见性
    */
 
 
-  set visible (v) {
+  set visible(v) {
     if (v === this._visible) {
-      return
+      return;
     }
 
     [...this._itemPool.values()].forEach(item => {
-      item.forEach(lyr => lyr.visible = v)
-    })
-    this._visible = v
+      item.forEach(lyr => lyr.visible = v);
+    });
+    this._visible = v;
     this.fire('changed:visible', {
       visible: v
-    })
+    });
   }
   /**
    * 当前底图选中项
    */
 
 
-  get selectedKey () {
-    return this._selectedKey
+  get selectedKey() {
+    return this._selectedKey;
   }
   /**
    * 当前底图选中项
    */
 
 
-  set selectedKey (key) {
+  set selectedKey(key) {
     if (key === this._selectedKey) {
-      return
+      return;
     }
 
-    const item = this._itemPool.get(key)
+    const item = this._itemPool.get(key);
 
     if (!item) {
-      warn(this, `无底图项${key}`)
-      return
+      warn(this, `无底图项${key}`);
+      return;
     } // eslint-disable-next-line
     // @ts-ignore
 
 
-    this.map_.basemap.baseLayers = item
-    this._selectedKey = key
+    this.map_.basemap.baseLayers = item;
+    this._selectedKey = key;
     this.fire('changed:selected-key', {
       selectedKey: key
-    })
+    });
   }
   /**
    * 构造底图控制插件
@@ -1221,22 +1221,22 @@ class Basemap extends FssgEsriPlugin {
    */
 
 
-  constructor (options) {
-    let _options$items
+  constructor(options) {
+    var _options$items;
 
     super(options, {
       items: [],
       selectedKey: options === null || options === void 0 ? void 0 : (_options$items = options.items) === null || _options$items === void 0 ? void 0 : _options$items[0].key,
       visible: true
-    })
+    });
 
-    _defineProperty(this, '_selectedKey', void 0)
+    _defineProperty(this, "_selectedKey", void 0);
 
-    _defineProperty(this, '_visible', void 0)
+    _defineProperty(this, "_visible", void 0);
 
-    _defineProperty(this, '_itemPool', void 0)
+    _defineProperty(this, "_itemPool", void 0);
 
-    this._itemPool = new Map()
+    this._itemPool = new Map();
   }
   /**
    * 初始化
@@ -1244,61 +1244,61 @@ class Basemap extends FssgEsriPlugin {
    */
 
 
-  _init () {
-    let _this$options_$items
+  _init() {
+    var _this$options_$items;
 
     if (!this.map_.basemap) {
-      this.map_.basemap = new EsriBasemap()
+      this.map_.basemap = new EsriBasemap();
     }
 
     (_this$options_$items = this.options_.items) === null || _this$options_$items === void 0 ? void 0 : _this$options_$items.forEach(item => {
       if (item.lyrs) {
-        const layers = []
+        const layers = [];
         item.lyrs.forEach(o => {
           if (o.type === 'webtilelayer') {
-            o.props.urlTemplate = o.url
+            o.props.urlTemplate = o.url;
           } else {
-            o.props.url = o.url
+            o.props.url = o.url;
           }
 
           layers.push(createLayerFactory().createLayer({
             layerType: o.type,
             ...o.props
-          }))
-        })
+          }));
+        });
 
-        this._itemPool.set(item.key, layers)
+        this._itemPool.set(item.key, layers);
 
-        return
+        return;
       }
 
       if (item.type === 'webtilelayer') {
-        item.props.urlTemplate = item.url
+        item.props.urlTemplate = item.url;
       } else {
-        item.props.url = item.url
+        item.props.url = item.url;
       }
 
       const layer = createLayerFactory().createLayer({
         layerType: item.type,
         ...item.props
-      })
+      });
 
       if (layer) {
-        this._itemPool.set(item.key, [layer])
+        this._itemPool.set(item.key, [layer]);
       }
-    })
+    });
 
-    this._createTianDiTu() // eslint-disable-next-line
+    this._createTianDiTu(); // eslint-disable-next-line
     // @ts-ignore
 
 
-    this._visible = void 0 // eslint-disable-next-line
+    this._visible = void 0; // eslint-disable-next-line
     // @ts-ignore
 
-    this._selectedKey = void 0
-    this.visible = !!this.options_.visible
-    this.selectedKey = this.options_.selectedKey ?? '天地图矢量3857'
-    return this
+    this._selectedKey = void 0;
+    this.visible = !!this.options_.visible;
+    this.selectedKey = this.options_.selectedKey ?? '天地图矢量3857';
+    return this;
   }
   /**
    * 创建天地图底图项
@@ -1306,20 +1306,20 @@ class Basemap extends FssgEsriPlugin {
    */
 
 
-  _createTianDiTu () {
+  _createTianDiTu() {
     const createTianDiTuItem = (name, proj) => {
-      this.createBasemapItem(`天地图${name}${proj}`, createLayerFactory().createWebTileLayer(Basemap[`BASEMAP_TIAN_DI_TU_${proj}`][`${name}底图`]))
-      this.createBasemapItem(`天地图${name}含注记${proj}`, [createLayerFactory().createWebTileLayer(Basemap[`BASEMAP_TIAN_DI_TU_${proj}`][`${name}底图`]), createLayerFactory().createWebTileLayer(Basemap[`BASEMAP_TIAN_DI_TU_${proj}`][`${name}注记`])])
-      return createTianDiTuItem
-    }
+      this.createBasemapItem(`天地图${name}${proj}`, createLayerFactory().createWebTileLayer(Basemap[`BASEMAP_TIAN_DI_TU_${proj}`][`${name}底图`]));
+      this.createBasemapItem(`天地图${name}含注记${proj}`, [createLayerFactory().createWebTileLayer(Basemap[`BASEMAP_TIAN_DI_TU_${proj}`][`${name}底图`]), createLayerFactory().createWebTileLayer(Basemap[`BASEMAP_TIAN_DI_TU_${proj}`][`${name}注记`])]);
+      return createTianDiTuItem;
+    };
 
-    createTianDiTuItem('影像', '4326')('矢量', '4326')('地形', '4326')('影像', '3857')('矢量', '3857')('地形', '3857')
-    return this
+    createTianDiTuItem('影像', '4326')('矢量', '4326')('地形', '4326')('影像', '3857')('矢量', '3857')('地形', '3857');
+    return this;
   }
 
-  installPlugin (fssgEsri) {
-    super.installPlugin(fssgEsri)
-    return this._init()
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
   /**
    * 创建底图项
@@ -1329,19 +1329,19 @@ class Basemap extends FssgEsriPlugin {
    */
 
 
-  createBasemapItem (key, arg1) {
-    const layers = Array.isArray(arg1) ? arg1 : [arg1]
+  createBasemapItem(key, arg1) {
+    const layers = Array.isArray(arg1) ? arg1 : [arg1];
 
-    this._itemPool.set(key, layers)
+    this._itemPool.set(key, layers);
 
-    return this
+    return this;
   }
 
 }
 
-_defineProperty(Basemap, 'BASEMAP_TIAN_DI_TU_3857', BASEMAP_TIAN_DI_TU_3857)
+_defineProperty(Basemap, "BASEMAP_TIAN_DI_TU_3857", BASEMAP_TIAN_DI_TU_3857);
 
-_defineProperty(Basemap, 'BASEMAP_TIAN_DI_TU_4326', BASEMAP_TIAN_DI_TU_4326)
+_defineProperty(Basemap, "BASEMAP_TIAN_DI_TU_4326", BASEMAP_TIAN_DI_TU_4326);
 
 /**
  * 图元控制插件
@@ -1361,12 +1361,12 @@ class MapElement extends FssgEsriPlugin {
   /** 图元图层存储图层组 */
   //#endregion
   //#region getter
-  get graphicsLayer () {
-    return this._graphicsLayer
+  get graphicsLayer() {
+    return this._graphicsLayer;
   }
 
-  get highlightLayer () {
-    return this._highlightLayer
+  get highlightLayer() {
+    return this._highlightLayer;
   } //#endregion
 
   /**
@@ -1375,7 +1375,7 @@ class MapElement extends FssgEsriPlugin {
    */
 
 
-  constructor (options) {
+  constructor(options) {
     super(options, {
       graphicsSymbol: {
         marker: {
@@ -1431,177 +1431,177 @@ class MapElement extends FssgEsriPlugin {
           }
         }
       }
-    })
+    });
 
-    _defineProperty(this, '_graphicsSymbol', void 0)
+    _defineProperty(this, "_graphicsSymbol", void 0);
 
-    _defineProperty(this, '_highlightSymbol', void 0)
+    _defineProperty(this, "_highlightSymbol", void 0);
 
-    _defineProperty(this, '_graphicsLayer', void 0)
+    _defineProperty(this, "_graphicsLayer", void 0);
 
-    _defineProperty(this, '_highlightLayer', void 0)
+    _defineProperty(this, "_highlightLayer", void 0);
 
-    _defineProperty(this, '_groupLayer', void 0)
+    _defineProperty(this, "_groupLayer", void 0);
   }
 
-  _init () {
-    this._graphicsSymbol = this.options_.graphicsSymbol ?? {}
-    this._highlightSymbol = this.options_.highlightSymbol ?? {}
+  _init() {
+    this._graphicsSymbol = this.options_.graphicsSymbol ?? {};
+    this._highlightSymbol = this.options_.highlightSymbol ?? {};
     this._graphicsLayer = createLayerFactory().createLayer({
       layerType: 'graphicslayer'
-    })
+    });
     this._highlightLayer = createLayerFactory().createLayer({
       layerType: 'graphicslayer'
-    })
+    });
     this._groupLayer = createLayerFactory().createLayer({
       layerType: 'grouplayer',
       layers: [this._graphicsLayer, this._highlightLayer]
-    })
-    this.map_.layers.add(this._groupLayer)
+    });
+    this.map_.layers.add(this._groupLayer);
     this.map_.layers.on('after-changes', () => {
-      const index = this.map_.layers.indexOf(this._groupLayer)
+      const index = this.map_.layers.indexOf(this._groupLayer);
 
       if (index !== this.map_.layers.length - 1) {
-        this.map_.layers.reorder(this._groupLayer, this.map_.layers.length - 1)
+        this.map_.layers.reorder(this._groupLayer, this.map_.layers.length - 1);
       }
-    })
-    return this
+    });
+    return this;
   }
 
-  _getSymbol (type, isHighlight) {
-    const _symbol = isHighlight ? this._highlightSymbol : this._graphicsSymbol
+  _getSymbol(type, isHighlight) {
+    const _symbol = isHighlight ? this._highlightSymbol : this._graphicsSymbol;
 
-    let symbol
+    let symbol;
 
     switch (type) {
       case 'point':
       case 'multipoint':
-        symbol = deepCopyJSON(_symbol.marker)
-        break
+        symbol = deepCopyJSON(_symbol.marker);
+        break;
 
       case 'polyline':
-        symbol = deepCopyJSON(_symbol.line)
-        break
+        symbol = deepCopyJSON(_symbol.line);
+        break;
 
       case 'polygon':
       case 'extent':
-        symbol = deepCopyJSON(_symbol.fill)
-        break
+        symbol = deepCopyJSON(_symbol.fill);
+        break;
       // case 'mesh': // TODO
       //   break
 
       default:
-        warn(this, `类型${type}无法匹配符号`)
-        break
+        warn(this, `类型${type}无法匹配符号`);
+        break;
     }
 
-    return symbol ?? {}
+    return symbol ?? {};
   }
 
-  _addGraphics (graphics) {
-    this._graphicsLayer.graphics.addMany(graphics)
+  _addGraphics(graphics) {
+    this._graphicsLayer.graphics.addMany(graphics);
 
-    return this
+    return this;
   }
 
-  _addHighlight (graphics) {
-    this._highlightLayer.graphics.addMany(graphics)
+  _addHighlight(graphics) {
+    this._highlightLayer.graphics.addMany(graphics);
 
-    return this
+    return this;
   }
 
-  installPlugin (fssgEsri) {
-    super.installPlugin(fssgEsri)
-    return this._init()
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
 
-  add (arg0, arg1) {
-    let _arg
+  add(arg0, arg1) {
+    var _arg;
 
     if (arg0 instanceof Geometry || ((_arg = arg0) === null || _arg === void 0 ? void 0 : _arg[0]) instanceof Geometry) {
-      const graphics = []
-      arg0 = arg0
-      const geometries = Array.isArray(arg0) ? arg0 : [arg0]
+      const graphics = [];
+      arg0 = arg0;
+      const geometries = Array.isArray(arg0) ? arg0 : [arg0];
       geometries.forEach(geometry => {
-        arg1 = $extend(true, {}, this._getSymbol(geometry.type), arg1)
+        arg1 = $extend(true, {}, this._getSymbol(geometry.type), arg1);
         const graphic = new Graphic({
           geometry,
           symbol: arg1
-        })
-        graphics.push(graphic)
-      })
+        });
+        graphics.push(graphic);
+      });
 
-      this._addGraphics(graphics)
+      this._addGraphics(graphics);
 
-      return Array.isArray(arg0) ? graphics : graphics[0]
+      return Array.isArray(arg0) ? graphics : graphics[0];
     } else {
-      arg0 = Array.isArray(arg0) ? arg0 : [arg0]
-      return this._addGraphics(arg0)
+      arg0 = Array.isArray(arg0) ? arg0 : [arg0];
+      return this._addGraphics(arg0);
     }
   }
 
-  remove (arg0) {
-    arg0 = Array.isArray(arg0) ? arg0 : [arg0]
+  remove(arg0) {
+    arg0 = Array.isArray(arg0) ? arg0 : [arg0];
 
-    this._graphicsLayer.graphics.removeMany(arg0)
+    this._graphicsLayer.graphics.removeMany(arg0);
 
-    this._highlightLayer.graphics.removeMany(arg0)
+    this._highlightLayer.graphics.removeMany(arg0);
 
-    return this
+    return this;
   }
 
-  clear (withHighlight) {
-    this._graphicsLayer.graphics.removeAll()
+  clear(withHighlight) {
+    this._graphicsLayer.graphics.removeAll();
 
-    withHighlight && this._highlightLayer.graphics.removeAll()
-    return this
+    withHighlight && this._highlightLayer.graphics.removeAll();
+    return this;
   }
 
-  set (arg0, arg1) {
-    return this.clear().add(arg0, arg1)
+  set(arg0, arg1) {
+    return this.clear().add(arg0, arg1);
   }
 
-  addHighlight (arg0, arg1) {
-    let _arg2
+  addHighlight(arg0, arg1) {
+    var _arg2;
 
     if (arg0 instanceof Geometry || ((_arg2 = arg0) === null || _arg2 === void 0 ? void 0 : _arg2[0]) instanceof Geometry) {
-      const graphics = []
-      arg0 = arg0
-      const geometries = Array.isArray(arg0) ? arg0 : [arg0]
+      const graphics = [];
+      arg0 = arg0;
+      const geometries = Array.isArray(arg0) ? arg0 : [arg0];
       geometries.forEach(geometry => {
-        arg1 = $extend(true, {}, this._getSymbol(geometry.type, true), arg1)
+        arg1 = $extend(true, {}, this._getSymbol(geometry.type, true), arg1);
         const graphic = new Graphic({
           geometry,
           symbol: arg1
-        })
-        graphics.push(graphic)
-      })
+        });
+        graphics.push(graphic);
+      });
 
-      this._addHighlight(graphics)
+      this._addHighlight(graphics);
 
-      return Array.isArray(arg0) ? graphics : graphics[0]
+      return Array.isArray(arg0) ? graphics : graphics[0];
     } else {
-      arg0 = Array.isArray(arg0) ? arg0 : [arg0]
-      return this._addHighlight(arg0)
+      arg0 = Array.isArray(arg0) ? arg0 : [arg0];
+      return this._addHighlight(arg0);
     }
   }
 
-  removeHighlight (arg0) {
-    arg0 = Array.isArray(arg0) ? arg0 : [arg0]
+  removeHighlight(arg0) {
+    arg0 = Array.isArray(arg0) ? arg0 : [arg0];
 
-    this._highlightLayer.graphics.removeMany(arg0)
+    this._highlightLayer.graphics.removeMany(arg0);
 
-    return this
+    return this;
   }
 
-  clearHighlight () {
-    this._highlightLayer.graphics.removeAll()
+  clearHighlight() {
+    this._highlightLayer.graphics.removeAll();
 
-    return this
+    return this;
   }
 
-  setHighlight (arg0, arg1) {
-    return this.clearHighlight().addHighlight(arg0, arg1)
+  setHighlight(arg0, arg1) {
+    return this.clearHighlight().addHighlight(arg0, arg1);
   }
 
 }
@@ -1621,8 +1621,8 @@ class FssgEsriBaseTool extends BaseTool {
    * 视图对象
    */
   //#endregion
-  get $ () {
-    return this.map_.$owner
+  get $() {
+    return this.map_.$owner;
   } //#region 构造函数
 
   /**
@@ -1632,15 +1632,15 @@ class FssgEsriBaseTool extends BaseTool {
    */
 
 
-  constructor (map, view, options, defaultOptions) {
-    super(options, defaultOptions)
+  constructor(map, view, options, defaultOptions) {
+    super(options, defaultOptions);
 
-    _defineProperty(this, 'map_', void 0)
+    _defineProperty(this, "map_", void 0);
 
-    _defineProperty(this, 'view_', void 0)
+    _defineProperty(this, "view_", void 0);
 
-    this.map_ = map
-    this.view_ = view
+    this.map_ = map;
+    this.view_ = view;
   }
 
 }
@@ -1661,30 +1661,30 @@ class ZoomHomeTool extends FssgEsriBaseTool {
    * @param options 配置项
    * @param defaultOptions 默认配置项
    */
-  constructor (map, view, options, defaultOptions) {
-    super(map, view, options, defaultOptions)
+  constructor(map, view, options, defaultOptions) {
+    super(map, view, options, defaultOptions);
 
-    _defineProperty(this, 'home', void 0)
+    _defineProperty(this, "home", void 0);
 
-    view.when().then(() => this.home = view.extent)
+    view.when().then(() => this.home = view.extent);
   }
   /**
    * 工具激活时触发
    */
 
 
-  onToolActived_ (e) {
+  onToolActived_(e) {
     if (!super.onToolActived_(e)) {
-      return false
+      return false;
     }
 
     if (!this.home) {
-      warn(this, '无定位范围')
-      return true
+      warn(this, '无定位范围');
+      return true;
     }
 
-    this.$.goto(this.home)
-    return true
+    this.$.goto(this.home);
+    return true;
   }
 
 }
@@ -1717,17 +1717,17 @@ class DrawTool extends FssgEsriBaseTool {
    * @param map 地图对象
    * @param view 视图对象
    */
-  constructor (map, view, options) {
+  constructor(map, view, options) {
     super(map, view, options, {
       cursorType: 'draw',
       isOnceTool: false
-    })
+    });
 
-    _defineProperty(this, '_graphics', new Set())
+    _defineProperty(this, "_graphics", new Set());
 
-    _defineProperty(this, '_tempGraphic', void 0)
+    _defineProperty(this, "_tempGraphic", void 0);
 
-    _defineProperty(this, '_drawingStyle', {
+    _defineProperty(this, "_drawingStyle", {
       marker: {
         color: [255, 0, 0, .3],
         size: 12,
@@ -1744,9 +1744,9 @@ class DrawTool extends FssgEsriBaseTool {
           color: [255, 0, 0, .5]
         }
       }
-    })
+    });
 
-    _defineProperty(this, '_drawedStyle', {
+    _defineProperty(this, "_drawedStyle", {
       marker: {
         color: [255, 0, 0, .5],
         size: 12,
@@ -1763,48 +1763,48 @@ class DrawTool extends FssgEsriBaseTool {
           color: [255, 0, 0, 1]
         }
       }
-    })
+    });
 
-    _defineProperty(this, 'draw_', void 0)
+    _defineProperty(this, "draw_", void 0);
 
-    _defineProperty(this, 'action_', void 0)
+    _defineProperty(this, "action_", void 0);
 
-    _defineProperty(this, 'drawType_', void 0)
+    _defineProperty(this, "drawType_", void 0);
 
-    _defineProperty(this, 'cursorType_', void 0)
+    _defineProperty(this, "cursorType_", void 0);
 
-    _defineProperty(this, 'onlyOneGraphic_', void 0)
+    _defineProperty(this, "onlyOneGraphic_", void 0);
 
     this.draw_ = new Draw({
       view
-    })
-    this.drawType_ = this.options_.drawType
-    this.onlyOneGraphic_ = !!this.options_.onlyOneGraphic
-    this.cursorType_ = this.options_.cursorType ?? 'default'
-    this.on('draw-start', e => this.onDrawStart_(e))
-    this.on('draw-move', e => this.onDrawMove_(e))
-    this.on('draw-end', e => this.onDrawEnd_(e))
+    });
+    this.drawType_ = this.options_.drawType;
+    this.onlyOneGraphic_ = !!this.options_.onlyOneGraphic;
+    this.cursorType_ = this.options_.cursorType ?? 'default';
+    this.on('draw-start', e => this.onDrawStart_(e));
+    this.on('draw-move', e => this.onDrawMove_(e));
+    this.on('draw-end', e => this.onDrawEnd_(e));
   } //#endregion
   //#region 私有方法
 
 
-  _matchStyle (geometry, symbolOptions) {
-    const type = geometry.type
+  _matchStyle(geometry, symbolOptions) {
+    const type = geometry.type;
 
     switch (type) {
       case 'point':
       case 'multipoint':
-        return symbolOptions.marker ?? {}
+        return symbolOptions.marker ?? {};
 
       case 'polyline':
-        return symbolOptions.line ?? {}
+        return symbolOptions.line ?? {};
 
       case 'polygon':
       case 'extent':
-        return symbolOptions.fill ?? {}
+        return symbolOptions.fill ?? {};
 
       default:
-        return {}
+        return {};
     }
   } //#endregion
   //#region 保护方法
@@ -1814,140 +1814,140 @@ class DrawTool extends FssgEsriBaseTool {
    */
 
 
-  initAction_ () {
-    let _this$action_;
+  initAction_() {
+    var _this$action_;
 
-    (_this$action_ = this.action_) === null || _this$action_ === void 0 ? void 0 : _this$action_.destroy()
-    return this
+    (_this$action_ = this.action_) === null || _this$action_ === void 0 ? void 0 : _this$action_.destroy();
+    return this;
   }
   /**
    * 工具激活处理事件
    */
 
 
-  onToolActived_ (e) {
+  onToolActived_(e) {
     if (!super.onToolActived_(e)) {
-      return false
+      return false;
     }
 
     const {
       mapElement,
       mapCursor
-    } = this.$
+    } = this.$;
 
     if (!mapElement) {
       // TODO
-      return false
+      return false;
     }
 
-    mapCursor.cursorType = this.cursorType_
-    this.initAction_()
-    return true
+    mapCursor.cursorType = this.cursorType_;
+    this.initAction_();
+    return true;
   }
   /**
    * 工具失活处理事件
    */
 
 
-  onToolDeactived_ (e) {
+  onToolDeactived_(e) {
     if (!super.onToolDeactived_(e)) {
-      return false
+      return false;
     }
 
-    this.action_.destroy()
-    this.draw_.destroy()
+    this.action_.destroy();
+    this.draw_.destroy();
     const {
       mapElement
-    } = this.map_.$owner
+    } = this.map_.$owner;
 
     if (!mapElement) {
-      return false
+      return false;
     }
 
-    this._tempGraphic && mapElement.remove(this._tempGraphic)
-    this._tempGraphic = null
+    this._tempGraphic && mapElement.remove(this._tempGraphic);
+    this._tempGraphic = null;
     const {
       mapCursor
-    } = this.$
-    mapCursor.cursorType = 'default'
-    return true
+    } = this.$;
+    mapCursor.cursorType = 'default';
+    return true;
   }
   /**
    * 工具绘制开始处理事件
    */
 
 
-  onDrawStart_ (e) {
+  onDrawStart_(e) {
     if (!this.actived) {
-      return false
+      return false;
     }
 
     const {
       x,
       y
-    } = e
+    } = e;
     return new Point({
       x,
       y,
       spatialReference: this.view_.spatialReference
-    })
+    });
   }
   /**
    * 工具绘制过程处理事件
    */
 
 
-  onDrawMove_ (e) {
+  onDrawMove_(e) {
     if (!this.actived) {
-      return false
+      return false;
     }
 
     const {
       mapElement
-    } = this.map_.$owner
+    } = this.map_.$owner;
 
     if (!mapElement) {
-      return false
+      return false;
     }
 
-    this._tempGraphic && mapElement.remove(this._tempGraphic)
-    this._tempGraphic = mapElement.add(e.geometry, this._matchStyle(e.geometry, this._drawingStyle))
-    return this._tempGraphic
+    this._tempGraphic && mapElement.remove(this._tempGraphic);
+    this._tempGraphic = mapElement.add(e.geometry, this._matchStyle(e.geometry, this._drawingStyle));
+    return this._tempGraphic;
   }
   /**
    * 工具绘制完成处理事件
    */
 
 
-  onDrawEnd_ (e) {
+  onDrawEnd_(e) {
     if (!this.actived) {
-      return false
+      return false;
     }
 
     const {
       mapElement
-    } = this.map_.$owner
+    } = this.map_.$owner;
 
     if (!mapElement) {
-      return false
+      return false;
     }
 
-    this._tempGraphic && mapElement.remove(this._tempGraphic)
-    this._tempGraphic = null
-    let graphic
+    this._tempGraphic && mapElement.remove(this._tempGraphic);
+    this._tempGraphic = null;
+    let graphic;
 
     if (this.onlyOneGraphic_) {
-      graphic = mapElement.set(e.geometry, this._matchStyle(e.geometry, this._drawedStyle))
+      graphic = mapElement.set(e.geometry, this._matchStyle(e.geometry, this._drawedStyle));
 
-      this._graphics.clear()
+      this._graphics.clear();
     } else {
-      graphic = mapElement.add(e.geometry, this._matchStyle(e.geometry, this._drawedStyle))
+      graphic = mapElement.add(e.geometry, this._matchStyle(e.geometry, this._drawedStyle));
     }
 
-    this._graphics.add(graphic)
+    this._graphics.add(graphic);
 
-    this.initAction_()
-    return graphic
+    this.initAction_();
+    return graphic;
   } //#endregion
   //#region 公有方法
 
@@ -1956,330 +1956,330 @@ class DrawTool extends FssgEsriBaseTool {
    */
 
 
-  clearDrawed () {
+  clearDrawed() {
     const {
       mapElement
-    } = this.map_.$owner
+    } = this.map_.$owner;
 
     if (!mapElement) {
-      return this
+      return this;
     }
 
-    mapElement.remove([...this._graphics])
+    mapElement.remove([...this._graphics]);
 
-    this._graphics.clear()
+    this._graphics.clear();
 
-    return this
+    return this;
   }
   /**
    * 设置绘制完成图元样式
    */
 
 
-  setDrawedStyle (style) {
-    $extend(true, this._drawedStyle, style)
-    return this
+  setDrawedStyle(style) {
+    $extend(true, this._drawedStyle, style);
+    return this;
   }
   /**
    * 设置绘制时图元样式
    */
 
 
-  setDrawingStyle (style) {
-    $extend(true, this._drawingStyle, style)
-    return this
+  setDrawingStyle(style) {
+    $extend(true, this._drawingStyle, style);
+    return this;
   }
 
 }
 
 class DrawPointTool extends DrawTool {
-  constructor (map, view, onlyOneGraphic = false) {
+  constructor(map, view, onlyOneGraphic = false) {
     super(map, view, {
       drawType: 'point',
       onlyOneGraphic,
       cursorType: 'draw-point'
-    })
+    });
 
-    _defineProperty(this, '_pointerMoveHandler', void 0)
+    _defineProperty(this, "_pointerMoveHandler", void 0);
   }
 
-  initAction_ () {
-    super.initAction_()
-    this.action_ = this.draw_.create('point')
+  initAction_() {
+    super.initAction_();
+    this.action_ = this.draw_.create('point');
     this.action_.on('draw-complete', e => {
-      const [x, y] = e.coordinates
+      const [x, y] = e.coordinates;
       this.fire('draw-start', {
         x,
         y
-      })
+      });
       const geometry = new Point({
         x,
         y,
         spatialReference: this.view_.spatialReference
-      })
+      });
       this.fire('draw-end', {
         geometry
-      })
-    })
+      });
+    });
     this._pointerMoveHandler = this.view_.on('pointer-move', e => {
-      const geometry = this.view_.toMap(e)
+      const geometry = this.view_.toMap(e);
       this.fire('draw-move', {
         geometry
-      })
-    })
-    return this
+      });
+    });
+    return this;
   }
 
-  onToolDeactived_ (e) {
+  onToolDeactived_(e) {
     if (!super.onToolDeactived_(e)) {
-      return false
+      return false;
     }
 
-    this._pointerMoveHandler.remove()
+    this._pointerMoveHandler.remove();
 
-    return true
+    return true;
   }
 
 }
 
 class DrawPolygonTool extends DrawTool {
-  constructor (map, view, options) {
+  constructor(map, view, options) {
     super(map, view, { ...options,
       drawType: 'polygon',
       cursorType: 'draw-polygon'
-    })
+    });
   }
 
-  initAction_ () {
-    this.action_ = this.draw_.create('polygon')
+  initAction_() {
+    this.action_ = this.draw_.create('polygon');
     this.action_.on(['vertex-add', 'cursor-update', 'vertex-remove'], e => {
-      const rings = e.vertices
+      const rings = e.vertices;
 
       if (rings.length === 1) {
         e.type === 'vertex-add' && this.fire('draw-start', {
           x: rings[0][0][0],
           y: rings[0][0][1]
-        })
-        return
+        });
+        return;
       }
 
       const geometry = new Polygon({
         rings,
         spatialReference: this.view_.spatialReference
-      })
+      });
       this.fire('draw-move', {
         geometry
-      })
-    })
+      });
+    });
     this.action_.on('draw-complete', e => {
-      const rings = e.vertices
+      const rings = e.vertices;
       const geometry = new Polygon({
         rings,
         spatialReference: this.view_.spatialReference
-      })
+      });
       this.fire('draw-end', {
         geometry
-      })
-    })
-    return this
+      });
+    });
+    return this;
   }
 
 }
 
 class DrawPolylineTool extends DrawTool {
-  constructor (map, view, onlyOneGraphic = false) {
+  constructor(map, view, onlyOneGraphic = false) {
     super(map, view, {
       drawType: 'polyline',
       onlyOneGraphic,
       cursorType: 'draw-line'
-    })
+    });
   }
 
-  initAction_ () {
-    this.action_ = this.draw_.create('polyline')
+  initAction_() {
+    this.action_ = this.draw_.create('polyline');
     this.action_.on(['vertex-add', 'cursor-update', 'vertex-remove'], e => {
-      const paths = e.vertices
+      const paths = e.vertices;
 
       if (paths.length === 1) {
         e.type === 'vertex-add' && this.fire('draw-start', {
           x: paths[0][0],
           y: paths[0][1]
-        })
-        return
+        });
+        return;
       }
 
       const geometry = new Polyline({
         paths,
         spatialReference: this.view_.spatialReference
-      })
+      });
       this.fire('draw-move', {
         geometry
-      })
-    })
+      });
+    });
     this.action_.on('draw-complete', e => {
-      const paths = e.vertices
+      const paths = e.vertices;
       const geometry = new Polyline({
         paths,
         spatialReference: this.view_.spatialReference
-      })
+      });
       this.fire('draw-end', {
         geometry
-      })
-    })
-    return this
+      });
+    });
+    return this;
   }
 
 }
 
 class MeasureCoordinateTool extends DrawPointTool {
-  constructor (map, view) {
-    super(map, view)
+  constructor(map, view) {
+    super(map, view);
 
-    _defineProperty(this, '_overlayIds', void 0)
+    _defineProperty(this, "_overlayIds", void 0);
 
-    this._overlayIds = new Set()
+    this._overlayIds = new Set();
   }
 
-  onDrawMove_ (e) {
-    const graphic = super.onDrawMove_(e)
+  onDrawMove_(e) {
+    const graphic = super.onDrawMove_(e);
 
     if (!graphic) {
-      return false
+      return false;
     }
 
-    const point = graphic.geometry
-    this.view_.$owner.mouseTips.showTips(`x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`)
-    return graphic
+    const point = graphic.geometry;
+    this.view_.$owner.mouseTips.showTips(`x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`);
+    return graphic;
   }
 
-  onToolDeactived_ (e) {
+  onToolDeactived_(e) {
     if (!super.onToolDeactived_(e)) {
-      return false
+      return false;
     }
 
-    this.view_.$owner.mouseTips.cancelTips()
-    return true
+    this.view_.$owner.mouseTips.cancelTips();
+    return true;
   }
 
-  onDrawEnd_ (e) {
-    const graphic = super.onDrawEnd_(e)
+  onDrawEnd_(e) {
+    const graphic = super.onDrawEnd_(e);
 
     if (!graphic) {
-      return false
+      return false;
     }
 
-    const point = graphic.geometry
+    const point = graphic.geometry;
     const id = this.view_.$owner.overlays.add({
       point,
       content: `x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`,
       offsetX: 0,
       offsetY: 0,
       showBezierCurve: true
-    })
+    });
 
-    this._overlayIds.add(id)
+    this._overlayIds.add(id);
 
-    return graphic
+    return graphic;
   }
 
-  clearMeasure () {
+  clearMeasure() {
     this._overlayIds.forEach(id => {
-      this.view_.$owner.overlays.removeById(id)
-    })
+      this.view_.$owner.overlays.removeById(id);
+    });
 
-    return this.clearDrawed()
+    return this.clearDrawed();
   }
 
 }
 
 class MeasureLengthTool extends DrawPolylineTool {
-  constructor (map, view) {
-    super(map, view)
+  constructor(map, view) {
+    super(map, view);
 
-    _defineProperty(this, '_overlayIds', void 0)
+    _defineProperty(this, "_overlayIds", void 0);
 
-    _defineProperty(this, 'unit', void 0)
+    _defineProperty(this, "unit", void 0);
 
-    _defineProperty(this, 'fixedCount', void 0)
+    _defineProperty(this, "fixedCount", void 0);
 
-    _defineProperty(this, '_unitStrDic', {
+    _defineProperty(this, "_unitStrDic", {
       'kilometers': 'km',
       'feet': 'feet',
       'meters': 'm',
       'miles': 'miles',
       'nautical-miles': 'nautical-miles',
       'yards': 'yards'
-    })
+    });
 
-    this._overlayIds = new Set()
-    this.fixedCount = 3
-    this.unit = 'kilometers'
+    this._overlayIds = new Set();
+    this.fixedCount = 3;
+    this.unit = 'kilometers';
   }
 
-  onDrawMove_ (e) {
-    const graphic = super.onDrawMove_(e)
+  onDrawMove_(e) {
+    const graphic = super.onDrawMove_(e);
 
     if (!graphic) {
-      return false
+      return false;
     }
 
-    const line = graphic.geometry
+    const line = graphic.geometry;
     planarLength(line, this.unit).then(length => {
-      this.view_.$owner.mouseTips.showTips(`长度：${length.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`)
-    })
-    return graphic
+      this.view_.$owner.mouseTips.showTips(`长度：${length.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`);
+    });
+    return graphic;
   }
 
-  onToolDeactived_ (e) {
+  onToolDeactived_(e) {
     if (!super.onToolDeactived_(e)) {
-      return false
+      return false;
     }
 
-    this.view_.$owner.mouseTips.cancelTips()
-    return true
+    this.view_.$owner.mouseTips.cancelTips();
+    return true;
   }
 
-  onDrawEnd_ (e) {
-    const graphic = super.onDrawEnd_(e)
+  onDrawEnd_(e) {
+    const graphic = super.onDrawEnd_(e);
 
     if (!graphic) {
-      return false
+      return false;
     }
 
-    const line = graphic.geometry
+    const line = graphic.geometry;
     planarLength(line, this.unit).then(length => {
       const id = this.view_.$owner.overlays.add({
         point: line.extent.center,
         content: `长度：${length.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`
-      })
+      });
 
-      this._overlayIds.add(id)
-    })
-    this.view_.$owner.mouseTips.cancelTips()
-    return graphic
+      this._overlayIds.add(id);
+    });
+    this.view_.$owner.mouseTips.cancelTips();
+    return graphic;
   }
 
-  clearMeasure () {
+  clearMeasure() {
     this._overlayIds.forEach(id => {
-      this.view_.$owner.overlays.removeById(id)
-    })
+      this.view_.$owner.overlays.removeById(id);
+    });
 
-    return this.clearDrawed()
+    return this.clearDrawed();
   }
 
 }
 
 class MeasureAreaTool extends DrawPolygonTool {
-  constructor (map, view) {
-    super(map, view)
+  constructor(map, view) {
+    super(map, view);
 
-    _defineProperty(this, '_overlayIds', void 0)
+    _defineProperty(this, "_overlayIds", void 0);
 
-    _defineProperty(this, 'unit', void 0)
+    _defineProperty(this, "unit", void 0);
 
-    _defineProperty(this, 'fixedCount', void 0)
+    _defineProperty(this, "fixedCount", void 0);
 
-    _defineProperty(this, '_unitStrDic', {
+    _defineProperty(this, "_unitStrDic", {
       'acres': 'acres',
       'ares': 'ares',
       'hectares': 'hectares',
@@ -2288,153 +2288,153 @@ class MeasureAreaTool extends DrawPolygonTool {
       'square-meters': 'm²',
       'square-miles': 'square-miles',
       'square-yards': 'square-yards'
-    })
+    });
 
-    this._overlayIds = new Set()
-    this.fixedCount = 3
-    this.unit = 'square-kilometers'
+    this._overlayIds = new Set();
+    this.fixedCount = 3;
+    this.unit = 'square-kilometers';
   }
 
-  onDrawMove_ (e) {
-    const graphic = super.onDrawMove_(e)
+  onDrawMove_(e) {
+    const graphic = super.onDrawMove_(e);
 
     if (!graphic) {
-      return false
+      return false;
     }
 
-    const polygon = graphic.geometry
+    const polygon = graphic.geometry;
     planarArea(polygon, this.unit).then(area => {
-      area = Math.abs(area)
-      this.view_.$owner.mouseTips.showTips(`面积：${area.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`)
-    })
-    return graphic
+      area = Math.abs(area);
+      this.view_.$owner.mouseTips.showTips(`面积：${area.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`);
+    });
+    return graphic;
   }
 
-  onToolDeactived_ (e) {
+  onToolDeactived_(e) {
     if (!super.onToolDeactived_(e)) {
-      return false
+      return false;
     }
 
-    this.view_.$owner.mouseTips.cancelTips()
-    return true
+    this.view_.$owner.mouseTips.cancelTips();
+    return true;
   }
 
-  onDrawEnd_ (e) {
-    const graphic = super.onDrawEnd_(e)
+  onDrawEnd_(e) {
+    const graphic = super.onDrawEnd_(e);
 
     if (!graphic) {
-      return false
+      return false;
     }
 
-    const polygon = graphic.geometry
+    const polygon = graphic.geometry;
     planarArea(polygon, this.unit).then(area => {
-      area = Math.abs(area)
+      area = Math.abs(area);
       const id = this.view_.$owner.overlays.add({
         point: polygon.extent.center,
         content: `面积：${area.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`
-      })
+      });
 
-      this._overlayIds.add(id)
-    })
-    this.view_.$owner.mouseTips.cancelTips()
-    return graphic
+      this._overlayIds.add(id);
+    });
+    this.view_.$owner.mouseTips.cancelTips();
+    return graphic;
   }
 
-  clearMeasure () {
+  clearMeasure() {
     this._overlayIds.forEach(id => {
-      this.view_.$owner.overlays.removeById(id)
-    })
+      this.view_.$owner.overlays.removeById(id);
+    });
 
-    return this.clearDrawed()
+    return this.clearDrawed();
   }
 
 }
 
 class HitTestTool extends DrawPointTool {
   //#region 静态方法
-  static getAttributesFromGraphic (graphic) {
+  static getAttributesFromGraphic(graphic) {
     return Object.entries(graphic.attributes).map(([name, value]) => ({
       name,
       value
-    }))
+    }));
   }
 
-  static parseAttributesFromArcGISServer (attributes, graphic) {
+  static parseAttributesFromArcGISServer(attributes, graphic) {
     let layer = graphic.layer ?? graphic.sourceLayer; // eslint-disable-line
 
-    const fieldsSelf = layer === null || layer === void 0 ? void 0 : layer.fields // ArcGIS内置字段配置信息
+    const fieldsSelf = layer === null || layer === void 0 ? void 0 : layer.fields; // ArcGIS内置字段配置信息
 
     if (fieldsSelf) {
       fieldsSelf.forEach(field => {
-        const item = attributes.find(v => v.name === field.name)
-        item && (item.alias = field.alias)
-      })
+        const item = attributes.find(v => v.name === field.name);
+        item && (item.alias = field.alias);
+      });
     }
 
-    return attributes
+    return attributes;
   }
 
-  static parseAttributesFromCustomConfig (attributes, graphic, attributesConfig) {
+  static parseAttributesFromCustomConfig(attributes, graphic, attributesConfig) {
     let layer = graphic.layer ?? graphic.sourceLayer; // eslint-disable-line
 
     const name = layer.name ?? layer.layer.name; // eslint-disable-line
 
-    const attr = attributesConfig.find(item => item.layerName === name)
+    const attr = attributesConfig.find(item => item.layerName === name);
 
     if (attr) {
-      let _attr$fields
+      var _attr$fields;
 
       attr.exclude && (attributes = attributes.filter(item => {
-        let _attr$exclude
+        var _attr$exclude;
 
-        return !((_attr$exclude = attr.exclude) !== null && _attr$exclude !== void 0 && _attr$exclude.includes(item.name))
+        return !((_attr$exclude = attr.exclude) !== null && _attr$exclude !== void 0 && _attr$exclude.includes(item.name));
       }));
       (_attr$fields = attr.fields) === null || _attr$fields === void 0 ? void 0 : _attr$fields.forEach(field => {
-        const item = attributes.find(v => v.name === field.name)
+        const item = attributes.find(v => v.name === field.name);
 
         if (item) {
-          item.alias = field.alias
-          item.type = field.type
+          item.alias = field.alias;
+          item.type = field.type;
         }
-      })
+      });
     }
 
-    return attributes
+    return attributes;
   } //#endregion
 
 
-  constructor (map, view) {
-    super(map, view)
-    this.cursorType_ = 'help'
+  constructor(map, view) {
+    super(map, view);
+    this.cursorType_ = 'help';
     this.setDrawingStyle({
       marker: {
         size: 0
       }
-    })
+    });
   }
 
-  async _queryWithMapImageLayer (geometry) {
-    const fssgMap = this.$
-    const ret = []
+  async _queryWithMapImageLayer(geometry) {
+    const fssgMap = this.$;
+    const ret = [];
     await fssgMap.mapLayers.forEach(async ([layer, options]) => {
       if (!['mapimagelayer', 'dynamiclayer'].includes(options.layerType)) {
-        return
+        return;
       }
 
       if (!options.isQuery) {
-        return
+        return;
       }
 
       if (!layer.visible) {
-        return
+        return;
       }
 
-      const sublayer = layer.sublayers.getItemAt(0)
-      const screenPoint = this.view_.toScreen(geometry)
-      screenPoint.x += 10
-      const point = this.view_.toMap(screenPoint)
-      const bufferDistance = Math.abs(geometry.x - point.x)
-      const polygon = await buffer(geometry, bufferDistance, 'meters')
+      const sublayer = layer.sublayers.getItemAt(0);
+      const screenPoint = this.view_.toScreen(geometry);
+      screenPoint.x += 10;
+      const point = this.view_.toMap(screenPoint);
+      const bufferDistance = Math.abs(geometry.x - point.x);
+      const polygon = await buffer(geometry, bufferDistance, 'meters');
       const {
         features
       } = await sublayer.queryFeatures({
@@ -2442,53 +2442,53 @@ class HitTestTool extends DrawPointTool {
         returnGeometry: true,
         // distance: 10000,
         outFields: ['*']
-      })
+      });
 
       if (features.length > 0) {
-        ret.push(...features)
+        ret.push(...features);
       }
-    })
-    return ret
+    });
+    return ret;
   } //#region 保护方法
 
 
-  onDrawEnd_ (e) {
-    const graphic = super.onDrawEnd_(e)
+  onDrawEnd_(e) {
+    const graphic = super.onDrawEnd_(e);
 
     if (!graphic) {
-      return false
+      return false;
     }
 
-    this.clearDrawed()
-    const point = graphic.geometry
-    const screen = this.view_.toScreen(point)
+    this.clearDrawed();
+    const point = graphic.geometry;
+    const screen = this.view_.toScreen(point);
     const {
       mapElement,
       mapLayers,
       viewCliper
-    } = this.$
+    } = this.$;
     Promise.all([this._queryWithMapImageLayer(point), this.view_.hitTest(screen, {
       exclude: [mapElement === null || mapElement === void 0 ? void 0 : mapElement.graphicsLayer, mapElement === null || mapElement === void 0 ? void 0 : mapElement.highlightLayer, ...(mapLayers === null || mapLayers === void 0 ? void 0 : mapLayers.layersWhichCantQuery.map(([layer]) => layer)), viewCliper === null || viewCliper === void 0 ? void 0 : viewCliper.cliperLayer]
     })]).then(([queryResult, hitTestResult]) => {
-      let _hitTestResult$result, _hitTestResult$result2
+      var _hitTestResult$result, _hitTestResult$result2;
 
-      const mapPoint = (_hitTestResult$result = hitTestResult.results) === null || _hitTestResult$result === void 0 ? void 0 : (_hitTestResult$result2 = _hitTestResult$result[0]) === null || _hitTestResult$result2 === void 0 ? void 0 : _hitTestResult$result2.mapPoint
+      const mapPoint = (_hitTestResult$result = hitTestResult.results) === null || _hitTestResult$result === void 0 ? void 0 : (_hitTestResult$result2 = _hitTestResult$result[0]) === null || _hitTestResult$result2 === void 0 ? void 0 : _hitTestResult$result2.mapPoint;
       queryResult.forEach(graphic => {
         hitTestResult.results.push({
           graphic,
           mapPoint
-        })
-      })
-      this.finsheHitTest_(hitTestResult)
-    })
-    return graphic
+        });
+      });
+      this.finsheHitTest_(hitTestResult);
+    });
+    return graphic;
   }
 
-  finsheHitTest_ (result) {
+  finsheHitTest_(result) {
     this.fire('finshed', {
       results: result.results
-    })
-    return result.results
+    });
+    return result.results;
   }
 
 }
@@ -2501,38 +2501,38 @@ class ClearTool extends FssgEsriBaseTool {
    * @param map 地图对象
    * @param view 视图对象
    */
-  constructor (map, view) {
+  constructor(map, view) {
     super(map, view, {
       isOnceTool: true
-    })
+    });
   } //#endregion
   //#region 保护方法
 
 
-  onToolActived_ (e) {
+  onToolActived_(e) {
     if (!super.onToolActived_(e)) {
-      return false
+      return false;
     }
 
     const {
       mapElement,
       overlays,
       mouseTips
-    } = this.$
+    } = this.$;
 
     if (mapElement) {
-      mapElement.clear(true)
+      mapElement.clear(true);
     }
 
     if (overlays) {
-      overlays.clear()
+      overlays.clear();
     }
 
     if (mouseTips) {
-      mouseTips.cancelTips()
+      mouseTips.cancelTips();
     }
 
-    return true
+    return true;
   }
 
 }
@@ -2553,16 +2553,16 @@ class MapTools extends FssgEsriPlugin {
   /**
    * 当前激活工具的Key
    */
-  get activedKey () {
-    return this._activedKey
+  get activedKey() {
+    return this._activedKey;
   }
   /**
    * 当前激活工具的Key
    */
 
 
-  set activedKey (key) {
-    this._activeTool(key)
+  set activedKey(key) {
+    this._activeTool(key);
   }
   /**
    * 构造地图工具链
@@ -2570,33 +2570,33 @@ class MapTools extends FssgEsriPlugin {
    */
 
 
-  constructor (options) {
-    super(options, {})
+  constructor(options) {
+    super(options, {});
 
-    _defineProperty(this, '_toolPool', new Map())
+    _defineProperty(this, "_toolPool", new Map());
 
-    _defineProperty(this, '_activedKey', 'default')
+    _defineProperty(this, "_activedKey", 'default');
   }
   /**
    * 初始化
    */
 
 
-  _init () {
+  _init() {
     this._toolPool.set('default', new FssgEsriBaseTool(this.map_, this.view_, {
       isOnceTool: false
-    })).set('zoom-home', new ZoomHomeTool(this.map_, this.view_)).set('draw-point', new DrawPointTool(this.map_, this.view_)).set('draw-polyline', new DrawPolylineTool(this.map_, this.view_)).set('draw-polygon', new DrawPolygonTool(this.map_, this.view_)).set('clear', new ClearTool(this.map_, this.view_)).set('measure-coordinate', new MeasureCoordinateTool(this.map_, this.view_)).set('measure-length', new MeasureLengthTool(this.map_, this.view_)).set('measure-area', new MeasureAreaTool(this.map_, this.view_)).set('hit-test', new HitTestTool(this.map_, this.view_))
+    })).set('zoom-home', new ZoomHomeTool(this.map_, this.view_)).set('draw-point', new DrawPointTool(this.map_, this.view_)).set('draw-polyline', new DrawPolylineTool(this.map_, this.view_)).set('draw-polygon', new DrawPolygonTool(this.map_, this.view_)).set('clear', new ClearTool(this.map_, this.view_)).set('measure-coordinate', new MeasureCoordinateTool(this.map_, this.view_)).set('measure-length', new MeasureLengthTool(this.map_, this.view_)).set('measure-area', new MeasureAreaTool(this.map_, this.view_)).set('hit-test', new HitTestTool(this.map_, this.view_));
 
-    return this
+    return this;
   }
   /**
    * 安装插件
    */
 
 
-  installPlugin (fssgEsri) {
-    super.installPlugin(fssgEsri)
-    return this._init()
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
   /**
    * 设置工具
@@ -2604,12 +2604,12 @@ class MapTools extends FssgEsriPlugin {
    */
 
 
-  _activeTool (toolKey) {
-    const tool = this._toolPool.get(toolKey)
+  _activeTool(toolKey) {
+    const tool = this._toolPool.get(toolKey);
 
     if (!tool) {
-      warn(this, `无工具项${toolKey}`)
-      return this
+      warn(this, `无工具项${toolKey}`);
+      return this;
     }
 
     if (tool.isOnceTool) {
@@ -2617,24 +2617,24 @@ class MapTools extends FssgEsriPlugin {
         previousKey: this._activedKey,
         currentKey: this._activedKey,
         executeKey: toolKey
-      })
-      tool.active()
-      return this
+      });
+      tool.active();
+      return this;
     }
 
     [...this._toolPool.values()].map(t => {
       if (t !== tool) {
-        t.deactive()
+        t.deactive();
       }
-    })
+    });
     this.fire('change', {
       previousKey: this._activedKey,
       currentKey: toolKey,
       executeKey: toolKey
-    })
-    this._activedKey = toolKey
-    tool.active()
-    return this
+    });
+    this._activedKey = toolKey;
+    tool.active();
+    return this;
   }
   /**
    * 创建自定义工具
@@ -2643,14 +2643,14 @@ class MapTools extends FssgEsriPlugin {
    */
 
 
-  createTool (key, tool) {
+  createTool(key, tool) {
     if (this.hasTool(key)) {
-      warn(this, `工具项${key}已存在，将会被覆盖`)
+      warn(this, `工具项${key}已存在，将会被覆盖`);
     }
 
-    this._toolPool.set(key, tool)
+    this._toolPool.set(key, tool);
 
-    return this
+    return this;
   }
   /**
    * 检查是否存在工具
@@ -2658,8 +2658,8 @@ class MapTools extends FssgEsriPlugin {
    */
 
 
-  hasTool (key) {
-    return this._toolPool.has(key)
+  hasTool(key) {
+    return this._toolPool.has(key);
   }
   /**
    * 移除工具
@@ -2667,14 +2667,14 @@ class MapTools extends FssgEsriPlugin {
    */
 
 
-  deleteTool (key) {
-    this._toolPool.has(key) && this._toolPool.delete(key)
+  deleteTool(key) {
+    this._toolPool.has(key) && this._toolPool.delete(key);
 
     if (this._activedKey === key) {
-      this._activeTool('default')
+      this._activeTool('default');
     }
 
-    return this
+    return this;
   }
   /**
    * 获取工具
@@ -2682,11 +2682,11 @@ class MapTools extends FssgEsriPlugin {
    */
 
 
-  getTool (key) {
-    const tool = this._toolPool.get(key)
+  getTool(key) {
+    const tool = this._toolPool.get(key);
 
     if (tool) {
-      return tool
+      return tool;
     }
   }
 
@@ -2708,16 +2708,16 @@ class MapCursor extends FssgEsriPlugin {
   /**
    * 鼠标样式
    */
-  get cursorType () {
-    return this._cursorType
+  get cursorType() {
+    return this._cursorType;
   }
   /**
    * 鼠标样式
    */
 
 
-  set cursorType (t) {
-    this._setCursor(t)
+  set cursorType(t) {
+    this._setCursor(t);
   }
   /**
    * 构造地图鼠标控制器
@@ -2725,28 +2725,28 @@ class MapCursor extends FssgEsriPlugin {
    */
 
 
-  constructor (options) {
+  constructor(options) {
     super(options, {
       items: {}
-    })
+    });
 
-    _defineProperty(this, '_cursorType', void 0)
+    _defineProperty(this, "_cursorType", void 0);
 
-    _defineProperty(this, '_typePool', void 0)
+    _defineProperty(this, "_typePool", void 0);
   }
   /**
    * 初始化
    */
 
 
-  _init () {
-    this._typePool = new Map()
-    Object.entries(MAP_CURSOR_DIC).forEach(([cType, cData]) => this._typePool.set(cType, cData))
-    Object.entries(this.options_.items ?? {}).forEach(([cType, cData]) => this._typePool.set(cType, cData))
+  _init() {
+    this._typePool = new Map();
+    Object.entries(MAP_CURSOR_DIC).forEach(([cType, cData]) => this._typePool.set(cType, cData));
+    Object.entries(this.options_.items ?? {}).forEach(([cType, cData]) => this._typePool.set(cType, cData));
 
-    this._setCursor('default')
+    this._setCursor('default');
 
-    return this
+    return this;
   }
   /**
    * 设置鼠标样式
@@ -2754,27 +2754,27 @@ class MapCursor extends FssgEsriPlugin {
    */
 
 
-  _setCursor (cursorType) {
-    const cursor = this._typePool.get(cursorType)
+  _setCursor(cursorType) {
+    const cursor = this._typePool.get(cursorType);
 
     if (!cursor) {
-      warn(this, `无鼠标样式项${cursorType}`)
+      warn(this, `无鼠标样式项${cursorType}`);
     } else {
       this.fire('change', {
         cursorType
-      })
+      });
     }
 
-    this.view_.container.style.cursor = cursor ?? 'default'
+    this.view_.container.style.cursor = cursor ?? 'default';
   }
   /**
    * 安装插件
    */
 
 
-  installPlugin (fssgEsri) {
-    super.installPlugin(fssgEsri)
-    return this._init()
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
 
 }
@@ -2795,27 +2795,27 @@ class MapLayers extends FssgEsriPlugin {
   /**
    * 可查询的图层集合
    */
-  get layersWhichCanQuery () {
-    return [...this._layerPoolUnique.values()].filter(([_, options]) => options.isQuery)
+  get layersWhichCanQuery() {
+    return [...this._layerPoolUnique.values()].filter(([_, options]) => options.isQuery);
   }
   /**
    * 不可查询的图层集合
    */
 
 
-  get layersWhichCantQuery () {
-    return [...this._layerPoolUnique.values()].filter(([_, options]) => !options.isQuery)
+  get layersWhichCantQuery() {
+    return [...this._layerPoolUnique.values()].filter(([_, options]) => !options.isQuery);
   }
   /**
    * 图层容器，唯一存储
    */
 
 
-  get _layerPoolUnique () {
-    const set = new Set([...this._layerPool.values()])
-    const map = new Map()
-    set.forEach(item => map.set(item[0].id, item))
-    return map
+  get _layerPoolUnique() {
+    const set = new Set([...this._layerPool.values()]);
+    const map = new Map();
+    set.forEach(item => map.set(item[0].id, item));
+    return map;
   }
   /**
    * 构造图层控制插件
@@ -2823,75 +2823,75 @@ class MapLayers extends FssgEsriPlugin {
    */
 
 
-  constructor (options) {
+  constructor(options) {
     super(options, {
       items: [],
       defaultLayerVisible: true
-    })
+    });
 
-    _defineProperty(this, '_layerPool', void 0)
+    _defineProperty(this, "_layerPool", void 0);
 
-    _defineProperty(this, '_group', void 0)
+    _defineProperty(this, "_group", void 0);
   }
   /**
    * 初始化
    */
 
 
-  _init () {
-    this._layerPool = new Map()
-    this._group = createLayerFactory().createGroupLayer()
-    this.map_.add(this._group)
-    return this._initLayers()
+  _init() {
+    this._layerPool = new Map();
+    this._group = createLayerFactory().createGroupLayer();
+    this.map_.add(this._group);
+    return this._initLayers();
   }
   /**
    * 初始化图层
    */
 
 
-  _initLayers () {
-    let _this$options_$items;
+  _initLayers() {
+    var _this$options_$items;
 
     (_this$options_$items = this.options_.items) === null || _this$options_$items === void 0 ? void 0 : _this$options_$items.forEach(layerOptions => {
       const {
         properties,
         ...others
-      } = layerOptions
+      } = layerOptions;
       const props = {
         visible: this.options_.defaultLayerVisible,
         ...properties,
         ...others
-      }
+      };
 
       if (layerOptions.layerType === 'webtilelayer') {
-        props.urlTemplate = layerOptions.layerUrl
+        props.urlTemplate = layerOptions.layerUrl;
       } else {
-        props.url = layerOptions.layerUrl
+        props.url = layerOptions.layerUrl;
       }
 
       if (layerOptions.layerType === 'sqllayer' || layerOptions.layerType === 'sqllayer2') {
-        props.sqlOptions = layerOptions.sqlOptions
-        props.spatialReference = this.view_.spatialReference
+        props.sqlOptions = layerOptions.sqlOptions;
+        props.spatialReference = this.view_.spatialReference;
       }
 
       const layer = createLayerFactory().createLayer(props); // eslint-disable-line
 
-      this._group.add(layer)
+      this._group.add(layer);
 
-      this._layerPool.set(layerOptions.id, [layer, layerOptions]).set(layerOptions.name, [layer, layerOptions]).set(layer, [layer, layerOptions])
+      this._layerPool.set(layerOptions.id, [layer, layerOptions]).set(layerOptions.name, [layer, layerOptions]).set(layer, [layer, layerOptions]);
 
       layer.watch('visible', visible => this.fire('change:visible', {
         visible,
         layer,
         options: layerOptions
-      }))
+      }));
       layer.watch('opacity', opacity => this.fire('change:opacity', {
         opacity,
         layer,
         options: layerOptions
-      }))
-    })
-    return this
+      }));
+    });
+    return this;
   }
   /**
    * 查找图层项
@@ -2899,14 +2899,14 @@ class MapLayers extends FssgEsriPlugin {
    */
 
 
-  _findItem (key) {
-    const item = this._layerPool.get(key)
+  _findItem(key) {
+    const item = this._layerPool.get(key);
 
     if (!item) {
-      throw error(this, `无图层项${key}`)
+      throw error(this, `无图层项${key}`);
     }
 
-    return item
+    return item;
   }
   /**
    * 安装插件
@@ -2914,9 +2914,9 @@ class MapLayers extends FssgEsriPlugin {
    */
 
 
-  installPlugin (fssgEsri) {
-    super.installPlugin(fssgEsri)
-    return this._init()
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
   /**
    * 通过图层Id查找图层
@@ -2924,10 +2924,10 @@ class MapLayers extends FssgEsriPlugin {
    */
 
 
-  findLayer (nameOrId) {
-    let _this$_findItem
+  findLayer(nameOrId) {
+    var _this$_findItem;
 
-    return (_this$_findItem = this._findItem(nameOrId)) === null || _this$_findItem === void 0 ? void 0 : _this$_findItem[0]
+    return (_this$_findItem = this._findItem(nameOrId)) === null || _this$_findItem === void 0 ? void 0 : _this$_findItem[0];
   }
   /**
    * 通过图层Id查找配置项
@@ -2935,10 +2935,10 @@ class MapLayers extends FssgEsriPlugin {
    */
 
 
-  findLayerOptions (nameOrIdOrLayer) {
-    let _this$_findItem2
+  findLayerOptions(nameOrIdOrLayer) {
+    var _this$_findItem2;
 
-    return (_this$_findItem2 = this._findItem(nameOrIdOrLayer)) === null || _this$_findItem2 === void 0 ? void 0 : _this$_findItem2[1]
+    return (_this$_findItem2 = this._findItem(nameOrIdOrLayer)) === null || _this$_findItem2 === void 0 ? void 0 : _this$_findItem2[1];
   }
   /**
    * 查找动态图层
@@ -2946,13 +2946,13 @@ class MapLayers extends FssgEsriPlugin {
    */
 
 
-  findDynaLayer (nameOrId) {
-    const [layer, options] = this._findItem(nameOrId)
+  findDynaLayer(nameOrId) {
+    const [layer, options] = this._findItem(nameOrId);
 
     if (options.layerType === 'dynamiclayer' && layer instanceof MapImageLayer) {
-      return layer.sublayers.getItemAt(0)
+      return layer.sublayers.getItemAt(0);
     } else {
-      throw error(this, `图层${nameOrId}为非动态图层`)
+      throw error(this, `图层${nameOrId}为非动态图层`);
     }
   }
   /**
@@ -2962,10 +2962,10 @@ class MapLayers extends FssgEsriPlugin {
    */
 
 
-  setLayerVisible (nameOrId, visible = true) {
-    const layer = this.findLayer(nameOrId)
-    layer && (layer.visible = visible)
-    return this
+  setLayerVisible(nameOrId, visible = true) {
+    const layer = this.findLayer(nameOrId);
+    layer && (layer.visible = visible);
+    return this;
   }
   /**
    * 设置图层不透明度
@@ -2974,20 +2974,20 @@ class MapLayers extends FssgEsriPlugin {
    */
 
 
-  setLayerOpacity (nameOrId, opacity) {
-    const layer = this.findLayer(nameOrId)
-    layer && (layer.opacity = opacity)
-    return this
+  setLayerOpacity(nameOrId, opacity) {
+    const layer = this.findLayer(nameOrId);
+    layer && (layer.opacity = opacity);
+    return this;
   }
 
-  async forEach (callback) {
-    const values = [...this._layerPoolUnique.values()]
+  async forEach(callback) {
+    const values = [...this._layerPoolUnique.values()];
 
     for (let i = 0; i < values.length; i++) {
-      await callback(values[i])
+      await callback(values[i]);
     }
 
-    return this
+    return this;
   }
 
 }
@@ -3001,7 +3001,7 @@ class Hawkeye extends FssgEsriPlugin {
    * 构造鹰眼插件
    * @param options 配置项
    */
-  constructor (options) {
+  constructor(options) {
     super(options, {
       container: 'hawkeye-container',
       symbol: {
@@ -3009,19 +3009,19 @@ class Hawkeye extends FssgEsriPlugin {
         color: [255, 0, 0, 0.1]
       },
       layers: []
-    })
+    });
 
-    _defineProperty(this, '_fssgEsri', void 0)
+    _defineProperty(this, "_fssgEsri", void 0);
 
-    _defineProperty(this, '_container', void 0)
+    _defineProperty(this, "_container", void 0);
   }
   /**
    * 初始化
    */
 
 
-  _init () {
-    this._container = this.options_.container
+  _init() {
+    this._container = this.options_.container;
     this._fssgEsri = new FssgEsri(this._container, $extend(true, {}, this.$.options, this.options_.fssgEsriOptions, {
       debug: false
     })).use(new MapElement({
@@ -3030,45 +3030,45 @@ class Hawkeye extends FssgEsriPlugin {
       }
     })).use(new MapLayers({
       items: this.options_.layers
-    }))
+    }));
     this.$.when().then(() => whenRightReturn(1000, () => document.getElementById(this._container))).then(() => {
-      this._fssgEsri.mount()
+      this._fssgEsri.mount();
 
-      this._initExtentSync()
-    })
-    return this
+      this._initExtentSync();
+    });
+    return this;
   }
   /**
    * 初始化地图同步
    */
 
 
-  _initExtentSync () {
-    const sourceView = this.$.view
-    const hawkeyeView = this._fssgEsri.view
+  _initExtentSync() {
+    const sourceView = this.$.view;
+    const hawkeyeView = this._fssgEsri.view;
     Promise.all([sourceView.when, hawkeyeView.when]).then(() => {
-      this._fssgEsri.mapElement.set(sourceView.extent) //禁止移动地图
+      this._fssgEsri.mapElement.set(sourceView.extent); //禁止移动地图
 
 
       hawkeyeView.on('drag', event => {
-        event.stopPropagation()
-      })
+        event.stopPropagation();
+      });
       hawkeyeView.on('mouse-wheel', event => {
-        event.stopPropagation()
-      }) // 动态主图绘制范围
+        event.stopPropagation();
+      }); // 动态主图绘制范围
 
       sourceView.watch(['zoom', 'center'], throttle(() => {
-        this._fssgEsri.mapElement.set(sourceView.extent)
+        this._fssgEsri.mapElement.set(sourceView.extent);
 
         this._fssgEsri.goto({
           zoom: sourceView.zoom - 4,
           center: sourceView.center
         }, {
           duration: 100
-        })
-      }, 200))
-    })
-    return this
+        });
+      }, 200));
+    });
+    return this;
   }
   /**
    * 安装插件
@@ -3076,9 +3076,9 @@ class Hawkeye extends FssgEsriPlugin {
    */
 
 
-  installPlugin (fssgEsri) {
-    super.installPlugin(fssgEsri)
-    return this._init()
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
 
 }
@@ -3103,24 +3103,24 @@ class LayerTree extends FssgEsriPlugin {
   /**
   * 图层树列表
   */
-  get list () {
-    return this._list
+  get list() {
+    return this._list;
   }
   /**
   * 图层树
   */
 
 
-  get tree () {
-    return this._tree
+  get tree() {
+    return this._tree;
   }
   /**
   * 选中的树节点Id
   */
 
 
-  get checkedIds () {
-    return [...this._checkedIds]
+  get checkedIds() {
+    return [...this._checkedIds];
   } //#endregion
 
   /**
@@ -3129,20 +3129,20 @@ class LayerTree extends FssgEsriPlugin {
    */
 
 
-  constructor (options = {}) {
+  constructor(options = {}) {
     super(options, {
       items: []
-    })
+    });
 
-    _defineProperty(this, '_list', void 0)
+    _defineProperty(this, "_list", void 0);
 
-    _defineProperty(this, '_tree', void 0)
+    _defineProperty(this, "_tree", void 0);
 
-    _defineProperty(this, '_checkedIds', void 0)
+    _defineProperty(this, "_checkedIds", void 0);
 
-    this._list = options.items ?? []
-    this._tree = listToTree(this._list)
-    this._checkedIds = new Set()
+    this._list = options.items ?? [];
+    this._tree = listToTree(this._list);
+    this._checkedIds = new Set();
   } //#region 私有方法
 
   /**
@@ -3153,47 +3153,47 @@ class LayerTree extends FssgEsriPlugin {
    */
 
 
-  _setNodeChecked (node, checked) {
-    let _node$associatedLayer
+  _setNodeChecked(node, checked) {
+    var _node$associatedLayer;
 
     if (!node.layerId) {
-      return this
+      return this;
     }
 
-    const layer = this.$.mapLayers.findLayer(node.layerId)
+    const layer = this.$.mapLayers.findLayer(node.layerId);
     layer && (layer.visible = checked);
     (_node$associatedLayer = node.associatedLayerIds) === null || _node$associatedLayer === void 0 ? void 0 : _node$associatedLayer.forEach(id => {
-      const layer = this.$.mapLayers.findLayer(id)
-      layer && (layer.visible = checked)
-    })
+      const layer = this.$.mapLayers.findLayer(id);
+      layer && (layer.visible = checked);
+    });
 
     if (checked) {
-      this._checkedIds.add(node.id)
+      this._checkedIds.add(node.id);
     } else {
-      this._checkedIds.delete(node.id)
+      this._checkedIds.delete(node.id);
     }
 
     return this.fire('change:checked', {
       node,
       checked
-    })
+    });
   }
   /**
    * 初始化
    */
 
 
-  _init () {
+  _init() {
     this.$.mapLayers.when().then(() => {
       this._list.forEach(item => {
-        this._setNodeChecked(item, item.defaultChecked)
+        this._setNodeChecked(item, item.defaultChecked);
 
-        item.defaultChecked && this._checkedIds.add(item.id)
-      })
-    }) // this.on('change:checked', e => {
+        item.defaultChecked && this._checkedIds.add(item.id);
+      });
+    }); // this.on('change:checked', e => {
     // })
 
-    return this
+    return this;
   } //#endregion
   //#region 公有方法
 
@@ -3204,9 +3204,9 @@ class LayerTree extends FssgEsriPlugin {
    */
 
 
-  installPlugin (fssgEsri) {
-    super.installPlugin(fssgEsri)
-    return this.$.mapLayers.when().then(() => this._init())
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this.$.mapLayers.when().then(() => this._init());
   }
   /**
    * 通过树节点Id查找图层
@@ -3215,13 +3215,13 @@ class LayerTree extends FssgEsriPlugin {
    */
 
 
-  findLayerFromNodeId (nodeId) {
-    let _this$_list$find
+  findLayerFromNodeId(nodeId) {
+    var _this$_list$find;
 
-    const layerId = (_this$_list$find = this._list.find(item => item.id === nodeId)) === null || _this$_list$find === void 0 ? void 0 : _this$_list$find.layerId
+    const layerId = (_this$_list$find = this._list.find(item => item.id === nodeId)) === null || _this$_list$find === void 0 ? void 0 : _this$_list$find.layerId;
 
     if (layerId) {
-      return this.$.mapLayers.findLayer(layerId)
+      return this.$.mapLayers.findLayer(layerId);
     }
   }
   /**
@@ -3231,8 +3231,8 @@ class LayerTree extends FssgEsriPlugin {
    */
 
 
-  findNodeFromNodeId (nodeId) {
-    return this._list.find(item => item.id === nodeId)
+  findNodeFromNodeId(nodeId) {
+    return this._list.find(item => item.id === nodeId);
   }
   /**
    * 通过树节点名称查找树节点
@@ -3241,8 +3241,8 @@ class LayerTree extends FssgEsriPlugin {
    */
 
 
-  findNodeFromNodeName (nodeName) {
-    return this._list.find(item => item.name === nodeName)
+  findNodeFromNodeName(nodeName) {
+    return this._list.find(item => item.name === nodeName);
   }
   /**
    * 通过图层Id查找树节点
@@ -3251,12 +3251,12 @@ class LayerTree extends FssgEsriPlugin {
    */
 
 
-  findNodeFromLayerId (layerId) {
+  findNodeFromLayerId(layerId) {
     for (let i = 0; i < this._list.length; i++) {
-      const item = this._list[i]
+      const item = this._list[i];
 
       if (item.layerId === layerId) {
-        return item
+        return item;
       }
     }
   }
@@ -3268,10 +3268,10 @@ class LayerTree extends FssgEsriPlugin {
    */
 
 
-  setNodeCheckById (nodeId, checked) {
-    const node = this.findNodeFromNodeId(nodeId)
-    node && this._setNodeChecked(node, checked)
-    return this
+  setNodeCheckById(nodeId, checked) {
+    const node = this.findNodeFromNodeId(nodeId);
+    node && this._setNodeChecked(node, checked);
+    return this;
   }
   /**
    * 设置树节点选中状态
@@ -3281,10 +3281,10 @@ class LayerTree extends FssgEsriPlugin {
    */
 
 
-  setNodeCheckByName (nodeName, check) {
-    const node = this.findNodeFromNodeName(nodeName)
-    node && this._setNodeChecked(node, check)
-    return this
+  setNodeCheckByName(nodeName, check) {
+    const node = this.findNodeFromNodeName(nodeName);
+    node && this._setNodeChecked(node, check);
+    return this;
   }
 
 }
@@ -3305,16 +3305,16 @@ class MapModules extends FssgEsriPlugin {
   /**
   * 地图模块集合
   */
-  get items () {
-    return this._items
+  get items() {
+    return this._items;
   }
 
-  get selectedTitle () {
-    return this._selectedTitle
+  get selectedTitle() {
+    return this._selectedTitle;
   }
 
-  set selectedTitle (title) {
-    this.selectByTitle(title)
+  set selectedTitle(title) {
+    this.selectByTitle(title);
   } //#endregion
   //#region 构造函数
 
@@ -3324,17 +3324,17 @@ class MapModules extends FssgEsriPlugin {
   */
 
 
-  constructor (options = {}) {
+  constructor(options = {}) {
     super(options, {
       items: []
-    })
+    });
 
-    _defineProperty(this, '_items', void 0)
+    _defineProperty(this, "_items", void 0);
 
-    _defineProperty(this, '_selectedTitle', void 0)
+    _defineProperty(this, "_selectedTitle", void 0);
 
-    this._items = this.options_.items ?? []
-    this._selectedTitle = this.options_.defaultSelectedTitle ?? ''
+    this._items = this.options_.items ?? [];
+    this._selectedTitle = this.options_.defaultSelectedTitle ?? '';
   } //#endregion
   //#region 公有方法
 
@@ -3345,9 +3345,9 @@ class MapModules extends FssgEsriPlugin {
    */
 
 
-  installPlugin (fssgEsri) {
-    super.installPlugin(fssgEsri)
-    return this.$.layerTree.when().then(() => this)
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this.$.layerTree.when().then(() => this);
   }
   /**
   * 选择地图模块
@@ -3356,28 +3356,28 @@ class MapModules extends FssgEsriPlugin {
   */
 
 
-  selectById (moduleId) {
-    let item
-    this._selectedTitle = ''
+  selectById(moduleId) {
+    let item;
+    this._selectedTitle = '';
 
     this._items.forEach(module => {
       if (moduleId === module.id) {
-        this._selectedTitle = module.title
-        item = module
+        this._selectedTitle = module.title;
+        item = module;
         module.treeNodeIds.forEach(nodeId => {
-          this.$.layerTree.setNodeCheckById(nodeId, true)
-        })
+          this.$.layerTree.setNodeCheckById(nodeId, true);
+        });
       } else {
         module.treeNodeIds.forEach(nodeId => {
-          this.$.layerTree.setNodeCheckById(nodeId, false)
-        })
+          this.$.layerTree.setNodeCheckById(nodeId, false);
+        });
       }
-    })
+    });
 
     this.fire('change:selected', {
       item
-    })
-    return this
+    });
+    return this;
   }
   /**
   * 选择地图模块
@@ -3386,185 +3386,185 @@ class MapModules extends FssgEsriPlugin {
   */
 
 
-  selectByTitle (moduleTitle) {
-    let item
-    this._selectedTitle = ''
+  selectByTitle(moduleTitle) {
+    let item;
+    this._selectedTitle = '';
 
     this._items.forEach(module => {
       if (moduleTitle === module.title) {
-        this._selectedTitle = module.title
-        item = module
+        this._selectedTitle = module.title;
+        item = module;
         module.treeNodeIds.forEach(nodeId => {
-          this.$.layerTree.setNodeCheckById(nodeId, true)
-        })
+          this.$.layerTree.setNodeCheckById(nodeId, true);
+        });
       } else {
         module.treeNodeIds.forEach(nodeId => {
-          this.$.layerTree.setNodeCheckById(nodeId, false)
-        })
+          this.$.layerTree.setNodeCheckById(nodeId, false);
+        });
       }
-    })
+    });
 
     this.fire('change:selected', {
       item
-    })
-    return this
+    });
+    return this;
   }
 
 }
 
 class MouseTips extends FssgEsriPlugin {
-  constructor (options) {
-    super(options, {})
+  constructor(options) {
+    super(options, {});
 
-    _defineProperty(this, '_handlers', void 0)
+    _defineProperty(this, "_handlers", void 0);
 
-    _defineProperty(this, '_tipsDom', void 0)
+    _defineProperty(this, "_tipsDom", void 0);
   }
 
-  _init () {
-    this._handlers = new Set()
-    return this
+  _init() {
+    this._handlers = new Set();
+    return this;
   }
 
-  installPlugin (fssgEsri) {
-    super.installPlugin(fssgEsri)
-    return this._init()
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
 
-  showTips (tips) {
+  showTips(tips) {
     if (!this._tipsDom) {
-      this._tipsDom = document.createElement('div')
+      this._tipsDom = document.createElement('div');
 
-      this._tipsDom.classList.add('fssg-mouse-tips')
+      this._tipsDom.classList.add('fssg-mouse-tips');
 
-      this._tipsDom.style.position = 'absolute'
-      this._tipsDom.style.padding = '4px 8px'
-      this._tipsDom.style.backgroundColor = '#00000085'
-      this._tipsDom.style.color = '#fff'
-      this._tipsDom.style.boxShadow = '0 1px 4px rgb(0 0 0 / 80%)'
-      this.view_.container.append(this._tipsDom)
+      this._tipsDom.style.position = 'absolute';
+      this._tipsDom.style.padding = '4px 8px';
+      this._tipsDom.style.backgroundColor = '#00000085';
+      this._tipsDom.style.color = '#fff';
+      this._tipsDom.style.boxShadow = '0 1px 4px rgb(0 0 0 / 80%)';
+      this.view_.container.append(this._tipsDom);
     }
 
-    this._handlers.forEach(item => item.remove())
+    this._handlers.forEach(item => item.remove());
 
-    this._handlers.clear()
+    this._handlers.clear();
 
-    this._tipsDom.innerHTML = tips
+    this._tipsDom.innerHTML = tips;
     const pointerMouveHandler = this.view_.on('pointer-move', throttle(e => {
-      this._tipsDom.style.top = `${e.y + 16}px`
-      this._tipsDom.style.left = `${e.x + 16}px`
-    }, 100))
+      this._tipsDom.style.top = `${e.y + 16}px`;
+      this._tipsDom.style.left = `${e.x + 16}px`;
+    }, 100));
 
-    this._handlers.add(pointerMouveHandler)
+    this._handlers.add(pointerMouveHandler);
 
     const pointerLeaveHandler = this.view_.on('pointer-leave', () => {
-      this._tipsDom.style.display = 'none'
-    })
+      this._tipsDom.style.display = 'none';
+    });
 
-    this._handlers.add(pointerLeaveHandler)
+    this._handlers.add(pointerLeaveHandler);
 
     const pointerEnter = this.view_.on('pointer-enter', () => {
-      this._tipsDom.style.display = 'block'
-    })
+      this._tipsDom.style.display = 'block';
+    });
 
-    this._handlers.add(pointerEnter)
+    this._handlers.add(pointerEnter);
 
-    return this
+    return this;
   }
 
-  cancelTips () {
-    let _this$_tipsDom, _this$_tipsDom$remove;
+  cancelTips() {
+    var _this$_tipsDom, _this$_tipsDom$remove;
 
-    (_this$_tipsDom = this._tipsDom) === null || _this$_tipsDom === void 0 ? void 0 : (_this$_tipsDom$remove = _this$_tipsDom.remove) === null || _this$_tipsDom$remove === void 0 ? void 0 : _this$_tipsDom$remove.call(_this$_tipsDom) // eslint-disable-next-line
+    (_this$_tipsDom = this._tipsDom) === null || _this$_tipsDom === void 0 ? void 0 : (_this$_tipsDom$remove = _this$_tipsDom.remove) === null || _this$_tipsDom$remove === void 0 ? void 0 : _this$_tipsDom$remove.call(_this$_tipsDom); // eslint-disable-next-line
     // @ts-ignore
 
-    this._tipsDom = null
+    this._tipsDom = null;
 
-    this._handlers.forEach(item => item.remove())
+    this._handlers.forEach(item => item.remove());
 
-    this._handlers.clear()
+    this._handlers.clear();
 
-    return this
+    return this;
   }
 
 }
 
 class Overlays extends FssgEsriPlugin {
-  constructor (options) {
-    super(options, {})
+  constructor(options) {
+    super(options, {});
 
-    _defineProperty(this, '_overlayPool', void 0)
+    _defineProperty(this, "_overlayPool", void 0);
 
-    _defineProperty(this, '_overlayContainer', void 0)
+    _defineProperty(this, "_overlayContainer", void 0);
   }
 
-  _init () {
-    this._overlayContainer = document.createElement('div')
+  _init() {
+    this._overlayContainer = document.createElement('div');
 
-    this._overlayContainer.classList.add('fssg-overlay-container')
+    this._overlayContainer.classList.add('fssg-overlay-container');
 
-    this._overlayContainer.style.height = '100%'
-    this._overlayContainer.style.width = '100%'
-    this._overlayContainer.style.top = '0'
-    this._overlayContainer.style.left = '0'
-    this._overlayContainer.style.position = 'absolute'
-    this._overlayContainer.style.pointerEvents = 'none'
-    this._overlayContainer.style.overflow = 'hidden'
-    this.view_.container.append(this._overlayContainer)
-    this._overlayPool = new Map()
+    this._overlayContainer.style.height = '100%';
+    this._overlayContainer.style.width = '100%';
+    this._overlayContainer.style.top = '0';
+    this._overlayContainer.style.left = '0';
+    this._overlayContainer.style.position = 'absolute';
+    this._overlayContainer.style.pointerEvents = 'none';
+    this._overlayContainer.style.overflow = 'hidden';
+    this.view_.container.append(this._overlayContainer);
+    this._overlayPool = new Map();
     this.view_.when().then(() => {
       this.view_.watch('extent', throttle(() => {
         [...this._overlayPool.values()].forEach(item => {
-          const screenPt = this.view_.toScreen(item.mapXY)
-          item.container.style.top = `${screenPt.y + item.offsetY}px`
-          item.container.style.left = `${screenPt.x + item.offsetX}px`
+          const screenPt = this.view_.toScreen(item.mapXY);
+          item.container.style.top = `${screenPt.y + item.offsetY}px`;
+          item.container.style.left = `${screenPt.x + item.offsetX}px`;
           const mapPt = this.view_.toMap({
             x: screenPt.x + (item.offsetX ?? 0),
             y: screenPt.y + (item.offsetY ?? 0)
-          })
+          });
 
           if (item.bezierCurve) {
-            item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve)
-            item.bezierCurve = this.view_.$owner.mapElement.add(createGeometryFactory(this.$).createBezierCurve(item.mapXY, mapPt), item.bezierCurveSymbol)
+            item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve);
+            item.bezierCurve = this.view_.$owner.mapElement.add(createGeometryFactory(this.$).createBezierCurve(item.mapXY, mapPt), item.bezierCurveSymbol);
           }
-        })
-      }, 200))
-    })
-    return this
+        });
+      }, 200));
+    });
+    return this;
   }
 
-  installPlugin (fssgEsri) {
-    super.installPlugin(fssgEsri)
-    return this._init()
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
 
-  add (options) {
-    const overlay = document.createElement('div')
-    overlay.classList.add('fssg-overlay')
-    overlay.style.position = 'absolute'
-    overlay.style.padding = '4px 8px'
-    overlay.style.backgroundColor = '#00000085'
-    overlay.style.color = '#fff'
-    overlay.style.boxShadow = '0 1px 4px rgb(0 0 0 / 80%)'
-    overlay.style.width = 'fit-content'
-    overlay.style.pointerEvents = 'all'
-    overlay.style.transition = 'all .1s ease-in-out'
-    typeof options.content === 'string' ? overlay.innerHTML = options.content : overlay.append(options.content)
-    const screenPt = this.view_.toScreen(options.point)
-    overlay.style.top = `${screenPt.y + (options.offsetY ?? 0)}px`
-    overlay.style.left = `${screenPt.x + (options.offsetX ?? 0)}px`
+  add(options) {
+    const overlay = document.createElement('div');
+    overlay.classList.add('fssg-overlay');
+    overlay.style.position = 'absolute';
+    overlay.style.padding = '4px 8px';
+    overlay.style.backgroundColor = '#00000085';
+    overlay.style.color = '#fff';
+    overlay.style.boxShadow = '0 1px 4px rgb(0 0 0 / 80%)';
+    overlay.style.width = 'fit-content';
+    overlay.style.pointerEvents = 'all';
+    overlay.style.transition = 'all .1s ease-in-out';
+    typeof options.content === 'string' ? overlay.innerHTML = options.content : overlay.append(options.content);
+    const screenPt = this.view_.toScreen(options.point);
+    overlay.style.top = `${screenPt.y + (options.offsetY ?? 0)}px`;
+    overlay.style.left = `${screenPt.x + (options.offsetX ?? 0)}px`;
     const mapPt = this.view_.toMap({
       x: screenPt.x + (options.offsetX ?? 0),
       y: screenPt.y + (options.offsetY ?? 0)
-    })
-    let bezierCurve = undefined
+    });
+    let bezierCurve = undefined;
 
     if (options.showBezierCurve) {
-      bezierCurve = this.view_.$owner.mapElement.add(createGeometryFactory(this.$).createBezierCurve(options.point, mapPt), options.bezierCurveSymbol)
+      bezierCurve = this.view_.$owner.mapElement.add(createGeometryFactory(this.$).createBezierCurve(options.point, mapPt), options.bezierCurveSymbol);
     }
 
-    const id = options.id ?? createGuid()
-    overlay.id = id
+    const id = options.id ?? createGuid();
+    overlay.id = id;
 
     this._overlayPool.set(id, {
       id,
@@ -3574,89 +3574,89 @@ class Overlays extends FssgEsriPlugin {
       offsetY: options.offsetY ?? 0,
       bezierCurve: bezierCurve,
       bezierCurveSymbol: options.bezierCurveSymbol
-    })
+    });
 
-    this._overlayContainer.append(overlay)
+    this._overlayContainer.append(overlay);
 
-    return id
+    return id;
   }
 
-  removeById (id) {
-    const item = this._overlayPool.get(id)
+  removeById(id) {
+    const item = this._overlayPool.get(id);
 
     if (item) {
-      item.container.remove()
-      item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve)
+      item.container.remove();
+      item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve);
 
-      this._overlayPool.delete(id)
+      this._overlayPool.delete(id);
     }
 
-    return this
+    return this;
   }
 
-  clear () {
+  clear() {
     [...this._overlayPool.values()].forEach(item => {
-      item.container.remove()
-      item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve)
-    })
+      item.container.remove();
+      item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve);
+    });
 
-    this._overlayPool.clear()
+    this._overlayPool.clear();
 
-    return this
+    return this;
   }
 
 }
 
 class ViewCliper extends FssgEsriPlugin {
-  constructor (options) {
-    super(options, {})
+  constructor(options) {
+    super(options, {});
 
-    _defineProperty(this, '_cliperLayer', void 0)
+    _defineProperty(this, "_cliperLayer", void 0);
   }
 
-  get cliperLayer () {
-    return this._cliperLayer
+  get cliperLayer() {
+    return this._cliperLayer;
   }
 
-  _init () {
+  _init() {
     this._cliperLayer = new GraphicsLayer({
       blendMode: 'destination-in',
       effect: 'bloom(200%)'
-    })
-    return this
+    });
+    return this;
   }
 
-  installPlugin (fssgEsri) {
-    super.installPlugin(fssgEsri)
-    return this._init()
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
   }
 
-  clip (arg0) {
+  clip(arg0) {
     if (!this.map_.findLayerById(this._cliperLayer.id)) {
-      this.map_.add(this._cliperLayer)
+      this.map_.add(this._cliperLayer);
     }
 
-    let graphic = arg0.clone()
+    let graphic = arg0.clone();
 
     if (graphic instanceof Geometry) {
       graphic = new Graphic({
         geometry: graphic
-      })
+      });
     }
 
-    this._cliperLayer.graphics.removeAll()
+    this._cliperLayer.graphics.removeAll();
 
-    this._cliperLayer.graphics.add(graphic)
+    this._cliperLayer.graphics.add(graphic);
 
-    return this
+    return this;
   }
 
-  restore () {
+  restore() {
     if (this.map_.findLayerById(this._cliperLayer.id)) {
-      this.map_.remove(this._cliperLayer)
+      this.map_.remove(this._cliperLayer);
     }
 
-    return this
+    return this;
   }
 
 }
@@ -3666,20 +3666,18 @@ class ViewCliper extends FssgEsriPlugin {
  * @module glMatrix
  */
 // Configuration Constants
-let EPSILON = 0.000001
-let ARRAY_TYPE = typeof Float32Array !== 'undefined' ? Float32Array : Array
-if (!Math.hypot) {
- Math.hypot = function () {
-  let y = 0,
-      i = arguments.length
+var EPSILON = 0.000001;
+var ARRAY_TYPE = typeof Float32Array !== 'undefined' ? Float32Array : Array;
+if (!Math.hypot) Math.hypot = function () {
+  var y = 0,
+      i = arguments.length;
 
   while (i--) {
-    y += arguments[i] * arguments[i]
+    y += arguments[i] * arguments[i];
   }
 
-  return Math.sqrt(y)
-}
-}
+  return Math.sqrt(y);
+};
 
 /**
  * 3x3 Matrix
@@ -3692,22 +3690,22 @@ if (!Math.hypot) {
  * @returns {mat3} a new 3x3 matrix
  */
 
-function create$4 () {
-  let out = new ARRAY_TYPE(9)
+function create$4() {
+  var out = new ARRAY_TYPE(9);
 
   if (ARRAY_TYPE != Float32Array) {
-    out[1] = 0
-    out[2] = 0
-    out[3] = 0
-    out[5] = 0
-    out[6] = 0
-    out[7] = 0
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[5] = 0;
+    out[6] = 0;
+    out[7] = 0;
   }
 
-  out[0] = 1
-  out[4] = 1
-  out[8] = 1
-  return out
+  out[0] = 1;
+  out[4] = 1;
+  out[8] = 1;
+  return out;
 }
 /**
  * Create a new mat3 with the given values
@@ -3724,18 +3722,18 @@ function create$4 () {
  * @returns {mat3} A new mat3
  */
 
-function fromValues$2 (m00, m01, m02, m10, m11, m12, m20, m21, m22) {
-  let out = new ARRAY_TYPE(9)
-  out[0] = m00
-  out[1] = m01
-  out[2] = m02
-  out[3] = m10
-  out[4] = m11
-  out[5] = m12
-  out[6] = m20
-  out[7] = m21
-  out[8] = m22
-  return out
+function fromValues$2(m00, m01, m02, m10, m11, m12, m20, m21, m22) {
+  var out = new ARRAY_TYPE(9);
+  out[0] = m00;
+  out[1] = m01;
+  out[2] = m02;
+  out[3] = m10;
+  out[4] = m11;
+  out[5] = m12;
+  out[6] = m20;
+  out[7] = m21;
+  out[8] = m22;
+  return out;
 }
 /**
  * Set a mat3 to the identity matrix
@@ -3744,17 +3742,17 @@ function fromValues$2 (m00, m01, m02, m10, m11, m12, m20, m21, m22) {
  * @returns {mat3} out
  */
 
-function identity (out) {
-  out[0] = 1
-  out[1] = 0
-  out[2] = 0
-  out[3] = 0
-  out[4] = 1
-  out[5] = 0
-  out[6] = 0
-  out[7] = 0
-  out[8] = 1
-  return out
+function identity(out) {
+  out[0] = 1;
+  out[1] = 0;
+  out[2] = 0;
+  out[3] = 0;
+  out[4] = 1;
+  out[5] = 0;
+  out[6] = 0;
+  out[7] = 0;
+  out[8] = 1;
+  return out;
 }
 /**
  * Translate a mat3 by the given vector
@@ -3765,8 +3763,8 @@ function identity (out) {
  * @returns {mat3} out
  */
 
-function translate (out, a, v) {
-  let a00 = a[0],
+function translate(out, a, v) {
+  var a00 = a[0],
       a01 = a[1],
       a02 = a[2],
       a10 = a[3],
@@ -3776,17 +3774,17 @@ function translate (out, a, v) {
       a21 = a[7],
       a22 = a[8],
       x = v[0],
-      y = v[1]
-  out[0] = a00
-  out[1] = a01
-  out[2] = a02
-  out[3] = a10
-  out[4] = a11
-  out[5] = a12
-  out[6] = x * a00 + y * a10 + a20
-  out[7] = x * a01 + y * a11 + a21
-  out[8] = x * a02 + y * a12 + a22
-  return out
+      y = v[1];
+  out[0] = a00;
+  out[1] = a01;
+  out[2] = a02;
+  out[3] = a10;
+  out[4] = a11;
+  out[5] = a12;
+  out[6] = x * a00 + y * a10 + a20;
+  out[7] = x * a01 + y * a11 + a21;
+  out[8] = x * a02 + y * a12 + a22;
+  return out;
 }
 /**
  * Rotates a mat3 by the given angle
@@ -3797,8 +3795,8 @@ function translate (out, a, v) {
  * @returns {mat3} out
  */
 
-function rotate (out, a, rad) {
-  let a00 = a[0],
+function rotate(out, a, rad) {
+  var a00 = a[0],
       a01 = a[1],
       a02 = a[2],
       a10 = a[3],
@@ -3808,17 +3806,17 @@ function rotate (out, a, rad) {
       a21 = a[7],
       a22 = a[8],
       s = Math.sin(rad),
-      c = Math.cos(rad)
-  out[0] = c * a00 + s * a10
-  out[1] = c * a01 + s * a11
-  out[2] = c * a02 + s * a12
-  out[3] = c * a10 - s * a00
-  out[4] = c * a11 - s * a01
-  out[5] = c * a12 - s * a02
-  out[6] = a20
-  out[7] = a21
-  out[8] = a22
-  return out
+      c = Math.cos(rad);
+  out[0] = c * a00 + s * a10;
+  out[1] = c * a01 + s * a11;
+  out[2] = c * a02 + s * a12;
+  out[3] = c * a10 - s * a00;
+  out[4] = c * a11 - s * a01;
+  out[5] = c * a12 - s * a02;
+  out[6] = a20;
+  out[7] = a21;
+  out[8] = a22;
+  return out;
 }
 /**
  * Scales the mat3 by the dimensions in the given vec2
@@ -3829,19 +3827,19 @@ function rotate (out, a, rad) {
  * @returns {mat3} out
  **/
 
-function scale (out, a, v) {
-  let x = v[0],
-      y = v[1]
-  out[0] = x * a[0]
-  out[1] = x * a[1]
-  out[2] = x * a[2]
-  out[3] = y * a[3]
-  out[4] = y * a[4]
-  out[5] = y * a[5]
-  out[6] = a[6]
-  out[7] = a[7]
-  out[8] = a[8]
-  return out
+function scale(out, a, v) {
+  var x = v[0],
+      y = v[1];
+  out[0] = x * a[0];
+  out[1] = x * a[1];
+  out[2] = x * a[2];
+  out[3] = y * a[3];
+  out[4] = y * a[4];
+  out[5] = y * a[5];
+  out[6] = a[6];
+  out[7] = a[7];
+  out[8] = a[8];
+  return out;
 }
 
 /**
@@ -3855,16 +3853,16 @@ function scale (out, a, v) {
  * @returns {vec3} a new 3D vector
  */
 
-function create$3 () {
-  let out = new ARRAY_TYPE(3)
+function create$3() {
+  var out = new ARRAY_TYPE(3);
 
   if (ARRAY_TYPE != Float32Array) {
-    out[0] = 0
-    out[1] = 0
-    out[2] = 0
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
   }
 
-  return out
+  return out;
 }
 /**
  * Calculates the length of a vec3
@@ -3873,11 +3871,11 @@ function create$3 () {
  * @returns {Number} length of a
  */
 
-function length (a) {
-  let x = a[0]
-  let y = a[1]
-  let z = a[2]
-  return Math.hypot(x, y, z)
+function length(a) {
+  var x = a[0];
+  var y = a[1];
+  var z = a[2];
+  return Math.hypot(x, y, z);
 }
 /**
  * Creates a new vec3 initialized with the given values
@@ -3888,12 +3886,12 @@ function length (a) {
  * @returns {vec3} a new 3D vector
  */
 
-function fromValues$1 (x, y, z) {
-  let out = new ARRAY_TYPE(3)
-  out[0] = x
-  out[1] = y
-  out[2] = z
-  return out
+function fromValues$1(x, y, z) {
+  var out = new ARRAY_TYPE(3);
+  out[0] = x;
+  out[1] = y;
+  out[2] = z;
+  return out;
 }
 /**
  * Normalize a vec3
@@ -3903,21 +3901,21 @@ function fromValues$1 (x, y, z) {
  * @returns {vec3} out
  */
 
-function normalize$2 (out, a) {
-  let x = a[0]
-  let y = a[1]
-  let z = a[2]
-  let len = x * x + y * y + z * z
+function normalize$2(out, a) {
+  var x = a[0];
+  var y = a[1];
+  var z = a[2];
+  var len = x * x + y * y + z * z;
 
   if (len > 0) {
     //TODO: evaluate use of glm_invsqrt here?
-    len = 1 / Math.sqrt(len)
+    len = 1 / Math.sqrt(len);
   }
 
-  out[0] = a[0] * len
-  out[1] = a[1] * len
-  out[2] = a[2] * len
-  return out
+  out[0] = a[0] * len;
+  out[1] = a[1] * len;
+  out[2] = a[2] * len;
+  return out;
 }
 /**
  * Calculates the dot product of two vec3's
@@ -3927,8 +3925,8 @@ function normalize$2 (out, a) {
  * @returns {Number} dot product of a and b
  */
 
-function dot (a, b) {
-  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+function dot(a, b) {
+  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 /**
  * Computes the cross product of two vec3's
@@ -3939,24 +3937,24 @@ function dot (a, b) {
  * @returns {vec3} out
  */
 
-function cross (out, a, b) {
-  let ax = a[0],
+function cross(out, a, b) {
+  var ax = a[0],
       ay = a[1],
-      az = a[2]
-  let bx = b[0],
+      az = a[2];
+  var bx = b[0],
       by = b[1],
-      bz = b[2]
-  out[0] = ay * bz - az * by
-  out[1] = az * bx - ax * bz
-  out[2] = ax * by - ay * bx
-  return out
+      bz = b[2];
+  out[0] = ay * bz - az * by;
+  out[1] = az * bx - ax * bz;
+  out[2] = ax * by - ay * bx;
+  return out;
 }
 /**
  * Alias for {@link vec3.length}
  * @function
  */
 
-let len = length;
+var len = length;
 /**
  * Perform some operation over an array of vec3s.
  *
@@ -3971,37 +3969,37 @@ let len = length;
  */
 
 (function () {
-  let vec = create$3()
+  var vec = create$3();
   return function (a, stride, offset, count, fn, arg) {
-    let i, l
+    var i, l;
 
     if (!stride) {
-      stride = 3
+      stride = 3;
     }
 
     if (!offset) {
-      offset = 0
+      offset = 0;
     }
 
     if (count) {
-      l = Math.min(count * stride + offset, a.length)
+      l = Math.min(count * stride + offset, a.length);
     } else {
-      l = a.length
+      l = a.length;
     }
 
     for (i = offset; i < l; i += stride) {
-      vec[0] = a[i]
-      vec[1] = a[i + 1]
-      vec[2] = a[i + 2]
-      fn(vec, vec, arg)
-      a[i] = vec[0]
-      a[i + 1] = vec[1]
-      a[i + 2] = vec[2]
+      vec[0] = a[i];
+      vec[1] = a[i + 1];
+      vec[2] = a[i + 2];
+      fn(vec, vec, arg);
+      a[i] = vec[0];
+      a[i + 1] = vec[1];
+      a[i + 2] = vec[2];
     }
 
-    return a
-  }
-})()
+    return a;
+  };
+})();
 
 /**
  * 4 Dimensional Vector
@@ -4014,17 +4012,17 @@ let len = length;
  * @returns {vec4} a new 4D vector
  */
 
-function create$2 () {
-  let out = new ARRAY_TYPE(4)
+function create$2() {
+  var out = new ARRAY_TYPE(4);
 
   if (ARRAY_TYPE != Float32Array) {
-    out[0] = 0
-    out[1] = 0
-    out[2] = 0
-    out[3] = 0
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
   }
 
-  return out
+  return out;
 }
 /**
  * Normalize a vec4
@@ -4034,22 +4032,22 @@ function create$2 () {
  * @returns {vec4} out
  */
 
-function normalize$1 (out, a) {
-  let x = a[0]
-  let y = a[1]
-  let z = a[2]
-  let w = a[3]
-  let len = x * x + y * y + z * z + w * w
+function normalize$1(out, a) {
+  var x = a[0];
+  var y = a[1];
+  var z = a[2];
+  var w = a[3];
+  var len = x * x + y * y + z * z + w * w;
 
   if (len > 0) {
-    len = 1 / Math.sqrt(len)
+    len = 1 / Math.sqrt(len);
   }
 
-  out[0] = x * len
-  out[1] = y * len
-  out[2] = z * len
-  out[3] = w * len
-  return out
+  out[0] = x * len;
+  out[1] = y * len;
+  out[2] = z * len;
+  out[3] = w * len;
+  return out;
 }
 /**
  * Perform some operation over an array of vec4s.
@@ -4065,39 +4063,39 @@ function normalize$1 (out, a) {
  */
 
 (function () {
-  let vec = create$2()
+  var vec = create$2();
   return function (a, stride, offset, count, fn, arg) {
-    let i, l
+    var i, l;
 
     if (!stride) {
-      stride = 4
+      stride = 4;
     }
 
     if (!offset) {
-      offset = 0
+      offset = 0;
     }
 
     if (count) {
-      l = Math.min(count * stride + offset, a.length)
+      l = Math.min(count * stride + offset, a.length);
     } else {
-      l = a.length
+      l = a.length;
     }
 
     for (i = offset; i < l; i += stride) {
-      vec[0] = a[i]
-      vec[1] = a[i + 1]
-      vec[2] = a[i + 2]
-      vec[3] = a[i + 3]
-      fn(vec, vec, arg)
-      a[i] = vec[0]
-      a[i + 1] = vec[1]
-      a[i + 2] = vec[2]
-      a[i + 3] = vec[3]
+      vec[0] = a[i];
+      vec[1] = a[i + 1];
+      vec[2] = a[i + 2];
+      vec[3] = a[i + 3];
+      fn(vec, vec, arg);
+      a[i] = vec[0];
+      a[i + 1] = vec[1];
+      a[i + 2] = vec[2];
+      a[i + 3] = vec[3];
     }
 
-    return a
-  }
-})()
+    return a;
+  };
+})();
 
 /**
  * Quaternion
@@ -4110,17 +4108,17 @@ function normalize$1 (out, a) {
  * @returns {quat} a new quaternion
  */
 
-function create$1 () {
-  let out = new ARRAY_TYPE(4)
+function create$1() {
+  var out = new ARRAY_TYPE(4);
 
   if (ARRAY_TYPE != Float32Array) {
-    out[0] = 0
-    out[1] = 0
-    out[2] = 0
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
   }
 
-  out[3] = 1
-  return out
+  out[3] = 1;
+  return out;
 }
 /**
  * Sets a quat from the given angle and rotation axis,
@@ -4132,14 +4130,14 @@ function create$1 () {
  * @returns {quat} out
  **/
 
-function setAxisAngle (out, axis, rad) {
-  rad = rad * 0.5
-  let s = Math.sin(rad)
-  out[0] = s * axis[0]
-  out[1] = s * axis[1]
-  out[2] = s * axis[2]
-  out[3] = Math.cos(rad)
-  return out
+function setAxisAngle(out, axis, rad) {
+  rad = rad * 0.5;
+  var s = Math.sin(rad);
+  out[0] = s * axis[0];
+  out[1] = s * axis[1];
+  out[2] = s * axis[2];
+  out[3] = Math.cos(rad);
+  return out;
 }
 /**
  * Performs a spherical linear interpolation between two quat
@@ -4151,49 +4149,49 @@ function setAxisAngle (out, axis, rad) {
  * @returns {quat} out
  */
 
-function slerp (out, a, b, t) {
+function slerp(out, a, b, t) {
   // benchmarks:
   //    http://jsperf.com/quaternion-slerp-implementations
-  let ax = a[0],
+  var ax = a[0],
       ay = a[1],
       az = a[2],
-      aw = a[3]
-  let bx = b[0],
+      aw = a[3];
+  var bx = b[0],
       by = b[1],
       bz = b[2],
-      bw = b[3]
-  let omega, cosom, sinom, scale0, scale1 // calc cosine
+      bw = b[3];
+  var omega, cosom, sinom, scale0, scale1; // calc cosine
 
-  cosom = ax * bx + ay * by + az * bz + aw * bw // adjust signs (if necessary)
+  cosom = ax * bx + ay * by + az * bz + aw * bw; // adjust signs (if necessary)
 
   if (cosom < 0.0) {
-    cosom = -cosom
-    bx = -bx
-    by = -by
-    bz = -bz
-    bw = -bw
+    cosom = -cosom;
+    bx = -bx;
+    by = -by;
+    bz = -bz;
+    bw = -bw;
   } // calculate coefficients
 
 
   if (1.0 - cosom > EPSILON) {
     // standard case (slerp)
-    omega = Math.acos(cosom)
-    sinom = Math.sin(omega)
-    scale0 = Math.sin((1.0 - t) * omega) / sinom
-    scale1 = Math.sin(t * omega) / sinom
+    omega = Math.acos(cosom);
+    sinom = Math.sin(omega);
+    scale0 = Math.sin((1.0 - t) * omega) / sinom;
+    scale1 = Math.sin(t * omega) / sinom;
   } else {
     // "from" and "to" quaternions are very close
     //  ... so we can do a linear interpolation
-    scale0 = 1.0 - t
-    scale1 = t
+    scale0 = 1.0 - t;
+    scale1 = t;
   } // calculate final values
 
 
-  out[0] = scale0 * ax + scale1 * bx
-  out[1] = scale0 * ay + scale1 * by
-  out[2] = scale0 * az + scale1 * bz
-  out[3] = scale0 * aw + scale1 * bw
-  return out
+  out[0] = scale0 * ax + scale1 * bx;
+  out[1] = scale0 * ay + scale1 * by;
+  out[2] = scale0 * az + scale1 * bz;
+  out[3] = scale0 * aw + scale1 * bw;
+  return out;
 }
 /**
  * Creates a quaternion from the given 3x3 rotation matrix.
@@ -4207,42 +4205,38 @@ function slerp (out, a, b, t) {
  * @function
  */
 
-function fromMat3 (out, m) {
+function fromMat3(out, m) {
   // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
   // article "Quaternion Calculus and Fast Animation".
-  let fTrace = m[0] + m[4] + m[8]
-  let fRoot
+  var fTrace = m[0] + m[4] + m[8];
+  var fRoot;
 
   if (fTrace > 0.0) {
     // |w| > 1/2, may as well choose w > 1/2
-    fRoot = Math.sqrt(fTrace + 1.0) // 2w
+    fRoot = Math.sqrt(fTrace + 1.0); // 2w
 
-    out[3] = 0.5 * fRoot
-    fRoot = 0.5 / fRoot // 1/(4w)
+    out[3] = 0.5 * fRoot;
+    fRoot = 0.5 / fRoot; // 1/(4w)
 
-    out[0] = (m[5] - m[7]) * fRoot
-    out[1] = (m[6] - m[2]) * fRoot
-    out[2] = (m[1] - m[3]) * fRoot
+    out[0] = (m[5] - m[7]) * fRoot;
+    out[1] = (m[6] - m[2]) * fRoot;
+    out[2] = (m[1] - m[3]) * fRoot;
   } else {
     // |w| <= 1/2
-    let i = 0
-    if (m[4] > m[0]) {
- i = 1
-}
-    if (m[8] > m[i * 3 + i]) {
- i = 2
-}
-    let j = (i + 1) % 3
-    let k = (i + 2) % 3
-    fRoot = Math.sqrt(m[i * 3 + i] - m[j * 3 + j] - m[k * 3 + k] + 1.0)
-    out[i] = 0.5 * fRoot
-    fRoot = 0.5 / fRoot
-    out[3] = (m[j * 3 + k] - m[k * 3 + j]) * fRoot
-    out[j] = (m[j * 3 + i] + m[i * 3 + j]) * fRoot
-    out[k] = (m[k * 3 + i] + m[i * 3 + k]) * fRoot
+    var i = 0;
+    if (m[4] > m[0]) i = 1;
+    if (m[8] > m[i * 3 + i]) i = 2;
+    var j = (i + 1) % 3;
+    var k = (i + 2) % 3;
+    fRoot = Math.sqrt(m[i * 3 + i] - m[j * 3 + j] - m[k * 3 + k] + 1.0);
+    out[i] = 0.5 * fRoot;
+    fRoot = 0.5 / fRoot;
+    out[3] = (m[j * 3 + k] - m[k * 3 + j]) * fRoot;
+    out[j] = (m[j * 3 + i] + m[i * 3 + j]) * fRoot;
+    out[k] = (m[k * 3 + i] + m[i * 3 + k]) * fRoot;
   }
 
-  return out
+  return out;
 }
 /**
  * Normalize a quat
@@ -4253,7 +4247,7 @@ function fromMat3 (out, m) {
  * @function
  */
 
-let normalize = normalize$1;
+var normalize = normalize$1;
 /**
  * Sets a quaternion to represent the shortest rotation from one
  * vector to another.
@@ -4267,35 +4261,33 @@ let normalize = normalize$1;
  */
 
 (function () {
-  let tmpvec3 = create$3()
-  let xUnitVec3 = fromValues$1(1, 0, 0)
-  let yUnitVec3 = fromValues$1(0, 1, 0)
+  var tmpvec3 = create$3();
+  var xUnitVec3 = fromValues$1(1, 0, 0);
+  var yUnitVec3 = fromValues$1(0, 1, 0);
   return function (out, a, b) {
-    let dot$1 = dot(a, b)
+    var dot$1 = dot(a, b);
 
     if (dot$1 < -0.999999) {
-      cross(tmpvec3, xUnitVec3, a)
-      if (len(tmpvec3) < 0.000001) {
- cross(tmpvec3, yUnitVec3, a)
-}
-      normalize$2(tmpvec3, tmpvec3)
-      setAxisAngle(out, tmpvec3, Math.PI)
-      return out
+      cross(tmpvec3, xUnitVec3, a);
+      if (len(tmpvec3) < 0.000001) cross(tmpvec3, yUnitVec3, a);
+      normalize$2(tmpvec3, tmpvec3);
+      setAxisAngle(out, tmpvec3, Math.PI);
+      return out;
     } else if (dot$1 > 0.999999) {
-      out[0] = 0
-      out[1] = 0
-      out[2] = 0
-      out[3] = 1
-      return out
+      out[0] = 0;
+      out[1] = 0;
+      out[2] = 0;
+      out[3] = 1;
+      return out;
     } else {
-      cross(tmpvec3, a, b)
-      out[0] = tmpvec3[0]
-      out[1] = tmpvec3[1]
-      out[2] = tmpvec3[2]
-      out[3] = 1 + dot$1
-      return normalize(out, out)
+      cross(tmpvec3, a, b);
+      out[0] = tmpvec3[0];
+      out[1] = tmpvec3[1];
+      out[2] = tmpvec3[2];
+      out[3] = 1 + dot$1;
+      return normalize(out, out);
     }
-  }
+  };
 })();
 /**
  * Performs a spherical linear interpolation with two control points
@@ -4310,14 +4302,14 @@ let normalize = normalize$1;
  */
 
 (function () {
-  let temp1 = create$1()
-  let temp2 = create$1()
+  var temp1 = create$1();
+  var temp2 = create$1();
   return function (out, a, b, c, d, t) {
-    slerp(temp1, a, d, t)
-    slerp(temp2, b, c, t)
-    slerp(out, temp1, temp2, 2 * t * (1 - t))
-    return out
-  }
+    slerp(temp1, a, d, t);
+    slerp(temp2, b, c, t);
+    slerp(out, temp1, temp2, 2 * t * (1 - t));
+    return out;
+  };
 })();
 /**
  * Sets the specified quaternion with values corresponding to the given
@@ -4331,20 +4323,20 @@ let normalize = normalize$1;
  */
 
 (function () {
-  let matr = create$4()
+  var matr = create$4();
   return function (out, view, right, up) {
-    matr[0] = right[0]
-    matr[3] = right[1]
-    matr[6] = right[2]
-    matr[1] = up[0]
-    matr[4] = up[1]
-    matr[7] = up[2]
-    matr[2] = -view[0]
-    matr[5] = -view[1]
-    matr[8] = -view[2]
-    return normalize(out, fromMat3(out, matr))
-  }
-})()
+    matr[0] = right[0];
+    matr[3] = right[1];
+    matr[6] = right[2];
+    matr[1] = up[0];
+    matr[4] = up[1];
+    matr[7] = up[2];
+    matr[2] = -view[0];
+    matr[5] = -view[1];
+    matr[8] = -view[2];
+    return normalize(out, fromMat3(out, matr));
+  };
+})();
 
 /**
  * 2 Dimensional Vector
@@ -4357,15 +4349,15 @@ let normalize = normalize$1;
  * @returns {vec2} a new 2D vector
  */
 
-function create () {
-  let out = new ARRAY_TYPE(2)
+function create() {
+  var out = new ARRAY_TYPE(2);
 
   if (ARRAY_TYPE != Float32Array) {
-    out[0] = 0
-    out[1] = 0
+    out[0] = 0;
+    out[1] = 0;
   }
 
-  return out
+  return out;
 }
 /**
  * Creates a new vec2 initialized with the given values
@@ -4375,11 +4367,11 @@ function create () {
  * @returns {vec2} a new 2D vector
  */
 
-function fromValues (x, y) {
-  let out = new ARRAY_TYPE(2)
-  out[0] = x
-  out[1] = y
-  return out
+function fromValues(x, y) {
+  var out = new ARRAY_TYPE(2);
+  out[0] = x;
+  out[1] = y;
+  return out;
 }
 /**
  * Subtracts vector b from vector a
@@ -4390,17 +4382,17 @@ function fromValues (x, y) {
  * @returns {vec2} out
  */
 
-function subtract (out, a, b) {
-  out[0] = a[0] - b[0]
-  out[1] = a[1] - b[1]
-  return out
+function subtract(out, a, b) {
+  out[0] = a[0] - b[0];
+  out[1] = a[1] - b[1];
+  return out;
 }
 /**
  * Alias for {@link vec2.subtract}
  * @function
  */
 
-let sub = subtract;
+var sub = subtract;
 /**
  * Perform some operation over an array of vec2s.
  *
@@ -4415,35 +4407,35 @@ let sub = subtract;
  */
 
 (function () {
-  let vec = create()
+  var vec = create();
   return function (a, stride, offset, count, fn, arg) {
-    let i, l
+    var i, l;
 
     if (!stride) {
-      stride = 2
+      stride = 2;
     }
 
     if (!offset) {
-      offset = 0
+      offset = 0;
     }
 
     if (count) {
-      l = Math.min(count * stride + offset, a.length)
+      l = Math.min(count * stride + offset, a.length);
     } else {
-      l = a.length
+      l = a.length;
     }
 
     for (i = offset; i < l; i += stride) {
-      vec[0] = a[i]
-      vec[1] = a[i + 1]
-      fn(vec, vec, arg)
-      a[i] = vec[0]
-      a[i + 1] = vec[1]
+      vec[0] = a[i];
+      vec[1] = a[i + 1];
+      fn(vec, vec, arg);
+      a[i] = vec[0];
+      a[i + 1] = vec[1];
     }
 
-    return a
-  }
-})()
+    return a;
+  };
+})();
 
 // @ts-ignore
 
@@ -4455,36 +4447,36 @@ const RippleLayerView = BaseLayerViewGL2D.createSubclass({
   constructor: function () {
     // Geometrical transformations that must be recomputed
     // from scratch at every frame.
-    this.transform = create$4()
-    this.translationToCenter = create()
-    this.screenTranslation = create() // Geometrical transformations whose only a few elements
+    this.transform = create$4();
+    this.translationToCenter = create();
+    this.screenTranslation = create(); // Geometrical transformations whose only a few elements
     // must be updated per frame. Those elements are marked
     // with NaN.
 
-    this.display = fromValues$2(NaN, 0, 0, 0, NaN, 0, -1, 1, 1)
-    this.screenScaling = fromValues$1(NaN, NaN, 1) // Whether the vertex and index buffers need to be updated
+    this.display = fromValues$2(NaN, 0, 0, 0, NaN, 0, -1, 1, 1);
+    this.screenScaling = fromValues$1(NaN, NaN, 1); // Whether the vertex and index buffers need to be updated
     // due to a change in the layer data.
 
-    this.needsUpdate = false // We listen for changes to the graphics collection of the layer
+    this.needsUpdate = false; // We listen for changes to the graphics collection of the layer
     // and trigger the generation of new frames. A frame rendered while
     // `needsUpdate` is true may cause an update of the vertex and
     // index buffers.
 
     const requestUpdate = () => {
-      this.needsUpdate = true
-      this.requestRender()
-    }
+      this.needsUpdate = true;
+      this.requestRender();
+    };
 
-    this.watcher = on(this, 'layer.graphics', 'change', requestUpdate, requestUpdate, requestUpdate)
+    this.watcher = on(this, 'layer.graphics', 'change', requestUpdate, requestUpdate, requestUpdate);
   },
   // Called once a custom layer is added to the map.layers collection and this layer view is instantiated.
   attach: function () {
-    const gl = this.context
-    const rippleOptions = this.layer.rippleOptions
-    const color = (rippleOptions === null || rippleOptions === void 0 ? void 0 : rippleOptions.color) ?? '0.23, 0.43, 0.70'
-    const size = ((rippleOptions === null || rippleOptions === void 0 ? void 0 : rippleOptions.size) ?? 70.0).toFixed(2)
-    const freq = ((rippleOptions === null || rippleOptions === void 0 ? void 0 : rippleOptions.freq) ?? 1.0).toFixed(2)
-    const rings = ((rippleOptions === null || rippleOptions === void 0 ? void 0 : rippleOptions.rings) ?? 3.0).toFixed(2) // Define and compile shaders.
+    const gl = this.context;
+    const rippleOptions = this.layer.rippleOptions;
+    const color = (rippleOptions === null || rippleOptions === void 0 ? void 0 : rippleOptions.color) ?? '0.23, 0.43, 0.70';
+    const size = ((rippleOptions === null || rippleOptions === void 0 ? void 0 : rippleOptions.size) ?? 70.0).toFixed(2);
+    const freq = ((rippleOptions === null || rippleOptions === void 0 ? void 0 : rippleOptions.freq) ?? 1.0).toFixed(2);
+    const rings = ((rippleOptions === null || rippleOptions === void 0 ? void 0 : rippleOptions.rings) ?? 3.0).toFixed(2); // Define and compile shaders.
 
     const vertexSource = `
       precision highp float;
@@ -4498,7 +4490,7 @@ const RippleLayerView = BaseLayerViewGL2D.createSubclass({
           gl_Position.xy = (u_display * (u_transform * vec3(a_position, 1.0) + vec3(a_offset * SIZE, 0.0))).xy;
           gl_Position.zw = vec2(0.0, 1.0);
           v_offset = a_offset;
-      }`
+      }`;
     const fragmentSource = `
       precision highp float;
       uniform float u_current_time;
@@ -4511,203 +4503,203 @@ const RippleLayerView = BaseLayerViewGL2D.createSubclass({
           float l = length(v_offset);
           float intensity = clamp(cos(l * PI), 0.0, 1.0) * clamp(cos(2.0 * PI * (l * 2.0 * N_RINGS - FREQ * u_current_time)), 0.0, 1.0);
           gl_FragColor = vec4(COLOR * intensity, intensity);
-      }`
-    const vertexShader = gl.createShader(gl.VERTEX_SHADER)
-    gl.shaderSource(vertexShader, vertexSource)
-    gl.compileShader(vertexShader)
-    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
-    gl.shaderSource(fragmentShader, fragmentSource)
-    gl.compileShader(fragmentShader) // Create the shader program.
+      }`;
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vertexShader, vertexSource);
+    gl.compileShader(vertexShader);
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragmentShader, fragmentSource);
+    gl.compileShader(fragmentShader); // Create the shader program.
 
-    this.program = gl.createProgram()
-    gl.attachShader(this.program, vertexShader)
-    gl.attachShader(this.program, fragmentShader) // Bind attributes.
+    this.program = gl.createProgram();
+    gl.attachShader(this.program, vertexShader);
+    gl.attachShader(this.program, fragmentShader); // Bind attributes.
 
-    gl.bindAttribLocation(this.program, this.aPosition, 'a_position')
-    gl.bindAttribLocation(this.program, this.aOffset, 'a_offset') // Link.
+    gl.bindAttribLocation(this.program, this.aPosition, 'a_position');
+    gl.bindAttribLocation(this.program, this.aOffset, 'a_offset'); // Link.
 
-    gl.linkProgram(this.program) // Shader objects are not needed anymore.
+    gl.linkProgram(this.program); // Shader objects are not needed anymore.
 
-    gl.deleteShader(vertexShader)
-    gl.deleteShader(fragmentShader) // Retrieve uniform locations once and for all.
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragmentShader); // Retrieve uniform locations once and for all.
 
-    this.uTransform = gl.getUniformLocation(this.program, 'u_transform')
-    this.uDisplay = gl.getUniformLocation(this.program, 'u_display')
-    this.uCurrentTime = gl.getUniformLocation(this.program, 'u_current_time') // Create the vertex and index buffer. They are initially empty. We need to track the
+    this.uTransform = gl.getUniformLocation(this.program, 'u_transform');
+    this.uDisplay = gl.getUniformLocation(this.program, 'u_display');
+    this.uCurrentTime = gl.getUniformLocation(this.program, 'u_current_time'); // Create the vertex and index buffer. They are initially empty. We need to track the
     // size of the index buffer because we use indexed drawing.
 
-    this.vertexBuffer = gl.createBuffer()
-    this.indexBuffer = gl.createBuffer() // Number of indices in the index buffer.
+    this.vertexBuffer = gl.createBuffer();
+    this.indexBuffer = gl.createBuffer(); // Number of indices in the index buffer.
 
-    this.indexBufferSize = 0 // When certain conditions occur, we update the buffers and re-compute and re-encode
+    this.indexBufferSize = 0; // When certain conditions occur, we update the buffers and re-compute and re-encode
     // all the attributes. When buffer update occurs, we also take note of the current center
     // of the view state, and we reset a vector called `translationToCenter` to [0, 0], meaning that the
     // current center is the same as it was when the attributes were recomputed.
 
-    this.centerAtLastUpdate = fromValues(this.view.state.center[0], this.view.state.center[1])
+    this.centerAtLastUpdate = fromValues(this.view.state.center[0], this.view.state.center[1]);
   },
   // Called once a custom layer is removed from the map.layers collection and this layer view is destroyed.
   detach: function () {
     // Stop watching the `layer.graphics` collection.
-    this.watcher.remove()
-    const gl = this.context // Delete buffers and programs.
+    this.watcher.remove();
+    const gl = this.context; // Delete buffers and programs.
 
-    gl.deleteBuffer(this.vertexBuffer)
-    gl.deleteBuffer(this.indexBuffer)
-    gl.deleteProgram(this.program)
+    gl.deleteBuffer(this.vertexBuffer);
+    gl.deleteBuffer(this.indexBuffer);
+    gl.deleteProgram(this.program);
   },
   // Called every time a frame is rendered.
   render: function (renderParameters) {
-    const gl = renderParameters.context
-    const state = renderParameters.state // Update vertex positions. This may trigger an update of
+    const gl = renderParameters.context;
+    const state = renderParameters.state; // Update vertex positions. This may trigger an update of
     // the vertex coordinates contained in the vertex buffer.
     // There are three kinds of updates:
     //  - Modification of the layer.graphics collection ==> Buffer update
     //  - The view state becomes non-stationary ==> Only view update, no buffer update
     //  - The view state becomes stationary ==> Buffer update
 
-    this.updatePositions(renderParameters) // If there is nothing to render we return.
+    this.updatePositions(renderParameters); // If there is nothing to render we return.
 
     if (this.indexBufferSize === 0) {
-      return
+      return;
     } // Update view `transform` matrix; it converts from map units to pixels.
 
 
-    identity(this.transform)
-    this.screenTranslation[0] = state.pixelRatio * state.size[0] / 2
-    this.screenTranslation[1] = state.pixelRatio * state.size[1] / 2
-    translate(this.transform, this.transform, this.screenTranslation)
-    rotate(this.transform, this.transform, Math.PI * state.rotation / 180)
-    this.screenScaling[0] = state.pixelRatio / state.resolution
-    this.screenScaling[1] = -state.pixelRatio / state.resolution
-    scale(this.transform, this.transform, this.screenScaling)
-    translate(this.transform, this.transform, this.translationToCenter) // Update view `display` matrix; it converts from pixels to normalized device coordinates.
+    identity(this.transform);
+    this.screenTranslation[0] = state.pixelRatio * state.size[0] / 2;
+    this.screenTranslation[1] = state.pixelRatio * state.size[1] / 2;
+    translate(this.transform, this.transform, this.screenTranslation);
+    rotate(this.transform, this.transform, Math.PI * state.rotation / 180);
+    this.screenScaling[0] = state.pixelRatio / state.resolution;
+    this.screenScaling[1] = -state.pixelRatio / state.resolution;
+    scale(this.transform, this.transform, this.screenScaling);
+    translate(this.transform, this.transform, this.translationToCenter); // Update view `display` matrix; it converts from pixels to normalized device coordinates.
 
-    this.display[0] = 2 / (state.pixelRatio * state.size[0])
-    this.display[4] = -2 / (state.pixelRatio * state.size[1]) // Draw.
+    this.display[0] = 2 / (state.pixelRatio * state.size[0]);
+    this.display[4] = -2 / (state.pixelRatio * state.size[1]); // Draw.
 
-    gl.useProgram(this.program)
-    gl.uniformMatrix3fv(this.uTransform, false, this.transform)
-    gl.uniformMatrix3fv(this.uDisplay, false, this.display)
-    gl.uniform1f(this.uCurrentTime, performance.now() / 1000.0)
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer)
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer)
-    gl.enableVertexAttribArray(this.aPosition)
-    gl.enableVertexAttribArray(this.aOffset)
-    gl.vertexAttribPointer(this.aPosition, 2, gl.FLOAT, false, 16, 0)
-    gl.vertexAttribPointer(this.aOffset, 2, gl.FLOAT, false, 16, 8)
-    gl.enable(gl.BLEND)
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
-    gl.drawElements(gl.TRIANGLES, this.indexBufferSize, gl.UNSIGNED_SHORT, 0) // Request new render because markers are animated.
+    gl.useProgram(this.program);
+    gl.uniformMatrix3fv(this.uTransform, false, this.transform);
+    gl.uniformMatrix3fv(this.uDisplay, false, this.display);
+    gl.uniform1f(this.uCurrentTime, performance.now() / 1000.0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    gl.enableVertexAttribArray(this.aPosition);
+    gl.enableVertexAttribArray(this.aOffset);
+    gl.vertexAttribPointer(this.aPosition, 2, gl.FLOAT, false, 16, 0);
+    gl.vertexAttribPointer(this.aOffset, 2, gl.FLOAT, false, 16, 8);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.drawElements(gl.TRIANGLES, this.indexBufferSize, gl.UNSIGNED_SHORT, 0); // Request new render because markers are animated.
 
-    this.requestRender()
+    this.requestRender();
   },
   // Called by the map view or the popup view when hit testing is required.
   hitTest: function (x, y) {
     // The map view.
-    const view = this.view
+    const view = this.view;
 
     if (this.layer.graphics.length === 0) {
       // Nothing to do.
-      return resolve(null)
+      return resolve(null);
     } // Compute screen distance between each graphic and the test point.
 
 
     const distances = this.layer.graphics.map(graphic => {
-      const graphicPoint = view.toScreen(graphic.geometry)
-      return Math.sqrt((graphicPoint.x - x) * (graphicPoint.x - x) + (graphicPoint.y - y) * (graphicPoint.y - y))
-    }) // Find the minimum distance.
+      const graphicPoint = view.toScreen(graphic.geometry);
+      return Math.sqrt((graphicPoint.x - x) * (graphicPoint.x - x) + (graphicPoint.y - y) * (graphicPoint.y - y));
+    }); // Find the minimum distance.
 
-    let minIndex = 0
+    let minIndex = 0;
     distances.forEach((distance, i) => {
       if (distance < distances.getItemAt(minIndex)) {
-        minIndex = i
+        minIndex = i;
       }
-    })
-    const minDistance = distances.getItemAt(minIndex) // If the minimum distance is more than 35 pixel then nothing was hit.
+    });
+    const minDistance = distances.getItemAt(minIndex); // If the minimum distance is more than 35 pixel then nothing was hit.
 
     if (minDistance > 35) {
-      return resolve(null)
+      return resolve(null);
     } // Otherwise it is a hit; We set the layer as the source layer for the graphic
     // (required for the popup view to work) and we return a resolving promise to
     // the graphic.
 
 
-    const graphic = this.layer.graphics.getItemAt(minIndex)
-    graphic.sourceLayer = this.layer
-    return resolve(graphic)
+    const graphic = this.layer.graphics.getItemAt(minIndex);
+    graphic.sourceLayer = this.layer;
+    return resolve(graphic);
   },
   // Called internally from render().
   updatePositions: function (renderParameters) {
-    const gl = renderParameters.context
-    const stationary = renderParameters.stationary
-    const state = renderParameters.state // If we are not stationary we simply update the `translationToCenter` vector.
+    const gl = renderParameters.context;
+    const stationary = renderParameters.stationary;
+    const state = renderParameters.state; // If we are not stationary we simply update the `translationToCenter` vector.
 
     if (!stationary) {
-      sub(this.translationToCenter, this.centerAtLastUpdate, state.center)
-      this.requestRender()
-      return
+      sub(this.translationToCenter, this.centerAtLastUpdate, state.center);
+      this.requestRender();
+      return;
     } // If we are stationary, the `layer.graphics` collection has not changed, and
     // we are centered on the `centerAtLastUpdate`, we do nothing.
 
 
     if (!this.needsUpdate && this.translationToCenter[0] === 0 && this.translationToCenter[1] === 0) {
-      return
+      return;
     } // Otherwise, we record the new encoded center, which imply a reset of the `translationToCenter` vector,
     // we record the update time, and we proceed to update the buffers.
 
 
-    this.centerAtLastUpdate.set(state.center)
-    this.translationToCenter[0] = 0
-    this.translationToCenter[1] = 0
-    this.needsUpdate = false
-    const graphics = this.layer.graphics // Generate vertex data.
+    this.centerAtLastUpdate.set(state.center);
+    this.translationToCenter[0] = 0;
+    this.translationToCenter[1] = 0;
+    this.needsUpdate = false;
+    const graphics = this.layer.graphics; // Generate vertex data.
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer)
-    const vertexData = new Float32Array(16 * graphics.length)
-    let i = 0
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+    const vertexData = new Float32Array(16 * graphics.length);
+    let i = 0;
     graphics.forEach(graphic => {
-      const point = graphic.geometry // The (x, y) position is relative to the encoded center.
+      const point = graphic.geometry; // The (x, y) position is relative to the encoded center.
 
-      const x = point.x - this.centerAtLastUpdate[0]
-      const y = point.y - this.centerAtLastUpdate[1]
-      vertexData[i * 16 + 0] = x
-      vertexData[i * 16 + 1] = y
-      vertexData[i * 16 + 2] = -0.5
-      vertexData[i * 16 + 3] = -0.5
-      vertexData[i * 16 + 4] = x
-      vertexData[i * 16 + 5] = y
-      vertexData[i * 16 + 6] = 0.5
-      vertexData[i * 16 + 7] = -0.5
-      vertexData[i * 16 + 8] = x
-      vertexData[i * 16 + 9] = y
-      vertexData[i * 16 + 10] = -0.5
-      vertexData[i * 16 + 11] = 0.5
-      vertexData[i * 16 + 12] = x
-      vertexData[i * 16 + 13] = y
-      vertexData[i * 16 + 14] = 0.5
-      vertexData[i * 16 + 15] = 0.5
-      ++i
-    })
-    gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW) // Generates index data.
+      const x = point.x - this.centerAtLastUpdate[0];
+      const y = point.y - this.centerAtLastUpdate[1];
+      vertexData[i * 16 + 0] = x;
+      vertexData[i * 16 + 1] = y;
+      vertexData[i * 16 + 2] = -0.5;
+      vertexData[i * 16 + 3] = -0.5;
+      vertexData[i * 16 + 4] = x;
+      vertexData[i * 16 + 5] = y;
+      vertexData[i * 16 + 6] = 0.5;
+      vertexData[i * 16 + 7] = -0.5;
+      vertexData[i * 16 + 8] = x;
+      vertexData[i * 16 + 9] = y;
+      vertexData[i * 16 + 10] = -0.5;
+      vertexData[i * 16 + 11] = 0.5;
+      vertexData[i * 16 + 12] = x;
+      vertexData[i * 16 + 13] = y;
+      vertexData[i * 16 + 14] = 0.5;
+      vertexData[i * 16 + 15] = 0.5;
+      ++i;
+    });
+    gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW); // Generates index data.
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer)
-    const indexData = new Uint16Array(6 * graphics.length)
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    const indexData = new Uint16Array(6 * graphics.length);
 
     for (let i = 0; i < graphics.length; ++i) {
-      indexData[i * 6 + 0] = i * 4 + 0
-      indexData[i * 6 + 1] = i * 4 + 1
-      indexData[i * 6 + 2] = i * 4 + 2
-      indexData[i * 6 + 3] = i * 4 + 1
-      indexData[i * 6 + 4] = i * 4 + 3
-      indexData[i * 6 + 5] = i * 4 + 2
+      indexData[i * 6 + 0] = i * 4 + 0;
+      indexData[i * 6 + 1] = i * 4 + 1;
+      indexData[i * 6 + 2] = i * 4 + 2;
+      indexData[i * 6 + 3] = i * 4 + 1;
+      indexData[i * 6 + 4] = i * 4 + 3;
+      indexData[i * 6 + 5] = i * 4 + 2;
     }
 
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW) // Record number of indices.
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW); // Record number of indices.
 
-    this.indexBufferSize = indexData.length
+    this.indexBufferSize = indexData.length;
   }
-})
+});
 
 // @ts-ignore
 
@@ -4719,9 +4711,405 @@ const RippleGraphicsLayer = GraphicsLayer.createSubclass({
       return new RippleLayerView({
         view: view,
         layer: this
-      })
+      });
     }
   }
-})
+});
 
-export { Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, ViewCliper, ZoomHomeTool, createGeometryFactory, createLayerFactory, getLatfromLonLat, getLonfromLonLat, getXfromXY, getYfromXY }
+// @ts-ignore
+
+const AnimatedLinesLayerView = BaseLayerViewGL2D.createSubclass({
+  // Locations of the two vertex attributes that we use. They
+  // will be bound to the shader program before linking.
+  aPosition: 0,
+  aOffset: 1,
+  aDistance: 2,
+  aSide: 3,
+  aColor: 4,
+  constructor: function () {
+    // Geometrical transformations that must be recomputed
+    // from scratch at every frame.
+    this.transform = create$4();
+    this.extrude = create$4();
+    this.translationToCenter = create();
+    this.screenTranslation = create(); // Geometrical transformations whose only a few elements
+    // must be updated per frame. Those elements are marked
+    // with NaN.
+
+    this.display = fromValues$2(NaN, 0, 0, 0, NaN, 0, -1, 1, 1);
+    this.screenScaling = fromValues$1(NaN, NaN, 1); // Whether the vertex and index buffers need to be updated
+    // due to a change in the layer data.
+
+    this.needsUpdate = false; // We listen for changes to the graphics collection of the layer
+    // and trigger the generation of new frames. A frame rendered while
+    // `needsUpdate` is true may cause an update of the vertex and
+    // index buffers.
+
+    const requestUpdate = () => {
+      this.needsUpdate = true;
+      this.requestRender();
+    };
+
+    this.watcher = on(this, 'layer.graphics', 'change', requestUpdate, requestUpdate, requestUpdate);
+  },
+  // Called once a custom layer is added to the map.layers collection and this layer view is instantiated.
+  attach: function () {
+    const gl = this.context;
+    const animatedOptions = this.layer.animatedOptions;
+    const trailSpeed = ((animatedOptions === null || animatedOptions === void 0 ? void 0 : animatedOptions.trailSpeed) ?? 50.0).toFixed(2);
+    const trailLength = ((animatedOptions === null || animatedOptions === void 0 ? void 0 : animatedOptions.trailLength) ?? 300.0).toFixed(2);
+    const trailCycle = ((animatedOptions === null || animatedOptions === void 0 ? void 0 : animatedOptions.trailCycle) ?? 1000.0).toFixed(2);
+    const vertexSource = `
+      precision highp float;
+
+      uniform mat3 u_transform;
+      uniform mat3 u_extrude;
+      uniform mat3 u_display;
+
+      attribute vec2 a_position;
+      attribute vec2 a_offset;
+      attribute float a_distance;
+      attribute float a_side;
+      attribute vec4 a_color;
+
+      varying float v_distance;
+      varying float v_side;
+      varying vec4 v_color;
+
+      void main(void) {
+        gl_Position.xy = (u_display * (u_transform * vec3(a_position, 1.0) + u_extrude * vec3(a_offset, 0.0))).xy;
+        gl_Position.zw = vec2(0.0, 1.0);
+        v_distance = a_distance;
+        v_side = a_side;
+        v_color = a_color;
+      }`;
+    const fragmentSource = `
+      precision highp float;
+
+      uniform float u_current_time;
+
+      varying float v_distance;
+      varying float v_side;
+      varying vec4 v_color;
+
+      const float TRAIL_SPEED = ${trailSpeed};
+      const float TRAIL_LENGTH = ${trailLength};
+      const float TRAIL_CYCLE = ${trailCycle};
+
+      void main(void) {
+        float d = mod(v_distance - u_current_time * TRAIL_SPEED, TRAIL_CYCLE);
+        float a1 = d < TRAIL_LENGTH ? mix(0.0, 1.0, d / TRAIL_LENGTH) : 0.0;
+        float a2 = exp(-abs(v_side) * 3.0);
+        float a = a1 * a2;
+        gl_FragColor = v_color * a;
+      }`;
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vertexShader, vertexSource);
+    gl.compileShader(vertexShader);
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragmentShader, fragmentSource);
+    gl.compileShader(fragmentShader); // Create the shader program.
+
+    this.program = gl.createProgram();
+    gl.attachShader(this.program, vertexShader);
+    gl.attachShader(this.program, fragmentShader); // Bind attributes.
+
+    gl.bindAttribLocation(this.program, this.aPosition, 'a_position');
+    gl.bindAttribLocation(this.program, this.aOffset, 'a_offset');
+    gl.bindAttribLocation(this.program, this.aDistance, 'a_distance');
+    gl.bindAttribLocation(this.program, this.aSide, 'a_side');
+    gl.bindAttribLocation(this.program, this.aColor, 'a_color'); // Link.
+
+    gl.linkProgram(this.program); // Shader objects are not needed anymore.
+
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragmentShader); // Retrieve uniform locations once and for all.
+
+    this.uTransform = gl.getUniformLocation(this.program, 'u_transform');
+    this.uExtrude = gl.getUniformLocation(this.program, 'u_extrude');
+    this.uDisplay = gl.getUniformLocation(this.program, 'u_display');
+    this.uCurrentTime = gl.getUniformLocation(this.program, 'u_current_time'); // Create the vertex and index buffer. They are initially empty. We need to track the
+    // size of the index buffer because we use indexed drawing.
+
+    this.vertexBuffer = gl.createBuffer();
+    this.indexBuffer = gl.createBuffer(); // Number of indices in the index buffer.
+
+    this.indexBufferSize = 0; // When certain conditions occur, we update the buffers and re-compute and re-encode
+    // all the attributes. When buffer update occurs, we also take note of the current center
+    // of the view state, and we reset a vector called `translationToCenter` to [0, 0], meaning that the
+    // current center is the same as it was when the attributes were recomputed.
+
+    this.centerAtLastUpdate = fromValues(this.view.state.center[0], this.view.state.center[1]);
+  },
+  // Called once a custom layer is removed from the map.layers collection and this layer view is destroyed.
+  detach: function () {
+    // Stop watching the `layer.graphics` collection.
+    this.watcher.remove();
+    const gl = this.context; // Delete buffers and programs.
+
+    gl.deleteBuffer(this.vertexBuffer);
+    gl.deleteBuffer(this.indexBuffer);
+    gl.deleteProgram(this.program);
+  },
+  // Called every time a frame is rendered.
+  render: function (renderParameters) {
+    const gl = renderParameters.context;
+    const state = renderParameters.state; // Update vertex positions. This may trigger an update of
+    // the vertex coordinates contained in the vertex buffer.
+    // There are three kinds of updates:
+    //  - Modification of the layer.graphics collection ==> Buffer update
+    //  - The view state becomes non-stationary ==> Only view update, no buffer update
+    //  - The view state becomes stationary ==> Buffer update
+
+    this.updatePositions(renderParameters); // If there is nothing to render we return.
+
+    if (this.indexBufferSize === 0) {
+      return;
+    } // Update view `transform` matrix; it converts from map units to pixels.
+
+
+    identity(this.transform);
+    this.screenTranslation[0] = state.pixelRatio * state.size[0] / 2;
+    this.screenTranslation[1] = state.pixelRatio * state.size[1] / 2;
+    translate(this.transform, this.transform, this.screenTranslation);
+    rotate(this.transform, this.transform, Math.PI * state.rotation / 180);
+    this.screenScaling[0] = state.pixelRatio / state.resolution;
+    this.screenScaling[1] = -state.pixelRatio / state.resolution;
+    scale(this.transform, this.transform, this.screenScaling);
+    translate(this.transform, this.transform, this.translationToCenter); // Update view `extrude` matrix; it causes offset vectors to rotate and scale
+    // with the view, but caps the maximum width a polyline is allowed to be.
+
+    identity(this.extrude);
+    rotate(this.extrude, this.extrude, Math.PI * state.rotation / 180);
+    const HALF_WIDTH = 6;
+    scale(this.extrude, this.extrude, [HALF_WIDTH, -HALF_WIDTH, 1]); // Update view `display` matrix; it converts from pixels to normalized device coordinates.
+
+    this.display[0] = 2 / (state.pixelRatio * state.size[0]);
+    this.display[4] = -2 / (state.pixelRatio * state.size[1]); // Draw.
+
+    gl.useProgram(this.program);
+    gl.uniformMatrix3fv(this.uTransform, false, this.transform);
+    gl.uniformMatrix3fv(this.uExtrude, false, this.extrude);
+    gl.uniformMatrix3fv(this.uDisplay, false, this.display);
+    gl.uniform1f(this.uCurrentTime, performance.now() / 1000.0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    gl.enableVertexAttribArray(this.aPosition);
+    gl.enableVertexAttribArray(this.aOffset);
+    gl.enableVertexAttribArray(this.aDistance);
+    gl.enableVertexAttribArray(this.aSide);
+    gl.enableVertexAttribArray(this.aColor);
+    gl.vertexAttribPointer(this.aPosition, 2, gl.FLOAT, false, 28, 0);
+    gl.vertexAttribPointer(this.aOffset, 2, gl.FLOAT, false, 28, 8);
+    gl.vertexAttribPointer(this.aDistance, 1, gl.FLOAT, false, 28, 16);
+    gl.vertexAttribPointer(this.aSide, 1, gl.FLOAT, false, 28, 20);
+    gl.vertexAttribPointer(this.aColor, 4, gl.UNSIGNED_BYTE, true, 28, 24);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.drawElements(gl.TRIANGLES, this.indexBufferSize, gl.UNSIGNED_SHORT, 0); // Request new render because markers are animated.
+
+    this.requestRender();
+  },
+  // Called internally from render().
+  updatePositions: function (renderParameters) {
+    const gl = renderParameters.context;
+    const stationary = renderParameters.stationary;
+    const state = renderParameters.state;
+    const animatedOptions = this.layer.animatedOptions;
+    const defaultColor = (animatedOptions === null || animatedOptions === void 0 ? void 0 : animatedOptions.defaultColor) ?? [255, 0, 0]; // If we are not stationary we simply update the `translationToCenter` vector.
+
+    if (!stationary) {
+      sub(this.translationToCenter, this.centerAtLastUpdate, state.center);
+      this.requestRender();
+      return;
+    } // If we are stationary, the `layer.graphics` collection has not changed, and
+    // we are centered on the `centerAtLastUpdate`, we do nothing.
+
+
+    if (!this.needsUpdate && this.translationToCenter[0] === 0 && this.translationToCenter[1] === 0) {
+      return;
+    } // Otherwise, we record the new encoded center, which imply a reset of the `translationToCenter` vector,
+    // we record the update time, and we proceed to update the buffers.
+
+
+    this.centerAtLastUpdate.set(state.center);
+    this.translationToCenter[0] = 0;
+    this.translationToCenter[1] = 0;
+    this.needsUpdate = false;
+    const graphics = this.layer.graphics; // Allocate memory.
+
+    let vtxCount = 0;
+    let idxCount = 0;
+
+    for (let i = 0; i < graphics.items.length; ++i) {
+      const graphic = graphics.items[i];
+      const path = graphic.geometry.paths[0];
+      vtxCount += path.length * 2;
+      idxCount += (path.length - 1) * 6;
+    }
+
+    const vertexData = new ArrayBuffer(7 * vtxCount * 4);
+    const floatData = new Float32Array(vertexData);
+    const colorData = new Uint8Array(vertexData);
+    const indexData = new Uint16Array(idxCount); // Generate attribute and index data. These cursors count the number
+    // of GPU vertices and indices emitted by the triangulator; writes to
+    // vertex and index memory occur at the positions pointed by the cursors.
+
+    let vtxCursor = 0;
+    let idxCursor = 0;
+
+    for (let i = 0; i < graphics.items.length; ++i) {
+      var _graphic$attributes;
+
+      const graphic = graphics.items[i];
+      const path = graphic.geometry.paths[0];
+      const color = ((_graphic$attributes = graphic.attributes) === null || _graphic$attributes === void 0 ? void 0 : _graphic$attributes['color']) ?? defaultColor; // Initialize new triangulation state.
+
+      const s = {}; // eslint-disable-line
+      // Process each vertex.
+
+      for (let j = 0; j < path.length; ++j) {
+        // Point p is an original vertex of the polyline; we need to produce two extruded
+        // GPU vertices, for each original vertex.
+        const p = path[j];
+
+        if (s.current) {
+          // If this is not the first point, we compute the vector between the previous
+          // and the next vertex.
+          s.delta = [p[0] - s.current[0], p[1] - s.current[1]]; // And we normalize it. This is the direction of the current line segment
+          // that we are processing.
+
+          const deltaLength = Math.sqrt(s.delta[0] * s.delta[0] + s.delta[1] * s.delta[1]);
+          s.direction = [s.delta[0] / deltaLength, s.delta[1] / deltaLength]; // We want to compute the normal to that segment. The normal of a
+          // vector (x, y) can be computed by rotating it by 90 degrees; this yields (-y, x).
+
+          const normal = [-s.direction[1], s.direction[0]];
+
+          if (s.normal) {
+            // If there is already a normal vector in the state, then the offset is the
+            // average of that normal and the next normal, i.e. the bisector of the turn.
+            s.offset = [s.normal[0] + normal[0], s.normal[1] + normal[1]]; // We first normalize it.
+
+            const offsetLength = Math.sqrt(s.offset[0] * s.offset[0] + s.offset[1] * s.offset[1]);
+            s.offset[0] /= offsetLength;
+            s.offset[1] /= offsetLength; // Then we scale it like the cosine of the half turn angle. This can
+            // be computed as the dot product between the previous normal and the
+            // normalized bisector.
+
+            const d = s.normal[0] * s.offset[0] + s.normal[1] * s.offset[1];
+            s.offset[0] /= d;
+            s.offset[1] /= d;
+          } else {
+            // Otherwise, this is the offset of the first vertex; it is equal to the
+            // normal we just computed.
+            s.offset = [normal[0], normal[1]];
+          } // All the values that we computed are written to the first GPU vertex.
+
+
+          floatData[vtxCursor * 7 + 0] = s.current[0] - this.centerAtLastUpdate[0];
+          floatData[vtxCursor * 7 + 1] = s.current[1] - this.centerAtLastUpdate[1];
+          floatData[vtxCursor * 7 + 2] = s.offset[0];
+          floatData[vtxCursor * 7 + 3] = s.offset[1];
+          floatData[vtxCursor * 7 + 4] = s.distance;
+          floatData[vtxCursor * 7 + 5] = +1;
+          colorData[4 * (vtxCursor * 7 + 6) + 0] = color[0];
+          colorData[4 * (vtxCursor * 7 + 6) + 1] = color[1];
+          colorData[4 * (vtxCursor * 7 + 6) + 2] = color[2];
+          colorData[4 * (vtxCursor * 7 + 6) + 3] = 255; // We also write the same values to the second vertex, but we negate the
+          // offset and the side (these are the attributes at positions +9, +10 and +12).
+
+          floatData[vtxCursor * 7 + 7] = s.current[0] - this.centerAtLastUpdate[0];
+          floatData[vtxCursor * 7 + 8] = s.current[1] - this.centerAtLastUpdate[1];
+          floatData[vtxCursor * 7 + 9] = -s.offset[0];
+          floatData[vtxCursor * 7 + 10] = -s.offset[1];
+          floatData[vtxCursor * 7 + 11] = s.distance;
+          floatData[vtxCursor * 7 + 12] = -1;
+          colorData[4 * (vtxCursor * 7 + 13) + 0] = color[0];
+          colorData[4 * (vtxCursor * 7 + 13) + 1] = color[1];
+          colorData[4 * (vtxCursor * 7 + 13) + 2] = color[2];
+          colorData[4 * (vtxCursor * 7 + 13) + 3] = 255;
+          vtxCursor += 2;
+
+          if (j >= 2) {
+            // If this is the third iteration then it means that we have emitted
+            // four GPU vertices already; we can form a triangle with them.
+            indexData[idxCursor + 0] = vtxCursor - 4;
+            indexData[idxCursor + 1] = vtxCursor - 3;
+            indexData[idxCursor + 2] = vtxCursor - 2;
+            indexData[idxCursor + 3] = vtxCursor - 3;
+            indexData[idxCursor + 4] = vtxCursor - 1;
+            indexData[idxCursor + 5] = vtxCursor - 2;
+            idxCursor += 6;
+          } // The next normal becomes the current normal at the next iteration.
+
+
+          s.normal = normal; // We increment the distance along the line by the length of the segment
+          // that we just processed.
+
+          s.distance += deltaLength;
+        } else {
+          s.distance = 0;
+        } // We move to the next point.
+
+
+        s.current = p;
+      } // Finishing up (last 2 extruded vertices and 6 indices).
+
+
+      s.offset = [s.normal[0], s.normal[1]];
+      floatData[vtxCursor * 7 + 0] = s.current[0] - this.centerAtLastUpdate[0];
+      floatData[vtxCursor * 7 + 1] = s.current[1] - this.centerAtLastUpdate[1];
+      floatData[vtxCursor * 7 + 2] = s.offset[0];
+      floatData[vtxCursor * 7 + 3] = s.offset[1];
+      floatData[vtxCursor * 7 + 4] = s.distance;
+      floatData[vtxCursor * 7 + 5] = +1;
+      colorData[4 * (vtxCursor * 7 + 6) + 0] = color[0];
+      colorData[4 * (vtxCursor * 7 + 6) + 1] = color[1];
+      colorData[4 * (vtxCursor * 7 + 6) + 2] = color[2];
+      colorData[4 * (vtxCursor * 7 + 6) + 3] = 255;
+      floatData[vtxCursor * 7 + 7] = s.current[0] - this.centerAtLastUpdate[0];
+      floatData[vtxCursor * 7 + 8] = s.current[1] - this.centerAtLastUpdate[1];
+      floatData[vtxCursor * 7 + 9] = -s.offset[0];
+      floatData[vtxCursor * 7 + 10] = -s.offset[1];
+      floatData[vtxCursor * 7 + 11] = s.distance;
+      floatData[vtxCursor * 7 + 12] = -1;
+      colorData[4 * (vtxCursor * 7 + 13) + 0] = color[0];
+      colorData[4 * (vtxCursor * 7 + 13) + 1] = color[1];
+      colorData[4 * (vtxCursor * 7 + 13) + 2] = color[2];
+      colorData[4 * (vtxCursor * 7 + 13) + 3] = 255;
+      vtxCursor += 2;
+      indexData[idxCursor + 0] = vtxCursor - 4;
+      indexData[idxCursor + 1] = vtxCursor - 3;
+      indexData[idxCursor + 2] = vtxCursor - 2;
+      indexData[idxCursor + 3] = vtxCursor - 3;
+      indexData[idxCursor + 4] = vtxCursor - 1;
+      indexData[idxCursor + 5] = vtxCursor - 2;
+      idxCursor += 6; // There is no next vertex.
+
+      s.current = null;
+    } // Upload data to the GPU.
+
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW); // Record number of indices.
+
+    this.indexBufferSize = indexData.length;
+  }
+});
+
+// @ts-ignore
+
+const AnimatedLinesLayer = GraphicsLayer.createSubclass({
+  createLayerView: function (view) {
+    if (view.type === '2d') {
+      return new AnimatedLinesLayerView({
+        view: view,
+        layer: this
+      });
+    }
+  }
+});
+
+export { AnimatedLinesLayer, Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, ViewCliper, ZoomHomeTool, createGeometryFactory, createLayerFactory, getLatfromLonLat, getLonfromLonLat, getXfromXY, getYfromXY };

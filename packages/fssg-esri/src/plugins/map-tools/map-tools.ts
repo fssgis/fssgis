@@ -134,7 +134,7 @@ export class MapTools extends FssgEsriPlugin<IMapToolsOptions, IMapToolsEvents> 
    * @param key 工具Key
    * @param tool 工具对象
    */
-  public createTool (key: string, tool: FssgEsriBaseTool) : this {
+  public createTool (key: string, tool: FssgEsriBaseTool<any, any>) : this { // eslint-disable-line
     if (this.hasTool(key)) {
       warn(this, `工具项${key}已存在，将会被覆盖`)
     }

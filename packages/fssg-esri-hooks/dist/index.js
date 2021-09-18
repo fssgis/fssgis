@@ -1,5 +1,5 @@
 import { getCurrentInstance, onUnmounted, onBeforeUnmount, watch, ref, watchEffect, shallowRef, shallowReactive, inject, provide, reactive, createVNode, render } from 'vue';
-import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement, MapTools, Hawkeye, LayerTree, MapModules, MouseTips, Overlays, ViewCliper } from '@fssgis/fssg-esri';
+import { FssgEsri, Basemap, createGeometryFactory, createLayerFactory, MapCursor, MapLayers, MapElement, MapTools, Hawkeye, LayerTree, MapModules, MouseTips, Overlays, ViewCliper, MapPopups } from '@fssgis/fssg-esri';
 import { whenRightReturn, createGuid } from '@fssgis/utils';
 import '@fssgis/observable';
 
@@ -814,22 +814,102 @@ function useOverlays(fssgEsri) {
   return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.overlays) ?? inject(SYMBOL_OVERLAYS);
 }
 
-const SYMBOL_VIEWCLIPER = Symbol('FssgEsri.ViewCliper');
+const SYMBOL_VIEWCLIPER$1 = Symbol('FssgEsri.ViewCliper');
 function createViewCliper(options, fssgEsri, app) {
   const viewCliper = new ViewCliper(options);
   fssgEsri = fssgEsri ?? useFssgEsri();
   fssgEsri.use(viewCliper);
 
   if (app) {
-    app.provide(SYMBOL_VIEWCLIPER, viewCliper);
+    app.provide(SYMBOL_VIEWCLIPER$1, viewCliper);
   } else {
-    provide(SYMBOL_VIEWCLIPER, viewCliper);
+    provide(SYMBOL_VIEWCLIPER$1, viewCliper);
   }
 
   return viewCliper;
 }
 function useViewCliper(fssgEsri) {
-  return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.viewCliper) ?? inject(SYMBOL_VIEWCLIPER);
+  return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.viewCliper) ?? inject(SYMBOL_VIEWCLIPER$1);
 }
 
-export { controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, createMouseTips, createOverlays, createViewCliper, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useObservableOn, useOverlays, useSetOverlays, useViewCliper, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+function usePopup(arg0) {
+  var _getCurrentInstance;
+
+  const mapPopups = _getMapPopups(arg0);
+
+  const app = (_getCurrentInstance = getCurrentInstance()) === null || _getCurrentInstance === void 0 ? void 0 : _getCurrentInstance.appContext;
+  const visible = ref(mapPopups.visible);
+  mapPopups.$.view.watch('popup.visible', v => {
+    if (v !== visible.value) {
+      visible.value = v;
+    }
+  });
+  return {
+    visible,
+
+    showPopup([x, y], title, component, props, options) {
+      const content = (() => {
+        const dom = document.createElement('div');
+        const vm = createVNode(component, props);
+        vm.appContext = app;
+        render(vm, dom);
+        return dom;
+      })();
+
+      mapPopups.openByXY({
+        x,
+        y
+      }, {
+        title,
+        content,
+        ...(options ?? {})
+      });
+    },
+
+    cancel() {
+      mapPopups.cancel();
+    }
+
+  };
+}
+
+function _getMapPopups(arg0) {
+  let mapPopups;
+
+  if (!arg0) {
+    const fssgEsri = useFssgEsri();
+    mapPopups = fssgEsri.mapPopups;
+
+    if (!mapPopups) {
+      warn(this, 'MapPopups实例未挂载到FssgMap实例');
+    }
+  } else {
+    if (arg0 instanceof FssgEsri) {
+      mapPopups = arg0.mapPopups;
+    } else {
+      mapPopups = arg0;
+    }
+  }
+
+  return mapPopups;
+}
+
+const SYMBOL_VIEWCLIPER = Symbol('FssgEsri.MapPopups');
+function createMapPopups(options, fssgEsri, app) {
+  const mapPopups = new MapPopups(options);
+  fssgEsri = fssgEsri ?? useFssgEsri();
+  fssgEsri.use(mapPopups);
+
+  if (app) {
+    app.provide(SYMBOL_VIEWCLIPER, mapPopups);
+  } else {
+    provide(SYMBOL_VIEWCLIPER, mapPopups);
+  }
+
+  return mapPopups;
+}
+function useMapPopups(fssgEsri) {
+  return (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapPopups) ?? inject(SYMBOL_VIEWCLIPER);
+}
+
+export { controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapPopups, createMapTools, createMouseTips, createOverlays, createViewCliper, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapPopups, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useObservableOn, useOverlays, usePopup, useSetOverlays, useViewCliper, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

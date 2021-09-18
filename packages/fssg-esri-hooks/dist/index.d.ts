@@ -1,6 +1,6 @@
 import { WatchSource, WatchCallback, WatchOptions, Ref, App, Component } from 'vue';
 import { IHandle } from '@fssgis/observable';
-import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement, MapTools, IMapToolsOptions, IHawkeyeOptions, Hawkeye, ILayerTreeOptions, LayerTree, ITreeNode, MapModules, IMapModulesOptions, IMouseTipsOptions, MouseTips, IOverlayAddOptions, Overlays, IOverlaysOptions, IViewCliperOptions, ViewCliper } from '@fssgis/fssg-esri';
+import { FssgEsri, IFssgEsriOptions, Basemap, IBasemapOptions, GeometryFacory, ILayerFactory, MapCursor, IMapCursorOptions, IMapLayersOptions, MapLayers, IMapElementOptions, MapElement, MapTools, IMapToolsOptions, IHawkeyeOptions, Hawkeye, ILayerTreeOptions, LayerTree, ITreeNode, MapModules, IMapModulesOptions, IMouseTipsOptions, MouseTips, IOverlayAddOptions, Overlays, IOverlaysOptions, IViewCliperOptions, ViewCliper, MapPopups, IMapPopupsOptions } from '@fssgis/fssg-esri';
 
 declare type MapSources<T> = {
     [K in keyof T]: T[K] extends WatchSource<infer V> ? V : never;
@@ -207,4 +207,20 @@ declare function useViewCliper(): ViewCliper;
 declare function useViewCliper(fssgEsri: FssgEsri): ViewCliper;
 declare function useViewCliper(fssgEsri?: FssgEsri): ViewCliper;
 
-export { EsriWatchCallback, IOverlayState, MapOldSources, MapSources, controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapTools, createMouseTips, createOverlays, createViewCliper, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useObservableOn, useOverlays, useSetOverlays, useViewCliper, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+interface IPopupState {
+    visible: Ref<boolean>;
+    showPopup<T>(xy: number[], // [number, number]
+    title: string, component: Component<T>, props?: Partial<T>, options?: __esri.PopupOpenOptions): void;
+    cancel(): void;
+}
+declare function usePopup(): IPopupState;
+declare function usePopup(fssgEsri: FssgEsri): IPopupState;
+declare function usePopup(mapPopups: MapPopups): IPopupState;
+declare function usePopup(arg0?: FssgEsri | MapPopups): IPopupState;
+declare function createMapPopups(options: IMapPopupsOptions): MapPopups;
+declare function createMapPopups(options: IMapPopupsOptions, fssgEsri: FssgEsri, app?: App): MapPopups;
+declare function useMapPopups(): MapPopups;
+declare function useMapPopups(fssgEsri: FssgEsri): MapPopups;
+declare function useMapPopups(fssgEsri?: FssgEsri): MapPopups;
+
+export { EsriWatchCallback, IOverlayState, IPopupState, MapOldSources, MapSources, controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapPopups, createMapTools, createMouseTips, createOverlays, createViewCliper, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapState, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLayerTreeState, useLyrFactory, useMapCursor, useMapCursorState, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapModulesState, useMapPopups, useMapTools, useMapToolsActivedKey, useMapToolsState, useMouseTips, useObservableOn, useOverlays, usePopup, useSetOverlays, useViewCliper, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

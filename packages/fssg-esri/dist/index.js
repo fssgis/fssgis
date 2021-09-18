@@ -889,6 +889,8 @@ class FssgEsri extends FssgMap {
 
     _defineProperty(this, "viewCliper", void 0);
 
+    _defineProperty(this, "mapPopups", void 0);
+
     _defineProperty(this, "_map", void 0);
 
     _defineProperty(this, "_view", void 0);
@@ -2493,6 +2495,53 @@ class HitTestTool extends DrawPointTool {
 
 }
 
+class SelectByPolygonTool extends DrawPolygonTool {
+  constructor(map, view, options) {
+    super(map, view, options);
+    this.on('selected', e => this.onSelected_(e));
+  }
+
+  onSelected_(e) {
+    if (!this.actived) {
+      return false;
+    }
+
+    return e.features;
+  }
+
+  onDrawEnd_(e) {
+    const graphic = super.onDrawEnd_(e);
+
+    if (!graphic) {
+      return false;
+    }
+
+    const geometry = graphic.geometry;
+    Promise.all(this.options_.querylayers.map(layer => {
+      return layer.queryFeatures({
+        geometry,
+        returnGeometry: true,
+        outFields: ['*']
+      });
+    })).then(featureSets => {
+      const features = featureSets.reduce((ret, cur) => {
+        ret.push(...cur.features);
+        return ret;
+      }, []);
+      this.fire('selected', {
+        features
+      });
+    });
+    return graphic;
+  }
+
+  setQueryLayers(layers) {
+    this.options_.querylayers = layers;
+    return this;
+  }
+
+}
+
 class ClearTool extends FssgEsriBaseTool {
   //#region 构造函数
 
@@ -3670,6 +3719,53 @@ class ViewCliper extends FssgEsriPlugin {
       this.map_.remove(this._cliperLayer);
     }
 
+    return this;
+  }
+
+}
+
+class MapPopups extends FssgEsriPlugin {
+  get visible() {
+    return this.view_.popup.visible;
+  }
+
+  constructor(options) {
+    super(options, {});
+  }
+
+  installPlugin(fssgMap) {
+    super.installPlugin(fssgMap);
+    return this.fire('loaded');
+  }
+
+  openByXY(...args) {
+    let x, y, options;
+
+    if (Array.isArray(args[0])) {
+      [x, y] = [args[0][0], args[0][1]];
+      options = args[1];
+    } else if (typeof args[1] === 'number') {
+      [x, y] = [args[0], args[1]];
+      options = args[2];
+    } else {
+      [x, y] = [args[0].x, args[0].y];
+      options = args[1];
+    }
+
+    const point = new Point({
+      x,
+      y,
+      spatialReference: this.view_.spatialReference
+    });
+    this.view_.popup.open({
+      location: point,
+      ...options
+    });
+    return this;
+  }
+
+  cancel() {
+    this.view_.popup.visible = false;
     return this;
   }
 
@@ -5126,4 +5222,4 @@ const AnimatedLinesLayer = GraphicsLayer.createSubclass({
   }
 });
 
-export { AnimatedLinesLayer, Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, ViewCliper, ZoomHomeTool, createGeometryFactory, createLayerFactory, getLatfromLonLat, getLonfromLonLat, getXfromXY, getYfromXY };
+export { AnimatedLinesLayer, Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapPopups, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, SelectByPolygonTool, ViewCliper, ZoomHomeTool, createGeometryFactory, createLayerFactory, getLatfromLonLat, getLonfromLonLat, getXfromXY, getYfromXY };

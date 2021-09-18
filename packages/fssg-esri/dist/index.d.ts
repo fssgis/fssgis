@@ -305,7 +305,7 @@ declare class MapTools extends FssgEsriPlugin<IMapToolsOptions, IMapToolsEvents>
      * @param key 工具Key
      * @param tool 工具对象
      */
-    createTool(key: string, tool: FssgEsriBaseTool): this;
+    createTool(key: string, tool: FssgEsriBaseTool<any, any>): this;
     /**
      * 检查是否存在工具
      * @param key 工具Key
@@ -549,6 +549,25 @@ declare class HitTestTool<T_OPTIONS extends IHitTestToolOptions = IHitTestToolOp
     private _queryWithMapImageLayer;
     protected onDrawEnd_(e: OnDrawEndParams<this>): OnDrawEndReture;
     protected finsheHitTest_(result: __esri.HitTestResult): __esri.HitTestResultResults[];
+}
+
+interface ISelectByPolygonToolOptions extends IDrawPolygonToolOptions {
+    querylayers: Array<__esri.Sublayer | __esri.FeatureLayer>;
+}
+interface ISelectByPolygonToolEvent extends IDrawPolygonToolEvents {
+    'selected': {
+        features: __esri.Graphic[];
+    };
+}
+declare type OnSelectedParams<T> = ICallbackParams<'selected', T> & {
+    features: __esri.Graphic[];
+};
+declare type OnSelectedReture = __esri.Graphic[] | false;
+declare class SelectByPolygonTool<T_OPTIONS extends ISelectByPolygonToolOptions = ISelectByPolygonToolOptions, T_EVENTS extends ISelectByPolygonToolEvent = ISelectByPolygonToolEvent> extends DrawPolygonTool<T_OPTIONS, T_EVENTS> {
+    constructor(map: IMap, view: IView, options: Omit<T_OPTIONS, 'drawType'>);
+    protected onSelected_(e: OnSelectedParams<this>): OnSelectedReture;
+    protected onDrawEnd_(e: OnDrawEndParams<this>): OnDrawEndReture;
+    setQueryLayers(layers: Array<__esri.Sublayer | __esri.FeatureLayer>): this;
 }
 
 /**
@@ -1003,6 +1022,23 @@ declare class ViewCliper extends FssgEsriPlugin<IViewCliperOptions, IViewCliperE
     restore(): this;
 }
 
+interface IMapPopupsEvents extends IFssgEsriPluginEvents {
+}
+interface IMapPopupsOptions extends IFssgEsriPluginOptions {
+}
+declare class MapPopups extends FssgEsriPlugin<IMapPopupsOptions, IMapPopupsEvents> {
+    get visible(): boolean;
+    constructor(options?: IMapPopupsOptions);
+    installPlugin(fssgMap: FssgEsri): this;
+    openByXY(xy: {
+        x: number;
+        y: number;
+    }, options: __esri.PopupOpenOptions): this;
+    openByXY(xy: [number, number], options: __esri.PopupOpenOptions): this;
+    openByXY(x: number, y: number, options: __esri.PopupOpenOptions): this;
+    cancel(): this;
+}
+
 /**
  * 坐标XY
  */
@@ -1418,6 +1454,7 @@ declare class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
     mouseTips: MouseTips;
     overlays: Overlays;
     viewCliper: ViewCliper;
+    mapPopups: MapPopups;
     /**
      * 地图对象
      */
@@ -1545,4 +1582,4 @@ declare const RippleLayerView: any;
 
 declare const AnimatedLinesLayer: any;
 
-export { AnimatedLinesLayer, Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, IAttributesConfigItem, IBasemapEvents, IBasemapOptions, IDrawPointToolEvents, IDrawPointToolOptions, IDrawPolygonToolEvents, IDrawPolygonToolOptions, IDrawPolylineToolEvents, IDrawPolylineToolOptions, IField, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, IHitTestToolEvents, IHitTestToolOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapModulesEvents, IMapModulesOptions, IMapToolsEvents, IMapToolsOptions, IMeasureAreaToolEvents, IMeasureAreaToolOptions, IMeasureCoordinateToolEvents, IMeasureCoordinateToolOptions, IMeasureLengthToolEvents, IMeasureLengthToolOptions, IModuleItem, IMouseTipsEvents, IMouseTipsOptions, IOverlay, IOverlayAddOptions, IOverlaysEvents, IOverlaysOptions, IOwner, ITreeNode, IView, IViewCliperEvents, IViewCliperOptions, IZoomHomeToolEvents, IZoomHomeToolOptions, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapModules, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, ViewCliper, XY, ZoomHomeTool, createGeometryFactory, createLayerFactory, getLatfromLonLat, getLonfromLonLat, getXfromXY, getYfromXY };
+export { AnimatedLinesLayer, Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, IAttributesConfigItem, IBasemapEvents, IBasemapOptions, IDrawPointToolEvents, IDrawPointToolOptions, IDrawPolygonToolEvents, IDrawPolygonToolOptions, IDrawPolylineToolEvents, IDrawPolylineToolOptions, IField, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, IHitTestToolEvents, IHitTestToolOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapModulesEvents, IMapModulesOptions, IMapPopupsEvents, IMapPopupsOptions, IMapToolsEvents, IMapToolsOptions, IMeasureAreaToolEvents, IMeasureAreaToolOptions, IMeasureCoordinateToolEvents, IMeasureCoordinateToolOptions, IMeasureLengthToolEvents, IMeasureLengthToolOptions, IModuleItem, IMouseTipsEvents, IMouseTipsOptions, IOverlay, IOverlayAddOptions, IOverlaysEvents, IOverlaysOptions, IOwner, ISelectByPolygonToolEvent, ISelectByPolygonToolOptions, ITreeNode, IView, IViewCliperEvents, IViewCliperOptions, IZoomHomeToolEvents, IZoomHomeToolOptions, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapModules, MapPopups, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, OnSelectedParams, OnSelectedReture, Overlays, RippleGraphicsLayer, RippleLayerView, SelectByPolygonTool, ViewCliper, XY, ZoomHomeTool, createGeometryFactory, createLayerFactory, getLatfromLonLat, getLonfromLonLat, getXfromXY, getYfromXY };

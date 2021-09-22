@@ -1,6 +1,7 @@
 /**
  * 成员具体化
  * @example
+ * @deprecated please use Required<>
 Concrete<{       // => {
   a?: number     // =>   a: number
   b?: string     // =>   b: string
@@ -16,6 +17,7 @@ declare type Concrete<Type> = {
 /**
  * 成员可选化
  * @example
+ * @deprecated please use Partial<>
 Concrete<{       // => {
   a: number      // =>   a?: number
   b: string      // =>   b?: string
@@ -44,5 +46,6 @@ let t3 : ReturnPromiseType<typeof test> // number
 let t4 : ReturnPromiseType<typeof test2> // number
  */
 declare type ReturnPromiseType<Type extends (...args: any[]) => any> = Type extends (...args: any[]) => Promise<infer Return> ? Return : ReturnType<Type>;
+declare type IsomorphicDestructurable<T extends Record<string, unknown>, A extends readonly any[]> = T & A;
 
-export { Concrete, Optional, ReturnPromiseType };
+export { Concrete, IsomorphicDestructurable, Optional, ReturnPromiseType };

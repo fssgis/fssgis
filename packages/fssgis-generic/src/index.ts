@@ -2,6 +2,7 @@
 /**
  * 成员具体化
  * @example
+ * @deprecated please use Required<>
 Concrete<{       // => {
   a?: number     // =>   a: number
   b?: string     // =>   b: string
@@ -15,9 +16,11 @@ export type Concrete<Type> = {
   [Property in keyof Type]-?: Concrete<Type[Property]>
 }
 
+
 /**
  * 成员可选化
  * @example
+ * @deprecated please use Partial<>
 Concrete<{       // => {
   a: number      // =>   a?: number
   b: string      // =>   b?: string
@@ -52,4 +55,7 @@ export type ReturnPromiseType<
   ? Return
   : ReturnType<Type>;
 
-
+export type IsomorphicDestructurable<
+  T extends Record<string, unknown>,
+  A extends readonly any[] // eslint-disable-line
+> = T & A

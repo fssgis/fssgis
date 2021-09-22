@@ -1,6 +1,6 @@
 import { MapModules, FssgEsri, IMapModulesOptions } from '@fssgis/fssg-esri'
 import { warn } from '@fssgis/fssg-map'
-import { App, inject, InjectionKey, provide, reactive, ref, Ref, watch } from 'vue'
+import { App, inject, InjectionKey, provide, reactive, ref, Ref, watch, toRefs } from 'vue'
 import { controllableWatch, useObservableOn } from './base.hooks'
 import { useFssgEsri } from './fssg-esri.hooks'
 
@@ -11,7 +11,7 @@ function _getMapModules (arg0?: FssgEsri | MapModules) : MapModules
 function _getMapModules (arg0?: FssgEsri | MapModules) : MapModules {
   let mapModules: MapModules
   if (!arg0) {
-    const fssgEsri = useFssgEsri()
+    const { fssgEsri } = useFssgEsri()
     mapModules = fssgEsri.mapModules
   } else {
     if (arg0 instanceof FssgEsri) {
@@ -26,12 +26,15 @@ function _getMapModules (arg0?: FssgEsri | MapModules) : MapModules {
   return mapModules
 }
 
+interface IUseMapModulesSelectedTitle {
+  selectedTitle: Ref<string>
+}
 
-export function useMapModulesSelectedTitle () : Ref<string>
-export function useMapModulesSelectedTitle (fssgMap: FssgEsri) : Ref<string>
-export function useMapModulesSelectedTitle (mapModules: MapModules) : Ref<string>
-export function useMapModulesSelectedTitle (arg0?: FssgEsri | MapModules) : Ref<string>
-export function useMapModulesSelectedTitle (arg0?: FssgEsri | MapModules) : Ref<string> {
+export function useMapModulesSelectedTitle () : IUseMapModulesSelectedTitle
+export function useMapModulesSelectedTitle (fssgMap: FssgEsri) : IUseMapModulesSelectedTitle
+export function useMapModulesSelectedTitle (mapModules: MapModules) : IUseMapModulesSelectedTitle
+export function useMapModulesSelectedTitle (arg0?: FssgEsri | MapModules) : IUseMapModulesSelectedTitle
+export function useMapModulesSelectedTitle (arg0?: FssgEsri | MapModules) : IUseMapModulesSelectedTitle {
   const mapModules = _getMapModules(arg0)
   const selectedTitle = ref(mapModules.selectedTitle)
 
@@ -47,7 +50,9 @@ export function useMapModulesSelectedTitle (arg0?: FssgEsri | MapModules) : Ref<
     }
   }))
 
-  return selectedTitle
+  return {
+    selectedTitle
+  }
 }
 
 interface IMapModulesState {
@@ -61,7 +66,7 @@ export function createMapModules (options: IMapModulesOptions) : MapModules
 export function createMapModules (options: IMapModulesOptions, fssgEsri: FssgEsri, app?: App) : MapModules
 export function createMapModules (options: IMapModulesOptions, fssgEsri?: FssgEsri, app?: App) : MapModules {
   const mapModules = new MapModules(options)
-  fssgEsri = fssgEsri ?? useFssgEsri()
+  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri
   fssgEsri.use(mapModules)
   if (app) {
     app.provide(SYMBOL_MAPMODULES, mapModules)
@@ -91,13 +96,21 @@ export function createMapModules (options: IMapModulesOptions, fssgEsri?: FssgEs
   return mapModules
 }
 
-export function useMapModules () : MapModules
-export function useMapModules (fssgEsri: FssgEsri) : MapModules
-export function useMapModules (fssgEsri?: FssgEsri) : MapModules
-export function useMapModules (fssgEsri?: FssgEsri) : MapModules {
-  return fssgEsri?.mapModules ?? inject(SYMBOL_MAPMODULES) as MapModules
+interface IUseMapModules {
+  mapModules: MapModules
+  selectedId: Ref<string>
+  selectedTitle: Ref<string>
 }
 
-export function useMapModulesState () : IMapModulesState {
-  return inject(SYMBOL_MAPMODULES_STATE) as IMapModulesState
+export function useMapModules () : IUseMapModules
+export function useMapModules (fssgEsri: FssgEsri) : IUseMapModules
+export function useMapModules (fssgEsri?: FssgEsri) : IUseMapModules
+export function useMapModules (fssgEsri?: FssgEsri) : IUseMapModules {
+  const mapModules = fssgEsri?.mapModules ?? inject(SYMBOL_MAPMODULES) as MapModules
+  const { selectedId } = toRefs(inject(SYMBOL_MAPMODULES_STATE) as IMapModulesState)
+  return {
+    mapModules,
+    selectedId,
+    ...useMapModulesSelectedTitle(mapModules)
+  }
 }

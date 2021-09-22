@@ -1,7 +1,8 @@
 import { LayerTree, FssgEsri, ILayerTreeOptions, ITreeNode } from '@fssgis/fssg-esri'
 import { warn } from '@fssgis/fssg-map'
-import { App, inject, InjectionKey, provide, reactive, ref, Ref, watch } from 'vue'
-import { useFssgEsri } from './fssg-esri.hooks'
+import { App, inject, InjectionKey, provide, reactive, toRefs, watch, ToRefs } from 'vue'
+import { injectFssgEsri } from './fssg-esri.hooks'
+import { createIsomorphicDestructurable } from '@fssgis/utils'
 
 function _getLayerTree () : LayerTree
 function _getLayerTree (fssgMap: FssgEsri) : LayerTree
@@ -10,7 +11,7 @@ function _getLayerTree (arg0?: FssgEsri | LayerTree) : LayerTree
 function _getLayerTree (arg0?: FssgEsri | LayerTree) : LayerTree {
   let layerTree: LayerTree
   if (!arg0) {
-    const fssgEsri = useFssgEsri()
+    const fssgEsri = injectFssgEsri()
     layerTree = fssgEsri.layerTree
     if (!layerTree) {
       warn(this, 'LayerTree实例未挂载到FssgMap实例')
@@ -37,7 +38,7 @@ export function createLayerTree (options: ILayerTreeOptions) : LayerTree
 export function createLayerTree (options: ILayerTreeOptions, fssgEsri: FssgEsri, app?: App) : LayerTree
 export function createLayerTree (options: ILayerTreeOptions, fssgEsri?: FssgEsri, app?: App) : LayerTree {
   const layerTree = new LayerTree(options)
-  fssgEsri = fssgEsri ?? useFssgEsri()
+  fssgEsri = fssgEsri ?? injectFssgEsri()
   fssgEsri.use(layerTree)
   if (app) {
     app.provide(SYMBOL_LAYERTREE, layerTree)
@@ -100,13 +101,22 @@ export function createLayerTree (options: ILayerTreeOptions, fssgEsri?: FssgEsri
   return layerTree
 }
 
-export function useLayerTree () : LayerTree
-export function useLayerTree (fssgEsri: FssgEsri) : LayerTree
-export function useLayerTree (fssgEsri?: FssgEsri) : LayerTree
-export function useLayerTree (fssgEsri?: FssgEsri) : LayerTree {
-  return fssgEsri?.layerTree ?? inject(SYMBOL_LAYERTREE) as LayerTree
+export function injectLayerTree () : LayerTree {
+  return inject(SYMBOL_LAYERTREE) as LayerTree
 }
 
-export function useLayerTreeState () : ILayerTreeState {
-  return inject(SYMBOL_LAYERTREE_STATE) as ILayerTreeState
+interface IUseLayerTree extends ToRefs<ILayerTreeState> {
+  layerTree: LayerTree
 }
+
+export function useLayerTree () : IUseLayerTree
+export function useLayerTree (fssgEsri: FssgEsri) : IUseLayerTree
+export function useLayerTree (fssgEsri?: FssgEsri) : IUseLayerTree
+export function useLayerTree (fssgEsri?: FssgEsri) : IUseLayerTree {
+  const layerTree = fssgEsri?.layerTree ?? injectLayerTree()
+  return {
+    layerTree,
+    ...toRefs(inject(SYMBOL_LAYERTREE_STATE) as ILayerTreeState),
+  }
+}
+

@@ -1,7 +1,8 @@
 import { FssgEsri, IFssgEsriOptions } from '@fssgis/fssg-esri'
 import { App, inject, InjectionKey, provide, ref, Ref, shallowReactive, shallowRef, watch, watchEffect } from 'vue'
-import { whenRightReturn } from '@fssgis/utils'
+import { whenRightReturn, createIsomorphicDestructurable } from '@fssgis/utils'
 import { controllableWatch, tryOnBeforeUnmounted } from './base.hooks'
+import { IsomorphicDestructurable } from '@fssgis/generic'
 
 export type EsriWatchCallback<T extends __esri.Accessor, K extends keyof T> = (newValue: T[K], oldValue: T[K], propertyName: K, target: T) => void
 
@@ -131,7 +132,7 @@ export function useWatchShallowReactive<T extends __esri.Accessor, K extends key
 
 export function useZoom (fssgEsri?: FssgEsri) : { zoom: Ref<number> } & IWatchRef {
   if (!fssgEsri) {
-    fssgEsri = useFssgEsri()
+    fssgEsri = injectFssgEsri()
   }
   const { watchRef: zoom, ...others } = useWatchRef(fssgEsri.view, 'zoom')
   return { zoom, ...others }
@@ -139,7 +140,7 @@ export function useZoom (fssgEsri?: FssgEsri) : { zoom: Ref<number> } & IWatchRe
 
 export function useCenter (fssgEsri?: FssgEsri) : { center: Ref<__esri.Point | number[]> } & IWatchRef {
   if (!fssgEsri) {
-    fssgEsri = useFssgEsri()
+    fssgEsri = injectFssgEsri()
   }
   const { watchRef: center, ...others } = useWatchShallowRef(fssgEsri.view, 'center')
   return { center, ...others }
@@ -147,7 +148,7 @@ export function useCenter (fssgEsri?: FssgEsri) : { center: Ref<__esri.Point | n
 
 export function useExtent (fssgEsri?: FssgEsri) : { extent: Ref<__esri.Extent> } & IWatchRef {
   if (!fssgEsri) {
-    fssgEsri = useFssgEsri()
+    fssgEsri = injectFssgEsri()
   }
   const { watchRef: extent, ...others } = useWatchShallowRef(fssgEsri.view, 'extent')
   return { extent, ...others }
@@ -155,7 +156,7 @@ export function useExtent (fssgEsri?: FssgEsri) : { extent: Ref<__esri.Extent> }
 
 export function useCenterZoom (fssgEsri?: FssgEsri) : { state: { center: __esri.Point, zoom: number } } & IWatchRef {
   if (!fssgEsri) {
-    fssgEsri = useFssgEsri()
+    fssgEsri = injectFssgEsri()
   }
   const { watchReactive: state, ...others } = useWatchShallowReactive(fssgEsri.view, ['center', 'zoom'])
   return { state, ...others }
@@ -178,16 +179,36 @@ export function createFssgEsri (container: string, options?: IFssgEsriOptions, a
   return fssgEsri
 }
 
-export function useFssgEsri () : FssgEsri {
-  return inject(SYMBOL_FSSG_ESRI) as FssgEsri
-}
-
-export function useFssgEsriLoaded (fssgEsri?: FssgEsri) : Ref<boolean> {
+export function useFssgEsriLoaded (fssgEsri?: FssgEsri) : {
+  loaded: Ref<boolean>
+} & readonly [Ref<boolean>] {
   if (!fssgEsri) {
-    fssgEsri = useFssgEsri()
+    fssgEsri = injectFssgEsri()
   }
   const loaded = ref(false)
   fssgEsri.when().then(() => loaded.value = true)
-  return loaded
+  return createIsomorphicDestructurable(
+    { loaded } as const,
+    [loaded] as const,
+  )
+}
+
+export function injectFssgEsri () : FssgEsri {
+  return inject(SYMBOL_FSSG_ESRI) as FssgEsri
+}
+
+type UseFssgEsri = {
+  fssgEsri: FssgEsri
+  loaded: Ref<boolean>
+} & readonly [FssgEsri, Ref<boolean>]
+
+export function useFssgEsri () : UseFssgEsri {
+  const fssgEsri = injectFssgEsri()
+  const { loaded } = useFssgEsriLoaded(fssgEsri)
+
+  return createIsomorphicDestructurable(
+    { fssgEsri, loaded } as const,
+    [fssgEsri, loaded] as const,
+  )
 }
 

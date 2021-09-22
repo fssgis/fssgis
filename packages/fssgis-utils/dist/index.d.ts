@@ -104,5 +104,6 @@ declare function whenRightReturn<T>(time: number, intervalCallback: () => T | un
   */
 declare function isPromise<T>(obj: T): boolean;
 declare function isNullOrUndefined<T>(obj: T): boolean;
+declare function createIsomorphicDestructurable<T extends Record<string, unknown>, A extends readonly any[]>(obj: T, arr: A): T & A;
 
-export { $extend, copyText, createGuid, createIntRandom, debounce, deepCopy, deepCopyJSON, getArrayItemRandom, isFromMobileBrowser, isNullOrUndefined, isPromise, listToTree, loadCss, loadJs, parseListField, throttle, whenRightReturn };
+export { $extend, copyText, createGuid, createIntRandom, createIsomorphicDestructurable, debounce, deepCopy, deepCopyJSON, getArrayItemRandom, isFromMobileBrowser, isNullOrUndefined, isPromise, listToTree, loadCss, loadJs, parseListField, throttle, whenRightReturn };

@@ -58,7 +58,7 @@ function _getMapPopups (arg0?: FssgEsri | MapPopups) : MapPopups
 function _getMapPopups (arg0?: FssgEsri | MapPopups) : MapPopups {
   let mapPopups: MapPopups
   if (!arg0) {
-    const fssgEsri = useFssgEsri()
+    const { fssgEsri } = useFssgEsri()
     mapPopups = fssgEsri.mapPopups
     if (!mapPopups) {
       warn(this, 'MapPopups实例未挂载到FssgMap实例')
@@ -78,7 +78,7 @@ export function createMapPopups (options: IMapPopupsOptions) : MapPopups
 export function createMapPopups (options: IMapPopupsOptions, fssgEsri: FssgEsri, app?: App) : MapPopups
 export function createMapPopups (options: IMapPopupsOptions, fssgEsri?: FssgEsri, app?: App) : MapPopups {
   const mapPopups = new MapPopups(options)
-  fssgEsri = fssgEsri ?? useFssgEsri()
+  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri
   fssgEsri.use(mapPopups)
   if (app) {
     app.provide(SYMBOL_VIEWCLIPER, mapPopups)
@@ -88,9 +88,16 @@ export function createMapPopups (options: IMapPopupsOptions, fssgEsri?: FssgEsri
   return mapPopups
 }
 
-export function useMapPopups () : MapPopups
-export function useMapPopups (fssgEsri: FssgEsri) : MapPopups
-export function useMapPopups (fssgEsri?: FssgEsri) : MapPopups
-export function useMapPopups (fssgEsri?: FssgEsri) : MapPopups {
-  return fssgEsri?.mapPopups ?? inject(SYMBOL_VIEWCLIPER) as MapPopups
+interface IUseMapPopups {
+  mapPopups: MapPopups
+}
+
+export function useMapPopups () : IUseMapPopups
+export function useMapPopups (fssgEsri: FssgEsri) : IUseMapPopups
+export function useMapPopups (fssgEsri?: FssgEsri) : IUseMapPopups
+export function useMapPopups (fssgEsri?: FssgEsri) : IUseMapPopups {
+  const mapPopups = fssgEsri?.mapPopups ?? inject(SYMBOL_VIEWCLIPER) as MapPopups
+  return {
+    mapPopups,
+  }
 }

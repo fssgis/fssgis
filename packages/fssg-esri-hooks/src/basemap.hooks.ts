@@ -1,8 +1,9 @@
-import { Basemap, FssgEsri, IBasemapOptions } from '@fssgis/fssg-esri'
+import { Basemap, FssgEsri, IBasemapOptions, } from '@fssgis/fssg-esri'
 import { App, inject, InjectionKey, provide, ref, Ref } from 'vue'
 import { controllableWatch, useObservableOn } from './base.hooks'
-import { useFssgEsri } from './fssg-esri.hooks'
 import { warn } from '@fssgis/fssg-map'
+import { injectFssgEsri } from './fssg-esri.hooks'
+import { createIsomorphicDestructurable } from '@fssgis/utils'
 
 function _getBasemap () : Basemap
 function _getBasemap (fssgMap: FssgEsri) : Basemap
@@ -11,7 +12,7 @@ function _getBasemap (arg0?: FssgEsri | Basemap) : Basemap
 function _getBasemap (arg0?: FssgEsri | Basemap) : Basemap {
   let basemap: Basemap
   if (!arg0) {
-    const fssgEsri = useFssgEsri()
+    const fssgEsri = injectFssgEsri()
     basemap = fssgEsri.basemap
     if (!basemap) {
       warn(this, 'Basemap实例未挂载到FssgMap实例')
@@ -26,11 +27,34 @@ function _getBasemap (arg0?: FssgEsri | Basemap) : Basemap {
   return basemap
 }
 
-export function useBasemapSelectedKey () : Ref<string>
-export function useBasemapSelectedKey (fssgMap: FssgEsri) : Ref<string>
-export function useBasemapSelectedKey (basemap: Basemap) : Ref<string>
-export function useBasemapSelectedKey (arg0?: FssgEsri | Basemap) : Ref<string>
-export function useBasemapSelectedKey (arg0?: FssgEsri | Basemap) : Ref<string> {
+const SYMBOL_BASEMAP : InjectionKey<Basemap> = Symbol('FssgEsri.Basemap')
+export function createBasemap (options: IBasemapOptions) : Basemap
+export function createBasemap (options: IBasemapOptions, fssgEsri: FssgEsri, app?: App) : Basemap
+export function createBasemap (options: IBasemapOptions, fssgEsri?: FssgEsri, app?: App) : Basemap {
+  const basemap = new Basemap(options)
+  fssgEsri = fssgEsri ?? injectFssgEsri()
+  fssgEsri.use(basemap)
+  if (app) {
+    app.provide(SYMBOL_BASEMAP, basemap)
+  } else {
+    provide(SYMBOL_BASEMAP, basemap)
+  }
+  return basemap
+}
+
+export function injectBasemap () : Basemap {
+  return inject(SYMBOL_BASEMAP) as Basemap
+}
+
+type UseBasemapSelectedKey = {
+  selectedKey: Ref<string>
+} & readonly [Ref<string>]
+
+export function useBasemapSelectedKey () : UseBasemapSelectedKey
+export function useBasemapSelectedKey (fssgMap: FssgEsri) : UseBasemapSelectedKey
+export function useBasemapSelectedKey (basemap: Basemap) : UseBasemapSelectedKey
+export function useBasemapSelectedKey (arg0?: FssgEsri | Basemap) : UseBasemapSelectedKey
+export function useBasemapSelectedKey (arg0?: FssgEsri | Basemap) : UseBasemapSelectedKey {
   const basemap = _getBasemap(arg0)
   const selectedKey = ref(basemap.selectedKey)
 
@@ -46,14 +70,21 @@ export function useBasemapSelectedKey (arg0?: FssgEsri | Basemap) : Ref<string> 
     }
   }))
 
-  return selectedKey
+  return createIsomorphicDestructurable(
+    { selectedKey } as const,
+    [selectedKey] as const,
+  )
 }
 
-export function useBasemapVisible () : Ref<boolean>
-export function useBasemapVisible (fssgMap: FssgEsri) : Ref<boolean>
-export function useBasemapVisible (basemap: Basemap) : Ref<boolean>
-export function useBasemapVisible (arg0?: FssgEsri | Basemap) : Ref<boolean>
-export function useBasemapVisible (arg0?: FssgEsri | Basemap) : Ref<boolean> {
+type UseBasemapVisible = {
+  visible: Ref<boolean>
+} & readonly [Ref<boolean>]
+
+export function useBasemapVisible () : UseBasemapVisible
+export function useBasemapVisible (fssgMap: FssgEsri) : UseBasemapVisible
+export function useBasemapVisible (basemap: Basemap) : UseBasemapVisible
+export function useBasemapVisible (arg0?: FssgEsri | Basemap) : UseBasemapVisible
+export function useBasemapVisible (arg0?: FssgEsri | Basemap) : UseBasemapVisible {
   const basemap = _getBasemap(arg0)
   const visible = ref(basemap.visible)
 
@@ -69,45 +100,29 @@ export function useBasemapVisible (arg0?: FssgEsri | Basemap) : Ref<boolean> {
     }
   }))
 
-  return visible
+  return createIsomorphicDestructurable(
+    { visible } as const,
+    [visible] as const,
+  )
 }
 
-interface IBasemapHook {
+
+type UseBasemap = {
+  basemap: Basemap
   selectedKey: Ref<string>
   visible: Ref<boolean>
-  basemap: Basemap
-}
+} & readonly [Basemap, Ref<string>, Ref<boolean>]
 
-export function useBasemapState () : IBasemapHook
-export function useBasemapState (fssgMap: FssgEsri) : IBasemapHook
-export function useBasemapState (basemap: Basemap) : IBasemapHook
-export function useBasemapState (arg0?: FssgEsri | Basemap) : IBasemapHook
-export function useBasemapState (arg0?: FssgEsri | Basemap) : IBasemapHook {
-  const basemap = _getBasemap(arg0)
-  const selectedKey = useBasemapSelectedKey(basemap)
-  const visible = useBasemapVisible(basemap)
-  return { basemap, selectedKey, visible }
-}
-
-const SYMBOL_BASEMAP : InjectionKey<Basemap> = Symbol('FssgEsri.Basemap')
-export function createBasemap (options: IBasemapOptions) : Basemap
-export function createBasemap (options: IBasemapOptions, fssgMap: FssgEsri, app?: App) : Basemap
-export function createBasemap (options: IBasemapOptions, fssgMap?: FssgEsri, app?: App) : Basemap {
-  const basemap = new Basemap(options)
-  fssgMap = fssgMap ?? useFssgEsri()
-  fssgMap.use(basemap)
-  if (app) {
-    app.provide(SYMBOL_BASEMAP, basemap)
-  } else {
-    provide(SYMBOL_BASEMAP, basemap)
-  }
-  return basemap
-}
-
-export function useBasemap () : Basemap
-export function useBasemap (fssgEsri: FssgEsri) : Basemap
-export function useBasemap (fssgEsri?: FssgEsri) : Basemap
-export function useBasemap (fssgEsri?: FssgEsri) : Basemap {
-  return fssgEsri?.basemap ?? inject(SYMBOL_BASEMAP) as Basemap
+export function useBasemap () : UseBasemap
+export function useBasemap (fssgEsri: FssgEsri) : UseBasemap
+export function useBasemap (fssgEsri?: FssgEsri) : UseBasemap
+export function useBasemap (fssgEsri?: FssgEsri) : UseBasemap {
+  const basemap = fssgEsri?.basemap ?? injectBasemap()
+  const { selectedKey } = useBasemapSelectedKey(basemap)
+  const { visible } = useBasemapVisible(basemap)
+  return createIsomorphicDestructurable(
+    { basemap, selectedKey, visible } as const,
+    [basemap, selectedKey, visible] as const,
+  )
 }
 

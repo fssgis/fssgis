@@ -1,7 +1,8 @@
 import { MapLayers, FssgEsri, IMapLayersOptions } from '@fssgis/fssg-esri'
 import { warn } from '@fssgis/fssg-map'
 import { App, inject, InjectionKey, provide } from 'vue'
-import { useFssgEsri } from './fssg-esri.hooks'
+import { injectFssgEsri } from './fssg-esri.hooks'
+import { createIsomorphicDestructurable } from '@fssgis/utils'
 
 function _getMapLayers () : MapLayers
 function _getMapLayers (fssgMap: FssgEsri) : MapLayers
@@ -10,7 +11,7 @@ function _getMapLayers (arg0?: FssgEsri | MapLayers) : MapLayers
 function _getMapLayers (arg0?: FssgEsri | MapLayers) : MapLayers {
   let mapLayers: MapLayers
   if (!arg0) {
-    const fssgEsri = useFssgEsri()
+    const fssgEsri = injectFssgEsri()
     mapLayers = fssgEsri.mapLayers
     if (!mapLayers) {
       warn(this, 'MapLayers实例未挂载到FssgMap实例')
@@ -30,7 +31,7 @@ export function createMapLayers (options: IMapLayersOptions) : MapLayers
 export function createMapLayers (options: IMapLayersOptions, fssgEsri: FssgEsri, app?: App) : MapLayers
 export function createMapLayers (options: IMapLayersOptions, fssgEsri?: FssgEsri, app?: App) : MapLayers {
   const mapLayers = new MapLayers(options)
-  fssgEsri = fssgEsri ?? useFssgEsri()
+  fssgEsri = fssgEsri ?? injectFssgEsri()
   fssgEsri.use(mapLayers)
   if (app) {
     app.provide(SYMBOL_MAPLAYERS, mapLayers)
@@ -40,9 +41,21 @@ export function createMapLayers (options: IMapLayersOptions, fssgEsri?: FssgEsri
   return mapLayers
 }
 
-export function useMapLayers () : MapLayers
-export function useMapLayers (fssgEsri: FssgEsri) : MapLayers
-export function useMapLayers (fssgEsri?: FssgEsri) : MapLayers
-export function useMapLayers (fssgEsri?: FssgEsri) : MapLayers {
-  return fssgEsri?.mapLayers ?? inject(SYMBOL_MAPLAYERS) as MapLayers
+export function injectMapLayers () : MapLayers {
+  return inject(SYMBOL_MAPLAYERS) as MapLayers
+}
+
+type UseMapLayers = {
+  mapLayers: MapLayers
+} & readonly [MapLayers]
+
+export function useMapLayers () : UseMapLayers
+export function useMapLayers (fssgEsri: FssgEsri) : UseMapLayers
+export function useMapLayers (fssgEsri?: FssgEsri) : UseMapLayers
+export function useMapLayers (fssgEsri?: FssgEsri) : UseMapLayers {
+  const mapLayers = fssgEsri?.mapLayers ?? injectMapLayers()
+  return createIsomorphicDestructurable(
+    { mapLayers } as const,
+    [mapLayers] as const,
+  )
 }

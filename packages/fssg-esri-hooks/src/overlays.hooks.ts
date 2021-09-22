@@ -11,7 +11,7 @@ function _getOverlays (arg0?: FssgEsri | Overlays) : Overlays
 function _getOverlays (arg0?: FssgEsri | Overlays) : Overlays {
   let overlays: Overlays
   if (!arg0) {
-    const fssgEsri = useFssgEsri()
+    const { fssgEsri } = useFssgEsri()
     overlays = fssgEsri.overlays
     if (!overlays) {
       warn(this, 'Overlays实例未挂载到FssgMap实例')
@@ -66,7 +66,7 @@ export function createOverlays (options: IOverlaysOptions) : Overlays
 export function createOverlays (options: IOverlaysOptions, fssgEsri: FssgEsri, app?: App) : Overlays
 export function createOverlays (options: IOverlaysOptions, fssgEsri?: FssgEsri, app?: App) : Overlays {
   const overlays = new Overlays(options)
-  fssgEsri = fssgEsri ?? useFssgEsri()
+  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri
   fssgEsri.use(overlays)
   if (app) {
     app.provide(SYMBOL_OVERLAYS, overlays)
@@ -76,9 +76,18 @@ export function createOverlays (options: IOverlaysOptions, fssgEsri?: FssgEsri, 
   return overlays
 }
 
-export function useOverlays () : Overlays
-export function useOverlays (fssgEsri: FssgEsri) : Overlays
-export function useOverlays (fssgEsri?: FssgEsri) : Overlays
-export function useOverlays (fssgEsri?: FssgEsri) : Overlays {
-  return fssgEsri?.overlays ?? inject(SYMBOL_OVERLAYS) as Overlays
+interface IUseOverlays {
+  overlays: Overlays
+  setOverlay<T> (options: Omit<IOverlayAddOptions, 'content'> & { component?: Component<T>, props?: Partial<T> }) : string
+}
+
+export function useOverlays () : IUseOverlays
+export function useOverlays (fssgEsri: FssgEsri) : IUseOverlays
+export function useOverlays (fssgEsri?: FssgEsri) : IUseOverlays
+export function useOverlays (fssgEsri?: FssgEsri) : IUseOverlays {
+  const overlays = fssgEsri?.overlays ?? inject(SYMBOL_OVERLAYS) as Overlays
+  return {
+    overlays,
+    ...useSetOverlays(overlays),
+  }
 }

@@ -10,7 +10,7 @@ function _getMouseTips (arg0?: FssgEsri | MouseTips) : MouseTips
 function _getMouseTips (arg0?: FssgEsri | MouseTips) : MouseTips {
   let mouseTips: MouseTips
   if (!arg0) {
-    const fssgEsri = useFssgEsri()
+    const { fssgEsri } = useFssgEsri()
     mouseTips = fssgEsri.mouseTips
     if (!mouseTips) {
       warn(this, 'MouseTips实例未挂载到FssgMap实例')
@@ -30,7 +30,7 @@ export function createMouseTips (options: IMouseTipsOptions) : MouseTips
 export function createMouseTips (options: IMouseTipsOptions, fssgEsri: FssgEsri, app?: App) : MouseTips
 export function createMouseTips (options: IMouseTipsOptions, fssgEsri?: FssgEsri, app?: App) : MouseTips {
   const mouseTips = new MouseTips(options)
-  fssgEsri = fssgEsri ?? useFssgEsri()
+  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri
   fssgEsri.use(mouseTips)
   if (app) {
     app.provide(SYMBOL_MOUSETIPS, mouseTips)
@@ -40,9 +40,16 @@ export function createMouseTips (options: IMouseTipsOptions, fssgEsri?: FssgEsri
   return mouseTips
 }
 
-export function useMouseTips () : MouseTips
-export function useMouseTips (fssgEsri: FssgEsri) : MouseTips
-export function useMouseTips (fssgEsri?: FssgEsri) : MouseTips
-export function useMouseTips (fssgEsri?: FssgEsri) : MouseTips {
-  return fssgEsri?.mouseTips ?? inject(SYMBOL_MOUSETIPS) as MouseTips
+interface IUseMouseTips {
+  mouseTips: MouseTips
+}
+
+export function useMouseTips () : IUseMouseTips
+export function useMouseTips (fssgEsri: FssgEsri) : IUseMouseTips
+export function useMouseTips (fssgEsri?: FssgEsri) : IUseMouseTips
+export function useMouseTips (fssgEsri?: FssgEsri) : IUseMouseTips {
+  const mouseTips = fssgEsri?.mouseTips ?? inject(SYMBOL_MOUSETIPS) as MouseTips
+  return {
+    mouseTips,
+  }
 }

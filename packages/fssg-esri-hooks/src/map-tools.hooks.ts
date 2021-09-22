@@ -2,7 +2,8 @@ import { MapTools, FssgEsri, IMapToolsOptions } from '@fssgis/fssg-esri'
 import { warn } from '@fssgis/fssg-map'
 import { App, inject, InjectionKey, provide, ref, Ref } from 'vue'
 import { controllableWatch, useObservableOn } from './base.hooks'
-import { useFssgEsri } from './fssg-esri.hooks'
+import { injectFssgEsri } from './fssg-esri.hooks'
+import { createIsomorphicDestructurable } from '@fssgis/utils'
 
 function _getMapTools () : MapTools
 function _getMapTools (fssgMap: FssgEsri) : MapTools
@@ -11,7 +12,7 @@ function _getMapTools (arg0?: FssgEsri | MapTools) : MapTools
 function _getMapTools (arg0?: FssgEsri | MapTools) : MapTools {
   let mapTools: MapTools
   if (!arg0) {
-    const fssgEsri = useFssgEsri()
+    const fssgEsri = injectFssgEsri()
     mapTools = fssgEsri.mapTools
     if (!mapTools) {
       warn(this, 'MapTools实例未挂载到FssgMap实例')
@@ -26,16 +27,15 @@ function _getMapTools (arg0?: FssgEsri | MapTools) : MapTools {
   return mapTools
 }
 
-interface IMapToolsHook {
+type UseMapToolsActivedKey = {
   activedKey: Ref<string>
-  mapTools: MapTools
-}
+} & readonly [Ref<string>]
 
-export function useMapToolsActivedKey () : Ref<string>
-export function useMapToolsActivedKey (fssgMap: FssgEsri) : Ref<string>
-export function useMapToolsActivedKey (mapTools: MapTools) : Ref<string>
-export function useMapToolsActivedKey (arg0?: FssgEsri | MapTools) : Ref<string>
-export function useMapToolsActivedKey (arg0?: FssgEsri | MapTools) : Ref<string> {
+export function useMapToolsActivedKey () : UseMapToolsActivedKey
+export function useMapToolsActivedKey (fssgMap: FssgEsri) : UseMapToolsActivedKey
+export function useMapToolsActivedKey (mapTools: MapTools) : UseMapToolsActivedKey
+export function useMapToolsActivedKey (arg0?: FssgEsri | MapTools) : UseMapToolsActivedKey
+export function useMapToolsActivedKey (arg0?: FssgEsri | MapTools) : UseMapToolsActivedKey {
   const mapTools = _getMapTools(arg0)
   const activedKey = ref(mapTools.activedKey)
 
@@ -51,18 +51,10 @@ export function useMapToolsActivedKey (arg0?: FssgEsri | MapTools) : Ref<string>
     }
   }))
 
-  return activedKey
-}
-
-
-export function useMapToolsState () : IMapToolsHook
-export function useMapToolsState (fssgMap: FssgEsri) : IMapToolsHook
-export function useMapToolsState (mapTools: MapTools) : IMapToolsHook
-export function useMapToolsState (arg0?: FssgEsri | MapTools) : IMapToolsHook
-export function useMapToolsState (arg0?: FssgEsri | MapTools) : IMapToolsHook {
-  const mapTools = _getMapTools(arg0)
-  const activedKey = useMapToolsActivedKey(arg0)
-  return { mapTools, activedKey }
+  return createIsomorphicDestructurable(
+    { activedKey } as const,
+    [activedKey] as const,
+  )
 }
 
 const SYMBOL_MAPTOOLS : InjectionKey<MapTools> = Symbol('FssgEsri.MapTools')
@@ -70,7 +62,7 @@ export function createMapTools (options: IMapToolsOptions) : MapTools
 export function createMapTools (options: IMapToolsOptions, fssgEsri: FssgEsri, app?: App) : MapTools
 export function createMapTools (options: IMapToolsOptions, fssgEsri?: FssgEsri, app?: App) : MapTools {
   const mapTools = new MapTools(options)
-  fssgEsri = fssgEsri ?? useFssgEsri()
+  fssgEsri = fssgEsri ?? injectFssgEsri()
   fssgEsri.use(mapTools)
   if (app) {
     app.provide(SYMBOL_MAPTOOLS, mapTools)
@@ -80,9 +72,23 @@ export function createMapTools (options: IMapToolsOptions, fssgEsri?: FssgEsri, 
   return mapTools
 }
 
-export function useMapTools () : MapTools
-export function useMapTools (fssgEsri: FssgEsri) : MapTools
-export function useMapTools (fssgEsri?: FssgEsri) : MapTools
-export function useMapTools (fssgEsri?: FssgEsri) : MapTools {
-  return fssgEsri?.mapTools ?? inject(SYMBOL_MAPTOOLS) as MapTools
+export function injectMapTools () : MapTools {
+  return inject(SYMBOL_MAPTOOLS) as MapTools
+}
+
+type UseMapTools = {
+  mapTools: MapTools
+  activedKey: Ref<string>
+} & readonly [MapTools, Ref<string>]
+
+export function useMapTools () : UseMapTools
+export function useMapTools (fssgEsri: FssgEsri) : UseMapTools
+export function useMapTools (fssgEsri?: FssgEsri) : UseMapTools
+export function useMapTools (fssgEsri?: FssgEsri) : UseMapTools {
+  const mapTools = fssgEsri?.mapTools ?? injectMapTools()
+  const { activedKey } = useMapToolsActivedKey(fssgEsri)
+  return createIsomorphicDestructurable(
+    { mapTools, activedKey } as const,
+    [mapTools, activedKey] as const,
+  )
 }

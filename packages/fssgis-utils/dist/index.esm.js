@@ -371,5 +371,24 @@ function isPromise(obj) {
 function isNullOrUndefined(obj) {
   return obj === null || obj === undefined;
 }
+function createIsomorphicDestructurable(obj, arr) {
+  const clone = { ...obj
+  };
+  Object.defineProperty(clone, Symbol.iterator, {
+    enumerable: false,
 
-export { $extend, copyText, createGuid, createIntRandom, debounce, deepCopy, deepCopyJSON, getArrayItemRandom, isFromMobileBrowser, isNullOrUndefined, isPromise, listToTree, loadCss, loadJs, parseListField, throttle, whenRightReturn };
+    value() {
+      let index = 0;
+      return {
+        next: () => ({
+          value: arr[index++],
+          done: index > arr.length
+        })
+      };
+    }
+
+  });
+  return clone;
+}
+
+export { $extend, copyText, createGuid, createIntRandom, createIsomorphicDestructurable, debounce, deepCopy, deepCopyJSON, getArrayItemRandom, isFromMobileBrowser, isNullOrUndefined, isPromise, listToTree, loadCss, loadJs, parseListField, throttle, whenRightReturn };

@@ -10,7 +10,7 @@ function _getViewCliper (arg0?: FssgEsri | ViewCliper) : ViewCliper
 function _getViewCliper (arg0?: FssgEsri | ViewCliper) : ViewCliper {
   let viewCliper: ViewCliper
   if (!arg0) {
-    const fssgEsri = useFssgEsri()
+    const { fssgEsri } = useFssgEsri()
     viewCliper = fssgEsri.viewCliper
     if (!viewCliper) {
       warn(this, 'ViewCliper实例未挂载到FssgMap实例')
@@ -30,7 +30,7 @@ export function createViewCliper (options: IViewCliperOptions) : ViewCliper
 export function createViewCliper (options: IViewCliperOptions, fssgEsri: FssgEsri, app?: App) : ViewCliper
 export function createViewCliper (options: IViewCliperOptions, fssgEsri?: FssgEsri, app?: App) : ViewCliper {
   const viewCliper = new ViewCliper(options)
-  fssgEsri = fssgEsri ?? useFssgEsri()
+  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri
   fssgEsri.use(viewCliper)
   if (app) {
     app.provide(SYMBOL_VIEWCLIPER, viewCliper)
@@ -40,9 +40,16 @@ export function createViewCliper (options: IViewCliperOptions, fssgEsri?: FssgEs
   return viewCliper
 }
 
-export function useViewCliper () : ViewCliper
-export function useViewCliper (fssgEsri: FssgEsri) : ViewCliper
-export function useViewCliper (fssgEsri?: FssgEsri) : ViewCliper
-export function useViewCliper (fssgEsri?: FssgEsri) : ViewCliper {
-  return fssgEsri?.viewCliper ?? inject(SYMBOL_VIEWCLIPER) as ViewCliper
+interface IViewCliper {
+  viewCliper: ViewCliper
+}
+
+export function useViewCliper () : IViewCliper
+export function useViewCliper (fssgEsri: FssgEsri) : IViewCliper
+export function useViewCliper (fssgEsri?: FssgEsri) : IViewCliper
+export function useViewCliper (fssgEsri?: FssgEsri) : IViewCliper {
+  const viewCliper = fssgEsri?.viewCliper ?? inject(SYMBOL_VIEWCLIPER) as ViewCliper
+  return {
+    viewCliper,
+  }
 }

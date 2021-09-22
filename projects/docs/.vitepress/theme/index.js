@@ -8,6 +8,18 @@ import BaseMapContainer from '../../components/_base/BaseMapContainer.vue'
 import ExampleMapInit2 from '../../components/fssgis-esri/Example.MapInit2.vue'
 import 'virtual:windi.css'
 import './index.css'
+import {
+  FssgIcon,
+  FssgGrid,
+  FssgBox,
+  FssgBoxV1,
+  FssgBoxV2,
+  FssgBoxV3,
+  FssgBoxV4,
+  FssgBoxV5,
+  FssgBoxV6,
+} from '@fssgis/ui'
+import ExampleFssgBox from '../../components/fssgis-ui/Example.FssgBox.vue'
 
 export default {
   ...DefaultTheme,
@@ -19,5 +31,15 @@ export default {
     app.component('ExampleMapInit', ExampleMapInit)
     app.component('ExampleMapInit2', ExampleMapInit2)
     app.component('BaseMapContainer', BaseMapContainer)
+    app.component('FssgIcon', FssgIcon)
+    app.component('FssgGrid', FssgGrid)
+    app.component('FssgBox', FssgBox)
+    app.component('FssgBoxV1', FssgBoxV1)
+    app.component('FssgBoxV2', FssgBoxV2)
+    app.component('FssgBoxV3', FssgBoxV3)
+    app.component('FssgBoxV4', FssgBoxV4)
+    app.component('FssgBoxV5', FssgBoxV5)
+    app.component('FssgBoxV6', FssgBoxV6)
+    app.component('ExampleFssgBox', ExampleFssgBox)
   }
 }

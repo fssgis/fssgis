@@ -60,6 +60,15 @@ module.exports = {
             { text: 'use to @fssgis/esri', link: '/guide/fssgis-esri/index' },
           ],
         },
+        {
+          text: '@fssgis/ui',
+          children: [
+            { text: 'use to @fssgis/ui', link: '/guide/fssgis-ui/index' },
+            { text: 'FssgIcon 图标组件', link: '/guide/fssgis-ui/fssg-icon' },
+            { text: 'FssgGrid Grid布局组件', link: '/guide/fssgis-ui/fssg-grid' },
+            { text: 'FssgBox 指标可视化组件', link: '/guide/fssgis-ui/fssg-box' },
+          ]
+        }
       ],
     },
   },

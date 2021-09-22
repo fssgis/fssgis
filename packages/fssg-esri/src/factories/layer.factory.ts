@@ -8,6 +8,7 @@ import Graphic from '@arcgis/core/Graphic'
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer'
 import { createGuid, isNullOrUndefined } from '@fssgis/utils'
 import Field from '@arcgis/core/layers/support/Field'
+import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
 
 interface ISqlLayerProperties {
   url: string
@@ -32,7 +33,9 @@ export interface ILayerFactory {
   createLayer (options: { layerType: 'mapimagelayer' } & __esri.MapImageLayerProperties) : __esri.MapImageLayer
   createLayer (options: { layerType: 'sqllayer' } & __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer
   createLayer (options: { layerType: 'sqllayer2' } & __esri.FeatureLayerProperties & ISqlLayerProperties) : __esri.FeatureLayer
+  createLayer (options: { layerType: 'sqllayer3' } & __esri.GeoJSONLayerProperties & ISqlLayerProperties) : __esri.GeoJSONLayer
   createLayer (options: { layerType: 'featurelayer' } & __esri.FeatureLayerProperties) : __esri.FeatureLayer
+  createLayer (options: { layerType: 'geojsonlayer' } & __esri.GeoJSONLayerProperties) : __esri.GeoJSONLayer
   createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer
   createGraphicsLayer (options: __esri.GraphicsLayerProperties) : __esri.GraphicsLayer
   createGroupLayer (options: __esri.GroupLayerProperties) : __esri.GroupLayer
@@ -42,7 +45,9 @@ export interface ILayerFactory {
   createMapImageLayer (options: __esri.MapImageLayerProperties) : __esri.MapImageLayer
   createSqlLayer (options: __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer
   createSqlLayer2 (options: __esri.FeatureLayerProperties & ISqlLayerProperties) : __esri.FeatureLayer
+  createSqlLayer3 (options: __esri.GeoJSONLayerProperties & ISqlLayerProperties) : __esri.GeoJSONLayer
   createFeatureLayer (options: __esri.FeatureLayerProperties) : __esri.FeatureLayer
+  createGeoJSONLayer (options: __esri.GeoJSONLayerProperties) : __esri.GeoJSONLayer
 }
 
 /**
@@ -75,7 +80,9 @@ class LayerFactory implements ILayerFactory {
   public createLayer (options: { layerType: 'mapimagelayer' } & __esri.MapImageLayerProperties) : __esri.MapImageLayer
   public createLayer (options: { layerType: 'sqllayer' } & __esri.GraphicsLayerProperties & ISqlLayerProperties) : __esri.GraphicsLayer
   public createLayer (options: { layerType: 'sqllayer2' } & __esri.FeatureLayerProperties & ISqlLayerProperties) : __esri.FeatureLayer
+  public createLayer (options: { layerType: 'sqllayer3' } & __esri.GeoJSONLayerProperties & ISqlLayerProperties) : __esri.GeoJSONLayer
   public createLayer (options: { layerType: 'featurelayer' } & __esri.FeatureLayerProperties) : __esri.FeatureLayer
+  public createLayer (options: { layerType: 'geojsonlayer' } & __esri.GeoJSONLayerProperties) : __esri.GeoJSONLayer
   public createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer
   public createLayer (options: { layerType: string } & __esri.LayerProperties) : __esri.Layer {
     switch (options.layerType) {
@@ -95,8 +102,12 @@ class LayerFactory implements ILayerFactory {
         return this.createSqlLayer(options as any) // eslint-disable-line
       case 'sqllayer2':
         return this.createSqlLayer2(options as any) // eslint-disable-line
+      case 'sqllayer3':
+        return this.createSqlLayer3(options as any) // eslint-disable-line
       case 'featurelayer':
         return this.createFeatureLayer(options)
+      case 'geojsonlayer':
+        return this.createGeoJSONLayer(options)
       default:
         return new Layer(options)
     }
@@ -234,7 +245,7 @@ class LayerFactory implements ILayerFactory {
     const layer = this.createFeatureLayer({
       spatialReference: options.spatialReference,
       source: [],
-      objectIdField: 'oidoid',
+      objectIdField: '$objectId',
       geometryType: 'point',
       outFields: ['*'],
       ...others,
@@ -255,7 +266,7 @@ class LayerFactory implements ILayerFactory {
       const graphics : __esri.Graphic[] = []
       if (result[0]) {
         layer.fields = [
-          new Field({ name: 'oidoid', alias: 'oidoid', type: 'oid' }),
+          new Field({ name: '$objectId', alias: '$objectId', type: 'oid' }),
           ...Object.keys(result[0]).map(key => new Field({
             name: key,
             alias: key,
@@ -268,7 +279,6 @@ class LayerFactory implements ILayerFactory {
           return
         }
         const attributes = row
-        attributes.oidoid = index + 1
         Object.keys(attributes).forEach(key => {
           if (isNullOrUndefined(attributes[key])) {
             attributes[key] = ''
@@ -293,9 +303,6 @@ class LayerFactory implements ILayerFactory {
       layer.applyEdits({
         addFeatures: graphics
       })
-      // eslint-disable-next-line
-      // @ts-ignore
-      layer.source = graphics
     })
     return layer
   }
@@ -311,6 +318,75 @@ class LayerFactory implements ILayerFactory {
    */
   public createFeatureLayer (options?: __esri.FeatureLayerProperties) : __esri.FeatureLayer {
     return new FeatureLayer(options)
+  }
+
+  public createSqlLayer3 (options: __esri.GeoJSONLayerProperties & ISqlLayerProperties) : __esri.GeoJSONLayer {
+    const { url, ...others } = options
+    const layer = this.createGeoJSONLayer({
+      geometryType: 'point',
+      objectIdField: '$objectId',
+      outFields: ['*'],
+      ...others
+    })
+    if (options.sqlOptions.iconUrl) {
+      layer.renderer = {
+        type: 'simple',
+        symbol: {
+          type: 'picture-marker',
+          url: options.sqlOptions.iconUrl,
+          width: '32px',
+          height: '32px'
+        } as __esri.SimpleMarkerSymbolProperties
+      } as __esri.renderers.SimpleRenderer
+    }
+    fetch(options.url, { method: 'get', mode:'cors' }).then(res => res.json()).then(result => {
+      const graphics : __esri.Graphic[] = []
+      if (result[0]) {
+        layer.fields = [
+          new Field({ name: '$objectId', alias: '$objectId', type: 'oid' }),
+          ...Object.keys(result[0]).map(key => new Field({
+            name: key,
+            alias: key,
+            type: [options.sqlOptions.xField, options.sqlOptions.yField].includes(key) ? 'double' : 'string'
+          }))
+        ]
+      }
+      result.forEach((row, index) => {
+        if (!row[options.sqlOptions.xField] || !row[options.sqlOptions.yField]) {
+          return
+        }
+        const attributes = row
+        Object.keys(attributes).forEach(key => {
+          if (isNullOrUndefined(attributes[key])) {
+            attributes[key] = ''
+          } else if (![options.sqlOptions.xField, options.sqlOptions.yField].includes(key)) {
+            attributes[key] = String(attributes[key])
+          }
+        })
+        const props : __esri.GraphicProperties = {
+          attributes: Object.fromEntries(layer.fields.map(item => {
+            return [item.name, attributes[item.name]]
+          })),
+          geometry: {
+            type: 'point',
+            x: row[options.sqlOptions.xField],
+            y: row[options.sqlOptions.yField],
+            spatialReference: options.spatialReference,
+          } as __esri.PointProperties,
+        }
+        const graphic = new Graphic(props)
+        graphics.push(graphic)
+      })
+      layer.applyEdits({
+        addFeatures: graphics
+      })
+    })
+
+    return layer
+  }
+
+  public createGeoJSONLayer (options?: __esri.GeoJSONLayerProperties) : __esri.GeoJSONLayer {
+    return new GeoJSONLayer(options)
   }
 
 }

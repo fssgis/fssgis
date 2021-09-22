@@ -1275,8 +1275,14 @@ interface ILayerFactory {
         layerType: 'sqllayer2';
     } & __esri.FeatureLayerProperties & ISqlLayerProperties): __esri.FeatureLayer;
     createLayer(options: {
+        layerType: 'sqllayer3';
+    } & __esri.GeoJSONLayerProperties & ISqlLayerProperties): __esri.GeoJSONLayer;
+    createLayer(options: {
         layerType: 'featurelayer';
     } & __esri.FeatureLayerProperties): __esri.FeatureLayer;
+    createLayer(options: {
+        layerType: 'geojsonlayer';
+    } & __esri.GeoJSONLayerProperties): __esri.GeoJSONLayer;
     createLayer(options: {
         layerType: string;
     } & __esri.LayerProperties): __esri.Layer;
@@ -1290,7 +1296,9 @@ interface ILayerFactory {
     createMapImageLayer(options: __esri.MapImageLayerProperties): __esri.MapImageLayer;
     createSqlLayer(options: __esri.GraphicsLayerProperties & ISqlLayerProperties): __esri.GraphicsLayer;
     createSqlLayer2(options: __esri.FeatureLayerProperties & ISqlLayerProperties): __esri.FeatureLayer;
+    createSqlLayer3(options: __esri.GeoJSONLayerProperties & ISqlLayerProperties): __esri.GeoJSONLayer;
     createFeatureLayer(options: __esri.FeatureLayerProperties): __esri.FeatureLayer;
+    createGeoJSONLayer(options: __esri.GeoJSONLayerProperties): __esri.GeoJSONLayer;
 }
 /**
  * 图层工厂（单例模式）
@@ -1332,8 +1340,14 @@ declare class LayerFactory implements ILayerFactory {
         layerType: 'sqllayer2';
     } & __esri.FeatureLayerProperties & ISqlLayerProperties): __esri.FeatureLayer;
     createLayer(options: {
+        layerType: 'sqllayer3';
+    } & __esri.GeoJSONLayerProperties & ISqlLayerProperties): __esri.GeoJSONLayer;
+    createLayer(options: {
         layerType: 'featurelayer';
     } & __esri.FeatureLayerProperties): __esri.FeatureLayer;
+    createLayer(options: {
+        layerType: 'geojsonlayer';
+    } & __esri.GeoJSONLayerProperties): __esri.GeoJSONLayer;
     createLayer(options: {
         layerType: string;
     } & __esri.LayerProperties): __esri.Layer;
@@ -1410,6 +1424,8 @@ declare class LayerFactory implements ILayerFactory {
      * ```
      */
     createFeatureLayer(options?: __esri.FeatureLayerProperties): __esri.FeatureLayer;
+    createSqlLayer3(options: __esri.GeoJSONLayerProperties & ISqlLayerProperties): __esri.GeoJSONLayer;
+    createGeoJSONLayer(options?: __esri.GeoJSONLayerProperties): __esri.GeoJSONLayer;
 }
 /**
  * 创建图层工厂

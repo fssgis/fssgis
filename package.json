@@ -36,7 +36,9 @@
     "build:ui": "npx rollup --config ./build/build.fssgis-ui.js -w",
     "test": "npx jest",
     "test:dev": "npx jest --watch",
-    "test:vite": "vite --config ./packages/test-vite/vite.config.js"
+    "test:vite": "vite --config ./packages/test-vite/vite.config.js",
+    "dev:map-configuration": "vite --config ./projects/map-configuration/vite.config.js",
+    "build:map-configuration": "vite build --config ./projects/map-configuration/vite.config.js"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",

@@ -79,7 +79,9 @@ export function createMapModules (options: IMapModulesOptions, fssgEsri?: FssgEs
   })
   mapModules.when(() => {
     watch(() => state.selectedId, id => {
-      mapModules.selectById(id)
+      if (id !== state.selectedId) {
+        mapModules.selectById(id)
+      }
     })
     mapModules.on('change:selected', e => {
       if (e.item?.id !== state.selectedId) {

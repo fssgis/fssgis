@@ -755,7 +755,9 @@ function createMapModules(options, fssgEsri, app) {
   });
   mapModules.when(() => {
     watch(() => state.selectedId, id => {
-      mapModules.selectById(id);
+      if (id !== state.selectedId) {
+        mapModules.selectById(id);
+      }
     });
     mapModules.on('change:selected', e => {
       var _e$item3;

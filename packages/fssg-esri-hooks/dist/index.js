@@ -696,9 +696,7 @@ function _getMapModules(arg0) {
   let mapModules;
 
   if (!arg0) {
-    const {
-      fssgEsri
-    } = useFssgEsri();
+    const fssgEsri = injectFssgEsri();
     mapModules = fssgEsri.mapModules;
   } else {
     if (arg0 instanceof FssgEsri) {
@@ -733,15 +731,15 @@ function useMapModulesSelectedTitle(arg0) {
       selectedTitle.value = ((_e$item2 = e.item) === null || _e$item2 === void 0 ? void 0 : _e$item2.title) ?? '';
     }
   }));
-  return {
+  return createIsomorphicDestructurable({
     selectedTitle
-  };
+  }, [selectedTitle]);
 }
 const SYMBOL_MAPMODULES = Symbol('FssgEsri.MapModules');
 const SYMBOL_MAPMODULES_STATE = Symbol('FssgEsri.MapModulesSTATE');
 function createMapModules(options, fssgEsri, app) {
   const mapModules = new MapModules(options);
-  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri;
+  fssgEsri = fssgEsri ?? injectFssgEsri();
   fssgEsri.use(mapModules);
 
   if (app) {
@@ -778,22 +776,28 @@ function createMapModules(options, fssgEsri, app) {
 
   return mapModules;
 }
+function injectMapModules() {
+  return inject(SYMBOL_MAPMODULES);
+}
 function useMapModules(fssgEsri) {
-  const mapModules = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapModules) ?? inject(SYMBOL_MAPMODULES);
+  const mapModules = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapModules) ?? injectMapModules();
   const {
     selectedId
   } = toRefs(inject(SYMBOL_MAPMODULES_STATE));
-  return {
+  const {
+    selectedTitle
+  } = useMapModulesSelectedTitle(mapModules);
+  return createIsomorphicDestructurable({
     mapModules,
     selectedId,
-    ...useMapModulesSelectedTitle(mapModules)
-  };
+    selectedTitle
+  }, [mapModules, selectedId, selectedTitle]);
 }
 
 const SYMBOL_MOUSETIPS = Symbol('FssgEsri.MouseTips');
 function createMouseTips(options, fssgEsri, app) {
   const mouseTips = new MouseTips(options);
-  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri;
+  fssgEsri = fssgEsri ?? injectFssgEsri();
   fssgEsri.use(mouseTips);
 
   if (app) {
@@ -804,11 +808,14 @@ function createMouseTips(options, fssgEsri, app) {
 
   return mouseTips;
 }
+function injectMouseTips() {
+  return inject(SYMBOL_MOUSETIPS);
+}
 function useMouseTips(fssgEsri) {
-  const mouseTips = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mouseTips) ?? inject(SYMBOL_MOUSETIPS);
-  return {
+  const mouseTips = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mouseTips) ?? injectMouseTips();
+  return createIsomorphicDestructurable({
     mouseTips
-  };
+  }, [mouseTips]);
 }
 
 function _getOverlays(arg0) {
@@ -891,7 +898,7 @@ function useOverlays(fssgEsri) {
 const SYMBOL_VIEWCLIPER$1 = Symbol('FssgEsri.ViewCliper');
 function createViewCliper(options, fssgEsri, app) {
   const viewCliper = new ViewCliper(options);
-  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri;
+  fssgEsri = fssgEsri ?? injectFssgEsri();
   fssgEsri.use(viewCliper);
 
   if (app) {
@@ -902,11 +909,14 @@ function createViewCliper(options, fssgEsri, app) {
 
   return viewCliper;
 }
+function injectViewCliper() {
+  return inject(SYMBOL_VIEWCLIPER$1);
+}
 function useViewCliper(fssgEsri) {
-  const viewCliper = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.viewCliper) ?? inject(SYMBOL_VIEWCLIPER$1);
-  return {
+  const viewCliper = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.viewCliper) ?? injectViewCliper();
+  return createIsomorphicDestructurable({
     viewCliper
-  };
+  }, [viewCliper]);
 }
 
 function usePopup(arg0) {
@@ -954,9 +964,7 @@ function _getMapPopups(arg0) {
   let mapPopups;
 
   if (!arg0) {
-    const {
-      fssgEsri
-    } = useFssgEsri();
+    const fssgEsri = injectFssgEsri();
     mapPopups = fssgEsri.mapPopups;
 
     if (!mapPopups) {
@@ -976,7 +984,7 @@ function _getMapPopups(arg0) {
 const SYMBOL_VIEWCLIPER = Symbol('FssgEsri.MapPopups');
 function createMapPopups(options, fssgEsri, app) {
   const mapPopups = new MapPopups(options);
-  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri;
+  fssgEsri = fssgEsri ?? injectFssgEsri();
   fssgEsri.use(mapPopups);
 
   if (app) {
@@ -987,11 +995,14 @@ function createMapPopups(options, fssgEsri, app) {
 
   return mapPopups;
 }
+function injectMapPopups() {
+  return inject(SYMBOL_VIEWCLIPER);
+}
 function useMapPopups(fssgEsri) {
-  const mapPopups = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapPopups) ?? inject(SYMBOL_VIEWCLIPER);
-  return {
+  const mapPopups = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapPopups) ?? injectMapPopups();
+  return createIsomorphicDestructurable({
     mapPopups
-  };
+  }, [mapPopups]);
 }
 
-export { controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapPopups, createMapTools, createMouseTips, createOverlays, createViewCliper, injectBasemap, injectFssgEsri, injectHawkeye, injectLayerTree, injectMapCursor, injectMapElement, injectMapLayers, injectMapTools, injectOverlays, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLyrFactory, useMapCursor, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapPopups, useMapTools, useMapToolsActivedKey, useMouseTips, useObservableOn, useOverlays, usePopup, useSetOverlays, useViewCliper, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapPopups, createMapTools, createMouseTips, createOverlays, createViewCliper, injectBasemap, injectFssgEsri, injectHawkeye, injectLayerTree, injectMapCursor, injectMapElement, injectMapLayers, injectMapModules, injectMapPopups, injectMapTools, injectMouseTips, injectOverlays, injectViewCliper, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLyrFactory, useMapCursor, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapPopups, useMapTools, useMapToolsActivedKey, useMouseTips, useObservableOn, useOverlays, usePopup, useSetOverlays, useViewCliper, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

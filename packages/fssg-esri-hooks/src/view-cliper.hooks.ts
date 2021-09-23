@@ -1,7 +1,8 @@
 import { ViewCliper, FssgEsri, IViewCliperOptions } from '@fssgis/fssg-esri'
 import { warn } from '@fssgis/fssg-map'
 import { App, inject, InjectionKey, provide } from 'vue'
-import { useFssgEsri } from './fssg-esri.hooks'
+import { injectFssgEsri } from './fssg-esri.hooks'
+import { createIsomorphicDestructurable } from '@fssgis/utils'
 
 function _getViewCliper () : ViewCliper
 function _getViewCliper (fssgMap: FssgEsri) : ViewCliper
@@ -10,7 +11,7 @@ function _getViewCliper (arg0?: FssgEsri | ViewCliper) : ViewCliper
 function _getViewCliper (arg0?: FssgEsri | ViewCliper) : ViewCliper {
   let viewCliper: ViewCliper
   if (!arg0) {
-    const { fssgEsri } = useFssgEsri()
+    const fssgEsri = injectFssgEsri()
     viewCliper = fssgEsri.viewCliper
     if (!viewCliper) {
       warn(this, 'ViewCliper实例未挂载到FssgMap实例')
@@ -30,7 +31,7 @@ export function createViewCliper (options: IViewCliperOptions) : ViewCliper
 export function createViewCliper (options: IViewCliperOptions, fssgEsri: FssgEsri, app?: App) : ViewCliper
 export function createViewCliper (options: IViewCliperOptions, fssgEsri?: FssgEsri, app?: App) : ViewCliper {
   const viewCliper = new ViewCliper(options)
-  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri
+  fssgEsri = fssgEsri ?? injectFssgEsri()
   fssgEsri.use(viewCliper)
   if (app) {
     app.provide(SYMBOL_VIEWCLIPER, viewCliper)
@@ -40,16 +41,21 @@ export function createViewCliper (options: IViewCliperOptions, fssgEsri?: FssgEs
   return viewCliper
 }
 
-interface IViewCliper {
-  viewCliper: ViewCliper
+export function injectViewCliper () : ViewCliper {
+  return inject(SYMBOL_VIEWCLIPER) as ViewCliper
 }
 
-export function useViewCliper () : IViewCliper
-export function useViewCliper (fssgEsri: FssgEsri) : IViewCliper
-export function useViewCliper (fssgEsri?: FssgEsri) : IViewCliper
-export function useViewCliper (fssgEsri?: FssgEsri) : IViewCliper {
-  const viewCliper = fssgEsri?.viewCliper ?? inject(SYMBOL_VIEWCLIPER) as ViewCliper
-  return {
-    viewCliper,
-  }
+type UseViewCliper = {
+  viewCliper: ViewCliper
+} & readonly [ViewCliper]
+
+export function useViewCliper () : UseViewCliper
+export function useViewCliper (fssgEsri: FssgEsri) : UseViewCliper
+export function useViewCliper (fssgEsri?: FssgEsri) : UseViewCliper
+export function useViewCliper (fssgEsri?: FssgEsri) : UseViewCliper {
+  const viewCliper = fssgEsri?.viewCliper ?? injectViewCliper()
+  return createIsomorphicDestructurable(
+    { viewCliper } as const,
+    [viewCliper] as const,
+  )
 }

@@ -194,32 +194,34 @@ declare function useLayerTree(): IUseLayerTree;
 declare function useLayerTree(fssgEsri: FssgEsri): IUseLayerTree;
 declare function useLayerTree(fssgEsri?: FssgEsri): IUseLayerTree;
 
-interface IUseMapModulesSelectedTitle {
+declare type UseMapModulesSelectedTitle = {
     selectedTitle: Ref<string>;
-}
-declare function useMapModulesSelectedTitle(): IUseMapModulesSelectedTitle;
-declare function useMapModulesSelectedTitle(fssgMap: FssgEsri): IUseMapModulesSelectedTitle;
-declare function useMapModulesSelectedTitle(mapModules: MapModules): IUseMapModulesSelectedTitle;
-declare function useMapModulesSelectedTitle(arg0?: FssgEsri | MapModules): IUseMapModulesSelectedTitle;
+} & readonly [Ref<string>];
+declare function useMapModulesSelectedTitle(): UseMapModulesSelectedTitle;
+declare function useMapModulesSelectedTitle(fssgMap: FssgEsri): UseMapModulesSelectedTitle;
+declare function useMapModulesSelectedTitle(mapModules: MapModules): UseMapModulesSelectedTitle;
+declare function useMapModulesSelectedTitle(arg0?: FssgEsri | MapModules): UseMapModulesSelectedTitle;
 declare function createMapModules(options: IMapModulesOptions): MapModules;
 declare function createMapModules(options: IMapModulesOptions, fssgEsri: FssgEsri, app?: App): MapModules;
-interface IUseMapModules {
+declare function injectMapModules(): MapModules;
+declare type UseMapModules = {
     mapModules: MapModules;
     selectedId: Ref<string>;
     selectedTitle: Ref<string>;
-}
-declare function useMapModules(): IUseMapModules;
-declare function useMapModules(fssgEsri: FssgEsri): IUseMapModules;
-declare function useMapModules(fssgEsri?: FssgEsri): IUseMapModules;
+} & readonly [MapModules, Ref<string>, Ref<string>];
+declare function useMapModules(): UseMapModules;
+declare function useMapModules(fssgEsri: FssgEsri): UseMapModules;
+declare function useMapModules(fssgEsri?: FssgEsri): UseMapModules;
 
 declare function createMouseTips(options: IMouseTipsOptions): MouseTips;
 declare function createMouseTips(options: IMouseTipsOptions, fssgEsri: FssgEsri, app?: App): MouseTips;
-interface IUseMouseTips {
+declare function injectMouseTips(): MouseTips;
+declare type UseMouseTips = {
     mouseTips: MouseTips;
-}
-declare function useMouseTips(): IUseMouseTips;
-declare function useMouseTips(fssgEsri: FssgEsri): IUseMouseTips;
-declare function useMouseTips(fssgEsri?: FssgEsri): IUseMouseTips;
+} & readonly [MouseTips];
+declare function useMouseTips(): UseMouseTips;
+declare function useMouseTips(fssgEsri: FssgEsri): UseMouseTips;
+declare function useMouseTips(fssgEsri?: FssgEsri): UseMouseTips;
 
 interface IOverlayState {
     setOverlay<T>(options: Omit<IOverlayAddOptions, 'content'> & {
@@ -247,12 +249,13 @@ declare function useOverlays(fssgEsri?: FssgEsri): IUseOverlays;
 
 declare function createViewCliper(options: IViewCliperOptions): ViewCliper;
 declare function createViewCliper(options: IViewCliperOptions, fssgEsri: FssgEsri, app?: App): ViewCliper;
-interface IViewCliper {
+declare function injectViewCliper(): ViewCliper;
+declare type UseViewCliper = {
     viewCliper: ViewCliper;
-}
-declare function useViewCliper(): IViewCliper;
-declare function useViewCliper(fssgEsri: FssgEsri): IViewCliper;
-declare function useViewCliper(fssgEsri?: FssgEsri): IViewCliper;
+} & readonly [ViewCliper];
+declare function useViewCliper(): UseViewCliper;
+declare function useViewCliper(fssgEsri: FssgEsri): UseViewCliper;
+declare function useViewCliper(fssgEsri?: FssgEsri): UseViewCliper;
 
 interface IPopupState {
     visible: Ref<boolean>;
@@ -266,11 +269,12 @@ declare function usePopup(mapPopups: MapPopups): IPopupState;
 declare function usePopup(arg0?: FssgEsri | MapPopups): IPopupState;
 declare function createMapPopups(options: IMapPopupsOptions): MapPopups;
 declare function createMapPopups(options: IMapPopupsOptions, fssgEsri: FssgEsri, app?: App): MapPopups;
-interface IUseMapPopups {
+declare function injectMapPopups(): MapPopups;
+declare type UseMapPopups = {
     mapPopups: MapPopups;
-}
-declare function useMapPopups(): IUseMapPopups;
-declare function useMapPopups(fssgEsri: FssgEsri): IUseMapPopups;
-declare function useMapPopups(fssgEsri?: FssgEsri): IUseMapPopups;
+} & readonly [MapPopups];
+declare function useMapPopups(): UseMapPopups;
+declare function useMapPopups(fssgEsri: FssgEsri): UseMapPopups;
+declare function useMapPopups(fssgEsri?: FssgEsri): UseMapPopups;
 
-export { EsriWatchCallback, IOverlayState, IPopupState, MapOldSources, MapSources, controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapPopups, createMapTools, createMouseTips, createOverlays, createViewCliper, injectBasemap, injectFssgEsri, injectHawkeye, injectLayerTree, injectMapCursor, injectMapElement, injectMapLayers, injectMapTools, injectOverlays, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLyrFactory, useMapCursor, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapPopups, useMapTools, useMapToolsActivedKey, useMouseTips, useObservableOn, useOverlays, usePopup, useSetOverlays, useViewCliper, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { EsriWatchCallback, IOverlayState, IPopupState, MapOldSources, MapSources, controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapPopups, createMapTools, createMouseTips, createOverlays, createViewCliper, injectBasemap, injectFssgEsri, injectHawkeye, injectLayerTree, injectMapCursor, injectMapElement, injectMapLayers, injectMapModules, injectMapPopups, injectMapTools, injectMouseTips, injectOverlays, injectViewCliper, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLyrFactory, useMapCursor, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapPopups, useMapTools, useMapToolsActivedKey, useMouseTips, useObservableOn, useOverlays, usePopup, useSetOverlays, useViewCliper, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

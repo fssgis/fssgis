@@ -1,7 +1,8 @@
 import { MouseTips, FssgEsri, IMouseTipsOptions } from '@fssgis/fssg-esri'
 import { warn } from '@fssgis/fssg-map'
 import { App, inject, InjectionKey, provide } from 'vue'
-import { useFssgEsri } from './fssg-esri.hooks'
+import { injectFssgEsri } from './fssg-esri.hooks'
+import { createIsomorphicDestructurable } from '@fssgis/utils'
 
 function _getMouseTips () : MouseTips
 function _getMouseTips (fssgMap: FssgEsri) : MouseTips
@@ -10,7 +11,7 @@ function _getMouseTips (arg0?: FssgEsri | MouseTips) : MouseTips
 function _getMouseTips (arg0?: FssgEsri | MouseTips) : MouseTips {
   let mouseTips: MouseTips
   if (!arg0) {
-    const { fssgEsri } = useFssgEsri()
+    const fssgEsri = injectFssgEsri()
     mouseTips = fssgEsri.mouseTips
     if (!mouseTips) {
       warn(this, 'MouseTips实例未挂载到FssgMap实例')
@@ -30,7 +31,7 @@ export function createMouseTips (options: IMouseTipsOptions) : MouseTips
 export function createMouseTips (options: IMouseTipsOptions, fssgEsri: FssgEsri, app?: App) : MouseTips
 export function createMouseTips (options: IMouseTipsOptions, fssgEsri?: FssgEsri, app?: App) : MouseTips {
   const mouseTips = new MouseTips(options)
-  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri
+  fssgEsri = fssgEsri ?? injectFssgEsri()
   fssgEsri.use(mouseTips)
   if (app) {
     app.provide(SYMBOL_MOUSETIPS, mouseTips)
@@ -40,16 +41,21 @@ export function createMouseTips (options: IMouseTipsOptions, fssgEsri?: FssgEsri
   return mouseTips
 }
 
-interface IUseMouseTips {
-  mouseTips: MouseTips
+export function injectMouseTips () : MouseTips {
+  return inject(SYMBOL_MOUSETIPS) as MouseTips
 }
 
-export function useMouseTips () : IUseMouseTips
-export function useMouseTips (fssgEsri: FssgEsri) : IUseMouseTips
-export function useMouseTips (fssgEsri?: FssgEsri) : IUseMouseTips
-export function useMouseTips (fssgEsri?: FssgEsri) : IUseMouseTips {
-  const mouseTips = fssgEsri?.mouseTips ?? inject(SYMBOL_MOUSETIPS) as MouseTips
-  return {
-    mouseTips,
-  }
+type UseMouseTips = {
+  mouseTips: MouseTips
+} & readonly [MouseTips]
+
+export function useMouseTips () : UseMouseTips
+export function useMouseTips (fssgEsri: FssgEsri) : UseMouseTips
+export function useMouseTips (fssgEsri?: FssgEsri) : UseMouseTips
+export function useMouseTips (fssgEsri?: FssgEsri) : UseMouseTips {
+  const mouseTips = fssgEsri?.mouseTips ?? injectMouseTips()
+  return createIsomorphicDestructurable(
+    { mouseTips } as const,
+    [mouseTips] as const,
+  )
 }

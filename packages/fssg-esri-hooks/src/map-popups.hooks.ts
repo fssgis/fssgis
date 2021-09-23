@@ -1,7 +1,8 @@
 import { AppContext, Component, createVNode, getCurrentInstance, Ref, ref, render, InjectionKey, App, provide, inject } from 'vue'
 import { FssgEsri, IMapPopupsOptions, MapPopups } from '@fssgis/fssg-esri'
-import { useFssgEsri } from '.'
+import { injectFssgEsri } from './fssg-esri.hooks'
 import { warn } from '@fssgis/fssg-map'
+import { createIsomorphicDestructurable } from '@fssgis/utils'
 
 export interface IPopupState {
   visible: Ref<boolean>
@@ -58,7 +59,7 @@ function _getMapPopups (arg0?: FssgEsri | MapPopups) : MapPopups
 function _getMapPopups (arg0?: FssgEsri | MapPopups) : MapPopups {
   let mapPopups: MapPopups
   if (!arg0) {
-    const { fssgEsri } = useFssgEsri()
+    const fssgEsri = injectFssgEsri()
     mapPopups = fssgEsri.mapPopups
     if (!mapPopups) {
       warn(this, 'MapPopups实例未挂载到FssgMap实例')
@@ -78,7 +79,7 @@ export function createMapPopups (options: IMapPopupsOptions) : MapPopups
 export function createMapPopups (options: IMapPopupsOptions, fssgEsri: FssgEsri, app?: App) : MapPopups
 export function createMapPopups (options: IMapPopupsOptions, fssgEsri?: FssgEsri, app?: App) : MapPopups {
   const mapPopups = new MapPopups(options)
-  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri
+  fssgEsri = fssgEsri ?? injectFssgEsri()
   fssgEsri.use(mapPopups)
   if (app) {
     app.provide(SYMBOL_VIEWCLIPER, mapPopups)
@@ -88,16 +89,21 @@ export function createMapPopups (options: IMapPopupsOptions, fssgEsri?: FssgEsri
   return mapPopups
 }
 
-interface IUseMapPopups {
-  mapPopups: MapPopups
+export function injectMapPopups () : MapPopups {
+  return inject(SYMBOL_VIEWCLIPER) as MapPopups
 }
 
-export function useMapPopups () : IUseMapPopups
-export function useMapPopups (fssgEsri: FssgEsri) : IUseMapPopups
-export function useMapPopups (fssgEsri?: FssgEsri) : IUseMapPopups
-export function useMapPopups (fssgEsri?: FssgEsri) : IUseMapPopups {
-  const mapPopups = fssgEsri?.mapPopups ?? inject(SYMBOL_VIEWCLIPER) as MapPopups
-  return {
-    mapPopups,
-  }
+type UseMapPopups = {
+  mapPopups: MapPopups
+} & readonly [MapPopups]
+
+export function useMapPopups () : UseMapPopups
+export function useMapPopups (fssgEsri: FssgEsri) : UseMapPopups
+export function useMapPopups (fssgEsri?: FssgEsri) : UseMapPopups
+export function useMapPopups (fssgEsri?: FssgEsri) : UseMapPopups {
+  const mapPopups = fssgEsri?.mapPopups ?? injectMapPopups()
+  return createIsomorphicDestructurable(
+    { mapPopups } as const,
+    [mapPopups] as const,
+  )
 }

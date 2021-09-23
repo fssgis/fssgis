@@ -3678,8 +3678,11 @@ class Overlays extends FssgEsriPlugin {
   }
 
   add(options) {
+    var _options$classNames;
+
     const overlay = document.createElement('div');
     overlay.classList.add('fssg-overlay');
+    (_options$classNames = options.classNames) === null || _options$classNames === void 0 ? void 0 : _options$classNames.forEach(name => overlay.classList.add(name));
     overlay.style.position = 'absolute';
     overlay.style.padding = '4px 8px';
     overlay.style.backgroundColor = '#00000085';
@@ -3708,11 +3711,12 @@ class Overlays extends FssgEsriPlugin {
       bezierCurve = this.view_.$owner.mapElement.add(createGeometryFactory(this.$).createBezierCurve(options.point, mapPt), options.bezierCurveSymbol);
     }
 
-    const id = options.id ?? createGuid();
+    const id = options.id ?? `overlay-${createGuid()}`;
     overlay.id = id;
 
     this._overlayPool.set(id, {
       id,
+      classNames: options.classNames,
       container: overlay,
       mapXY: options.point,
       offsetX: options.offsetX ?? 0,

@@ -975,6 +975,7 @@ interface IOverlaysEvents extends IFssgEsriPluginEvents {
 }
 interface IOverlayAddOptions {
     id?: string;
+    classNames?: string[];
     point: __esri.Point;
     content: string | HTMLDivElement;
     offsetX?: number;
@@ -986,6 +987,7 @@ interface IOverlayAddOptions {
 }
 interface IOverlay {
     id: string;
+    classNames?: string[];
     container: HTMLDivElement;
     mapXY: __esri.Point;
     offsetX: number;

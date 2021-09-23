@@ -813,9 +813,7 @@ function _getOverlays(arg0) {
   let overlays;
 
   if (!arg0) {
-    const {
-      fssgEsri
-    } = useFssgEsri();
+    const fssgEsri = injectFssgEsri();
     overlays = fssgEsri.overlays;
 
     if (!overlays) {
@@ -866,7 +864,7 @@ function useSetOverlays(arg0) {
 const SYMBOL_OVERLAYS = Symbol('FssgEsri.Overlays');
 function createOverlays(options, fssgEsri, app) {
   const overlays = new Overlays(options);
-  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri;
+  fssgEsri = fssgEsri ?? injectFssgEsri();
   fssgEsri.use(overlays);
 
   if (app) {
@@ -877,8 +875,11 @@ function createOverlays(options, fssgEsri, app) {
 
   return overlays;
 }
+function injectOverlays() {
+  return inject(SYMBOL_OVERLAYS);
+}
 function useOverlays(fssgEsri) {
-  const overlays = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.overlays) ?? inject(SYMBOL_OVERLAYS);
+  const overlays = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.overlays) ?? injectOverlays();
   return {
     overlays,
     ...useSetOverlays(overlays)
@@ -991,4 +992,4 @@ function useMapPopups(fssgEsri) {
   };
 }
 
-export { controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapPopups, createMapTools, createMouseTips, createOverlays, createViewCliper, injectBasemap, injectFssgEsri, injectHawkeye, injectLayerTree, injectMapCursor, injectMapElement, injectMapLayers, injectMapTools, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLyrFactory, useMapCursor, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapPopups, useMapTools, useMapToolsActivedKey, useMouseTips, useObservableOn, useOverlays, usePopup, useSetOverlays, useViewCliper, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };
+export { controllableWatch, createBasemap, createFssgEsri, createGeoFactory, createHawkeye, createLayerTree, createLyrFactory, createMapCursor, createMapElement, createMapLayers, createMapModules, createMapPopups, createMapTools, createMouseTips, createOverlays, createViewCliper, injectBasemap, injectFssgEsri, injectHawkeye, injectLayerTree, injectMapCursor, injectMapElement, injectMapLayers, injectMapTools, injectOverlays, tryOnBeforeUnmounted, tryOnUnmounted, useBasemap, useBasemapSelectedKey, useBasemapVisible, useCenter, useCenterZoom, useEsriWatch, useExtent, useFssgEsri, useFssgEsriLoaded, useGeoFactory, useHawkeye, useLayerTree, useLyrFactory, useMapCursor, useMapCursorType, useMapElement, useMapLayers, useMapModules, useMapModulesSelectedTitle, useMapPopups, useMapTools, useMapToolsActivedKey, useMouseTips, useObservableOn, useOverlays, usePopup, useSetOverlays, useViewCliper, useWatchRef, useWatchShallowReactive, useWatchShallowRef, useZoom };

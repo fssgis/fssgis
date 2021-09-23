@@ -13,6 +13,7 @@ export interface IOverlaysEvents extends IFssgEsriPluginEvents { // eslint-disab
 
 export interface IOverlayAddOptions {
   id?: string
+  classNames?: string[]
   point: __esri.Point
   content: string | HTMLDivElement
   offsetX?: number
@@ -25,6 +26,7 @@ export interface IOverlayAddOptions {
 
 export interface IOverlay {
   id: string
+  classNames?: string[]
   container: HTMLDivElement
   mapXY: __esri.Point
   offsetX: number
@@ -96,6 +98,7 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
   public add (options: IOverlayAddOptions) : string {
     const overlay = document.createElement('div')
     overlay.classList.add('fssg-overlay')
+    options.classNames?.forEach(name => overlay.classList.add(name))
     overlay.style.position = 'absolute'
     overlay.style.padding = '4px 8px'
     overlay.style.backgroundColor = '#00000085'
@@ -129,10 +132,11 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
       )
     }
 
-    const id = options.id ?? createGuid()
+    const id = options.id ?? `overlay-${createGuid()}`
     overlay.id = id
     this._overlayPool.set(id, {
       id,
+      classNames: options.classNames,
       container: overlay,
       mapXY: options.point,
       offsetX: options.offsetX ?? 0,

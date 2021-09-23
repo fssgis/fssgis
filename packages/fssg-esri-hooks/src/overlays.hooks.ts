@@ -2,7 +2,8 @@ import { Overlays, FssgEsri, IOverlaysOptions, IOverlayAddOptions } from '@fssgi
 import { warn } from '@fssgis/fssg-map'
 import { createGuid } from '@fssgis/utils'
 import { App, AppContext, Component, createVNode, getCurrentInstance, inject, InjectionKey, provide, render } from 'vue'
-import { useFssgEsri } from './fssg-esri.hooks'
+import { injectFssgEsri } from './fssg-esri.hooks'
+import { createIsomorphicDestructurable } from '@fssgis/utils'
 
 function _getOverlays () : Overlays
 function _getOverlays (fssgMap: FssgEsri) : Overlays
@@ -11,7 +12,7 @@ function _getOverlays (arg0?: FssgEsri | Overlays) : Overlays
 function _getOverlays (arg0?: FssgEsri | Overlays) : Overlays {
   let overlays: Overlays
   if (!arg0) {
-    const { fssgEsri } = useFssgEsri()
+    const fssgEsri = injectFssgEsri()
     overlays = fssgEsri.overlays
     if (!overlays) {
       warn(this, 'Overlays实例未挂载到FssgMap实例')
@@ -66,7 +67,7 @@ export function createOverlays (options: IOverlaysOptions) : Overlays
 export function createOverlays (options: IOverlaysOptions, fssgEsri: FssgEsri, app?: App) : Overlays
 export function createOverlays (options: IOverlaysOptions, fssgEsri?: FssgEsri, app?: App) : Overlays {
   const overlays = new Overlays(options)
-  fssgEsri = fssgEsri ?? useFssgEsri().fssgEsri
+  fssgEsri = fssgEsri ?? injectFssgEsri()
   fssgEsri.use(overlays)
   if (app) {
     app.provide(SYMBOL_OVERLAYS, overlays)
@@ -74,6 +75,10 @@ export function createOverlays (options: IOverlaysOptions, fssgEsri?: FssgEsri, 
     provide(SYMBOL_OVERLAYS, overlays)
   }
   return overlays
+}
+
+export function injectOverlays () : Overlays {
+  return inject(SYMBOL_OVERLAYS) as Overlays
 }
 
 interface IUseOverlays {
@@ -85,7 +90,7 @@ export function useOverlays () : IUseOverlays
 export function useOverlays (fssgEsri: FssgEsri) : IUseOverlays
 export function useOverlays (fssgEsri?: FssgEsri) : IUseOverlays
 export function useOverlays (fssgEsri?: FssgEsri) : IUseOverlays {
-  const overlays = fssgEsri?.overlays ?? inject(SYMBOL_OVERLAYS) as Overlays
+  const overlays = fssgEsri?.overlays ?? injectOverlays()
   return {
     overlays,
     ...useSetOverlays(overlays),

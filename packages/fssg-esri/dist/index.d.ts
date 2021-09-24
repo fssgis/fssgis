@@ -452,6 +452,37 @@ declare abstract class DrawTool<T_OPTIONS extends IDrawToolOptions = IDrawToolOp
     setDrawingStyle(style: IMapElementSymbol): this;
 }
 
+declare type IDrawRectangleFasterToolOptions = IDrawToolOptions;
+declare type IDrawRectangleFasterToolEvents = IDrawToolEvents;
+declare class DrawRectangleFasterTool<T_OPTIONS extends IDrawRectangleFasterToolOptions = IDrawRectangleFasterToolOptions, T_EVENTS extends IDrawRectangleFasterToolEvents = IDrawRectangleFasterToolEvents> extends DrawTool<T_OPTIONS, T_EVENTS> {
+    constructor(map: IMap, view: IView, options?: Omit<T_OPTIONS, 'drawType'>);
+    protected initAction_(): this;
+}
+
+/** 拉框放大工具类 */
+declare class ZoomInRectTool extends DrawRectangleFasterTool {
+    /**
+     * 构造拉框放大工具类
+     * @param map 地图对象
+     * @param view 视图对象
+     */
+    constructor(map: IMap, view: IView);
+    /** 重写绘制完成处理事件 */
+    protected onDrawEnd_(e: OnDrawEndParams<this>): OnDrawEndReture;
+}
+
+/** 拉框缩小工具类 */
+declare class ZoomOutRectTool extends DrawRectangleFasterTool {
+    /**
+     * 构造拉框缩小工具类
+     * @param map 地图对象
+     * @param view 视图对象
+     */
+    constructor(map: IMap, view: IView);
+    /** 重写绘制完成处理事件 */
+    protected onDrawEnd_(e: OnDrawEndParams<this>): OnDrawEndReture;
+}
+
 declare type IDrawPointToolOptions = IDrawToolOptions;
 declare type IDrawPointToolEvents = IDrawToolEvents;
 declare class DrawPointTool<T_OPTIONS extends IDrawPointToolOptions = IDrawPointToolOptions, T_EVENTS extends IDrawPointToolEvents = IDrawPointToolEvents> extends DrawTool<T_OPTIONS, T_EVENTS> {
@@ -472,6 +503,13 @@ declare type IDrawPolylineToolOptions = IDrawToolOptions;
 declare type IDrawPolylineToolEvents = IDrawToolEvents;
 declare class DrawPolylineTool<T_OPTIONS extends IDrawPolylineToolOptions = IDrawPolylineToolOptions, T_EVENTS extends IDrawPolylineToolEvents = IDrawPolylineToolEvents> extends DrawTool<T_OPTIONS, T_EVENTS> {
     constructor(map: IMap, view: IView, onlyOneGraphic?: boolean);
+    protected initAction_(): this;
+}
+
+declare type IDrawRectangleToolOptions = IDrawToolOptions;
+declare type IDrawRectangleToolEvents = IDrawToolEvents;
+declare class DrawRectangleTool<T_OPTIONS extends IDrawRectangleToolOptions = IDrawRectangleToolOptions, T_EVENTS extends IDrawRectangleToolEvents = IDrawRectangleToolEvents> extends DrawTool<T_OPTIONS, T_EVENTS> {
+    constructor(map: IMap, view: IView, options?: Omit<T_OPTIONS, 'drawType'>);
     protected initAction_(): this;
 }
 
@@ -1086,7 +1124,9 @@ interface IGeometryFactory {
     createPolygonFromPolyline(polyline: __esri.Polyline): __esri.Polygon;
     createPolygonFromXYs(xys: XY[]): __esri.Polygon;
     createPolygonFromLonLats(lonLats: LonLat[]): __esri.Polygon;
+    createPolygonFromExtent(extent: __esri.Extent): __esri.Polygon;
     createExtent(options: __esri.ExtentProperties): __esri.Extent;
+    createExtentFromPoints(points: __esri.Point[]): __esri.Extent;
 }
 /**
  * 几何工厂类（条件单例模式）
@@ -1229,6 +1269,16 @@ declare class GeometryFacory implements IGeometryFactory {
      * @param pt2 点2
      */
     createBezierCurve(pt1: __esri.Point, pt2: __esri.Point): __esri.Polyline;
+    /**
+     * 根据esri范围创建Esri面
+     * @param extent esri范围
+     */
+    createPolygonFromExtent(extent: __esri.Extent): __esri.Polygon;
+    /**
+     * 根据esri点集创建esri范围
+     * @param points esri点集
+     */
+    createExtentFromPoints(points: __esri.Point[]): __esri.Extent;
 }
 /**
  * 创建几何工厂
@@ -1600,4 +1650,4 @@ declare const RippleLayerView: any;
 
 declare const AnimatedLinesLayer: any;
 
-export { AnimatedLinesLayer, Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, IAttributesConfigItem, IBasemapEvents, IBasemapOptions, IDrawPointToolEvents, IDrawPointToolOptions, IDrawPolygonToolEvents, IDrawPolygonToolOptions, IDrawPolylineToolEvents, IDrawPolylineToolOptions, IField, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, IHitTestToolEvents, IHitTestToolOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapModulesEvents, IMapModulesOptions, IMapPopupsEvents, IMapPopupsOptions, IMapToolsEvents, IMapToolsOptions, IMeasureAreaToolEvents, IMeasureAreaToolOptions, IMeasureCoordinateToolEvents, IMeasureCoordinateToolOptions, IMeasureLengthToolEvents, IMeasureLengthToolOptions, IModuleItem, IMouseTipsEvents, IMouseTipsOptions, IOverlay, IOverlayAddOptions, IOverlaysEvents, IOverlaysOptions, IOwner, ISelectByPolygonToolEvent, ISelectByPolygonToolOptions, ITreeNode, IView, IViewCliperEvents, IViewCliperOptions, IZoomHomeToolEvents, IZoomHomeToolOptions, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapModules, MapPopups, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, OnSelectedParams, OnSelectedReture, Overlays, RippleGraphicsLayer, RippleLayerView, SelectByPolygonTool, ViewCliper, XY, ZoomHomeTool, createGeometryFactory, createLayerFactory, getLatfromLonLat, getLonfromLonLat, getXfromXY, getYfromXY };
+export { AnimatedLinesLayer, Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, DrawRectangleFasterTool, DrawRectangleTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, IAttributesConfigItem, IBasemapEvents, IBasemapOptions, IDrawPointToolEvents, IDrawPointToolOptions, IDrawPolygonToolEvents, IDrawPolygonToolOptions, IDrawPolylineToolEvents, IDrawPolylineToolOptions, IDrawRectangleFasterToolEvents, IDrawRectangleFasterToolOptions, IDrawRectangleToolEvents, IDrawRectangleToolOptions, IField, IFssgEsriEvents, IFssgEsriOptions, IFssgEsriPluginEvents, IFssgEsriPluginOptions, IGeometryFactory, IHawkeyeEvents, IHawkeyeOptions, IHitTestToolEvents, IHitTestToolOptions, ILayerFactory, ILayerTreeEvents, ILayerTreeOptions, IMap, IMapCursorEvents, IMapCursorOptions, IMapElementEvents, IMapElementOptions, IMapElementSymbol, IMapLayersEvents, IMapLayersOptions, IMapModulesEvents, IMapModulesOptions, IMapPopupsEvents, IMapPopupsOptions, IMapToolsEvents, IMapToolsOptions, IMeasureAreaToolEvents, IMeasureAreaToolOptions, IMeasureCoordinateToolEvents, IMeasureCoordinateToolOptions, IMeasureLengthToolEvents, IMeasureLengthToolOptions, IModuleItem, IMouseTipsEvents, IMouseTipsOptions, IOverlay, IOverlayAddOptions, IOverlaysEvents, IOverlaysOptions, IOwner, ISelectByPolygonToolEvent, ISelectByPolygonToolOptions, ITreeNode, IView, IViewCliperEvents, IViewCliperOptions, IZoomHomeToolEvents, IZoomHomeToolOptions, LayerTree, LonLat, MapCursor, MapElement, MapLayers, MapModules, MapPopups, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, OnSelectedParams, OnSelectedReture, Overlays, RippleGraphicsLayer, RippleLayerView, SelectByPolygonTool, ViewCliper, XY, ZoomHomeTool, ZoomInRectTool, ZoomOutRectTool, createGeometryFactory, createLayerFactory, getLatfromLonLat, getLonfromLonLat, getXfromXY, getYfromXY };

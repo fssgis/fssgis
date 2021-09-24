@@ -63,8 +63,10 @@ export interface IGeometryFactory {
   createPolygonFromPolyline (polyline: __esri.Polyline) : __esri.Polygon
   createPolygonFromXYs (xys: XY[]) : __esri.Polygon
   createPolygonFromLonLats (lonLats: LonLat[]) : __esri.Polygon
+  createPolygonFromExtent (extent: __esri.Extent) : __esri.Polygon
 
   createExtent (options: __esri.ExtentProperties) : __esri.Extent
+  createExtentFromPoints (points: __esri.Point[]) : __esri.Extent
 }
 
 /**
@@ -326,6 +328,48 @@ export class GeometryFacory implements IGeometryFactory {
     }
     return this.createPolylineFromXYs(xys)
   }
+
+  /**
+   * 根据esri范围创建Esri面
+   * @param extent esri范围
+   */
+  public createPolygonFromExtent (extent: __esri.Extent) : __esri.Polygon {
+    const { xmax, xmin, ymax, ymin } = extent
+    const xys: XY[] = [
+      [xmin, ymin],
+      [xmin, ymax],
+      [xmax, ymax],
+      [xmax, ymin],
+    ]
+    return this.createPolygonFromXYs(xys)
+  }
+
+  /**
+   * 根据esri点集创建esri范围
+   * @param points esri点集
+   */
+  public createExtentFromPoints (points: __esri.Point[]) : __esri.Extent {
+    const xmin = points.reduce((ret, cur) => {
+      ret < cur.x && (ret = cur.x)
+      return ret
+    }, points[0]?.x)
+    const xmax = points.reduce((ret, cur) => {
+      ret > cur.x && (ret = cur.x)
+      return ret
+    }, points[0]?.x)
+    const ymin = points.reduce((ret, cur) => {
+      ret < cur.y && (ret = cur.y)
+      return ret
+    }, points[0]?.y)
+    const ymax = points.reduce((ret, cur) => {
+      ret > cur.y && (ret = cur.y)
+      return ret
+    }, points[0]?.y)
+    return this.createExtent({
+      xmin, xmax, ymin, ymax
+    })
+  }
+
 }
 
 /**

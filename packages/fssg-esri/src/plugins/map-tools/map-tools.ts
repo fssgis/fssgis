@@ -6,7 +6,11 @@ import {
   DrawPointTool,
   DrawPolygonTool,
   DrawPolylineTool,
+  DrawRectangleTool,
+  DrawRectangleFasterTool,
   ZoomHomeTool,
+  ZoomInRectTool,
+  ZoomOutRectTool,
   MeasureCoordinateTool,
   MeasureLengthTool,
   MeasureAreaTool,
@@ -76,14 +80,19 @@ export class MapTools extends FssgEsriPlugin<IMapToolsOptions, IMapToolsEvents> 
     this._toolPool
       .set('default', new FssgEsriBaseTool(this.map_, this.view_, { isOnceTool: false }))
       .set('zoom-home', new ZoomHomeTool(this.map_, this.view_))
-      .set('draw-point', new DrawPointTool(this.map_, this.view_))
-      .set('draw-polyline', new DrawPolylineTool(this.map_, this.view_))
-      .set('draw-polygon', new DrawPolygonTool(this.map_, this.view_))
+      .set('zoom-in-rect', new ZoomInRectTool(this.map_, this.view_))
+      .set('zoom-out-rect', new ZoomOutRectTool(this.map_, this.view_))
       .set('clear', new ClearTool(this.map_, this.view_))
       .set('measure-coordinate', new MeasureCoordinateTool(this.map_, this.view_))
       .set('measure-length', new MeasureLengthTool(this.map_, this.view_))
       .set('measure-area', new MeasureAreaTool(this.map_, this.view_))
       .set('hit-test', new HitTestTool(this.map_, this.view_))
+      .set('draw-rectangle', new DrawRectangleTool(this.map_, this.view_))
+
+      .set('draw-point', new DrawPointTool(this.map_, this.view_))
+      .set('draw-polyline', new DrawPolylineTool(this.map_, this.view_))
+      .set('draw-polygon', new DrawPolygonTool(this.map_, this.view_))
+      .set('draw-rectangle-faster', new DrawRectangleFasterTool(this.map_, this.view_))
     return this
   }
 

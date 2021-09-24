@@ -357,6 +357,54 @@ class GeometryFacory {
 
     return this.createPolylineFromXYs(xys);
   }
+  /**
+   * 根据esri范围创建Esri面
+   * @param extent esri范围
+   */
+
+
+  createPolygonFromExtent(extent) {
+    const {
+      xmax,
+      xmin,
+      ymax,
+      ymin
+    } = extent;
+    const xys = [[xmin, ymin], [xmin, ymax], [xmax, ymax], [xmax, ymin]];
+    return this.createPolygonFromXYs(xys);
+  }
+  /**
+   * 根据esri点集创建esri范围
+   * @param points esri点集
+   */
+
+
+  createExtentFromPoints(points) {
+    var _points$, _points$2, _points$3, _points$4;
+
+    const xmin = points.reduce((ret, cur) => {
+      ret < cur.x && (ret = cur.x);
+      return ret;
+    }, (_points$ = points[0]) === null || _points$ === void 0 ? void 0 : _points$.x);
+    const xmax = points.reduce((ret, cur) => {
+      ret > cur.x && (ret = cur.x);
+      return ret;
+    }, (_points$2 = points[0]) === null || _points$2 === void 0 ? void 0 : _points$2.x);
+    const ymin = points.reduce((ret, cur) => {
+      ret < cur.y && (ret = cur.y);
+      return ret;
+    }, (_points$3 = points[0]) === null || _points$3 === void 0 ? void 0 : _points$3.y);
+    const ymax = points.reduce((ret, cur) => {
+      ret > cur.y && (ret = cur.y);
+      return ret;
+    }, (_points$4 = points[0]) === null || _points$4 === void 0 ? void 0 : _points$4.y);
+    return this.createExtent({
+      xmin,
+      xmax,
+      ymin,
+      ymax
+    });
+  }
 
 }
 /**
@@ -2078,6 +2126,156 @@ class DrawTool extends FssgEsriBaseTool {
 
 }
 
+class DrawRectangleFasterTool extends DrawTool {
+  constructor(map, view, options) {
+    super(map, view, { ...options,
+      drawType: 'rectangle',
+      cursorType: 'draw-polygon'
+    });
+  }
+
+  initAction_() {
+    this.action_ = this.draw_.create('rectangle', {
+      mode: 'freehand'
+    });
+    this.action_.on(['vertex-add', 'cursor-update', 'vertex-remove'], e => {
+      const vertices = e.vertices;
+
+      if (vertices.length === 1) {
+        e.type === 'vertex-add' && this.fire('draw-start', {
+          x: vertices[0][0],
+          y: vertices[0][1]
+        });
+        return;
+      }
+
+      const geometry = createGeometryFactory(this.$).createExtentFromPoints(vertices.map(xy => createGeometryFactory(this.$).createPointFromXY(xy)));
+      this.fire('draw-move', {
+        geometry
+      });
+    });
+    this.action_.on('draw-complete', e => {
+      const vertices = e.vertices;
+      const geometry = createGeometryFactory(this.$).createExtentFromPoints(vertices.map(xy => createGeometryFactory(this.$).createPointFromXY(xy)));
+      this.fire('draw-end', {
+        geometry
+      });
+    });
+    return this;
+  }
+
+}
+
+/** 拉框放大工具类 */
+
+class ZoomInRectTool extends DrawRectangleFasterTool {
+  //#region 构造函数
+
+  /**
+   * 构造拉框放大工具类
+   * @param map 地图对象
+   * @param view 视图对象
+   */
+  constructor(map, view) {
+    super(map, view);
+    this.cursorType_ = 'zoomin';
+    this.setDrawingStyle({
+      fill: {
+        color: [0, 0, 0, .5],
+        outline: {
+          color: [0, 0, 0, .3],
+          width: 4
+        }
+      }
+    });
+  } //#endregion
+  //#region 保护方法
+
+  /** 重写绘制完成处理事件 */
+
+
+  onDrawEnd_(e) {
+    const graphic = super.onDrawEnd_(e);
+
+    if (!graphic) {
+      return false;
+    }
+
+    this.clearDrawed();
+    this.view_.goTo(graphic);
+    return graphic;
+  }
+
+}
+
+/** 拉框缩小工具类 */
+
+class ZoomOutRectTool extends DrawRectangleFasterTool {
+  //#region 构造函数
+
+  /**
+   * 构造拉框缩小工具类
+   * @param map 地图对象
+   * @param view 视图对象
+   */
+  constructor(map, view) {
+    super(map, view);
+    this.cursorType_ = 'zoomout';
+    this.setDrawingStyle({
+      fill: {
+        color: [0, 0, 0, .5],
+        outline: {
+          color: [0, 0, 0, .3],
+          width: 4
+        }
+      }
+    });
+  } //#endregion
+  //#region 保护方法
+
+  /** 重写绘制完成处理事件 */
+
+
+  onDrawEnd_(e) {
+    const graphic = super.onDrawEnd_(e);
+
+    if (!graphic) {
+      return false;
+    }
+
+    this.clearDrawed();
+    const {
+      xmin,
+      ymin,
+      xmax,
+      ymax
+    } = graphic.geometry.extent;
+    const {
+      xmin: vXmin,
+      ymin: vYmin,
+      xmax: vXmax,
+      ymax: vYmax
+    } = this.view_.extent;
+    const [gWidth, gHeight] = [xmax - xmin, ymax, ymin];
+    const [vWidth, vHeight] = [vXmax - vXmin, vYmax - vYmin];
+    const nWidth = vWidth ** 2 / gWidth;
+    const nHeight = vHeight ** 2 / gHeight;
+    const nXmin = vXmin - (xmin - vXmin) * vWidth / gWidth;
+    const nYmin = vYmin - (ymin - vYmin) * vHeight / gHeight;
+    const nXmax = nXmin + Math.abs(nWidth);
+    const nYMax = nYmin + Math.abs(nHeight);
+    this.view_.goTo(new Extent({
+      xmin: nXmin,
+      ymin: nYmin,
+      xmax: nXmax,
+      ymax: nYMax,
+      spatialReference: this.view_.spatialReference
+    }));
+    return graphic;
+  }
+
+}
+
 class DrawPointTool extends DrawTool {
   constructor(map, view, onlyOneGraphic = false) {
     super(map, view, {
@@ -2208,6 +2406,46 @@ class DrawPolylineTool extends DrawTool {
         paths,
         spatialReference: this.view_.spatialReference
       });
+      this.fire('draw-end', {
+        geometry
+      });
+    });
+    return this;
+  }
+
+}
+
+class DrawRectangleTool extends DrawTool {
+  constructor(map, view, options) {
+    super(map, view, { ...options,
+      drawType: 'rectangle',
+      cursorType: 'draw-polygon'
+    });
+  }
+
+  initAction_() {
+    this.action_ = this.draw_.create('rectangle', {
+      mode: 'click'
+    });
+    this.action_.on(['vertex-add', 'cursor-update', 'vertex-remove'], e => {
+      const vertices = e.vertices;
+
+      if (vertices.length === 1) {
+        e.type === 'vertex-add' && this.fire('draw-start', {
+          x: vertices[0][0],
+          y: vertices[0][1]
+        });
+        return;
+      }
+
+      const geometry = createGeometryFactory(this.$).createExtentFromPoints(vertices.map(xy => createGeometryFactory(this.$).createPointFromXY(xy)));
+      this.fire('draw-move', {
+        geometry
+      });
+    });
+    this.action_.on('draw-complete', e => {
+      const vertices = e.vertices;
+      const geometry = createGeometryFactory(this.$).createExtentFromPoints(vertices.map(xy => createGeometryFactory(this.$).createPointFromXY(xy)));
       this.fire('draw-end', {
         geometry
       });
@@ -2718,7 +2956,7 @@ class MapTools extends FssgEsriPlugin {
   _init() {
     this._toolPool.set('default', new FssgEsriBaseTool(this.map_, this.view_, {
       isOnceTool: false
-    })).set('zoom-home', new ZoomHomeTool(this.map_, this.view_)).set('draw-point', new DrawPointTool(this.map_, this.view_)).set('draw-polyline', new DrawPolylineTool(this.map_, this.view_)).set('draw-polygon', new DrawPolygonTool(this.map_, this.view_)).set('clear', new ClearTool(this.map_, this.view_)).set('measure-coordinate', new MeasureCoordinateTool(this.map_, this.view_)).set('measure-length', new MeasureLengthTool(this.map_, this.view_)).set('measure-area', new MeasureAreaTool(this.map_, this.view_)).set('hit-test', new HitTestTool(this.map_, this.view_));
+    })).set('zoom-home', new ZoomHomeTool(this.map_, this.view_)).set('zoom-in-rect', new ZoomInRectTool(this.map_, this.view_)).set('zoom-out-rect', new ZoomOutRectTool(this.map_, this.view_)).set('clear', new ClearTool(this.map_, this.view_)).set('measure-coordinate', new MeasureCoordinateTool(this.map_, this.view_)).set('measure-length', new MeasureLengthTool(this.map_, this.view_)).set('measure-area', new MeasureAreaTool(this.map_, this.view_)).set('hit-test', new HitTestTool(this.map_, this.view_)).set('draw-rectangle', new DrawRectangleTool(this.map_, this.view_)).set('draw-point', new DrawPointTool(this.map_, this.view_)).set('draw-polyline', new DrawPolylineTool(this.map_, this.view_)).set('draw-polygon', new DrawPolygonTool(this.map_, this.view_)).set('draw-rectangle-faster', new DrawRectangleFasterTool(this.map_, this.view_));
 
     return this;
   }
@@ -5310,4 +5548,4 @@ const AnimatedLinesLayer = GraphicsLayer.createSubclass({
   }
 });
 
-export { AnimatedLinesLayer, Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapPopups, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, SelectByPolygonTool, ViewCliper, ZoomHomeTool, createGeometryFactory, createLayerFactory, getLatfromLonLat, getLonfromLonLat, getXfromXY, getYfromXY };
+export { AnimatedLinesLayer, Basemap, DrawPointTool, DrawPolygonTool, DrawPolylineTool, DrawRectangleFasterTool, DrawRectangleTool, FssgEsri, FssgEsriPlugin, GeometryFacory, Hawkeye, HitTestTool, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapPopups, MapTools, MeasureAreaTool, MeasureCoordinateTool, MeasureLengthTool, MouseTips, Overlays, RippleGraphicsLayer, RippleLayerView, SelectByPolygonTool, ViewCliper, ZoomHomeTool, ZoomInRectTool, ZoomOutRectTool, createGeometryFactory, createLayerFactory, getLatfromLonLat, getLonfromLonLat, getXfromXY, getYfromXY };

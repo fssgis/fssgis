@@ -30,6 +30,16 @@ export abstract class FssgMap<
   T_EVENTS extends IFssgMapEvents = IFssgMapEvents,
 > extends BaseClass<T_OPTIONS, T_EVENTS> {
 
+  public getPlugin<T extends abstract new (...args: any) => any> (pluginClass: T) : InstanceType<T> { // eslint-disable-line
+    const name = pluginClass.name
+    const pluginName = name.replace(name[0], name[0].toLowerCase())
+    const plugin = this[pluginName]
+    if (plugin) {
+      return plugin
+    }
+    throw new Error(`Fssg地图实例未安装${name}插件`)
+  }
+
   //#region 私有属性
 
   /**

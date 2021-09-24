@@ -33,17 +33,13 @@ class BaseClass extends Observable {
    * 实例配置项
    */
   //#endregion
-  get loaded() {
-    return this._loaded;
-  } //#region 构造函数
+  //#region 构造函数
 
   /**
    * 构造基类
    * @param options 配置项
    * @param defaultOptions 默认配置项
    */
-
-
   constructor(options = {}, defaultOptions = {}) {
     super();
 
@@ -135,11 +131,23 @@ class FssgMapPlugin extends BaseClass {
  */
 
 class FssgMap extends BaseClass {
-  //#region 私有属性
+  getPlugin(pluginClass) {
+    const name = pluginClass.name;
+    const pluginName = name.replace(name[0], name[0].toLowerCase());
+    const plugin = this[pluginName];
+
+    if (plugin) {
+      return plugin;
+    }
+
+    throw new Error(`Fssg地图实例未安装${name}插件`);
+  } //#region 私有属性
 
   /**
    * 地图容器
    */
+
+
   //#endregion
   //#region getter settter
 

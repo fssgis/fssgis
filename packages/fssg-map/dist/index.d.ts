@@ -26,7 +26,6 @@ declare abstract class BaseClass<T_OPTIONS extends IBaseClassOptions = IBaseClas
      * 实例配置项
      */
     protected options_: T_OPTIONS;
-    get loaded(): boolean;
     /**
      * 构造基类
      * @param options 配置项
@@ -102,6 +101,7 @@ interface IFssgMapOptions {
  * 地图应用类（抽象类）
  */
 declare abstract class FssgMap<T_OPTIONS extends IFssgMapOptions = IFssgMapOptions, T_EVENTS extends IFssgMapEvents = IFssgMapEvents> extends BaseClass<T_OPTIONS, T_EVENTS> {
+    getPlugin<T extends abstract new (...args: any) => any>(pluginClass: T): InstanceType<T>;
     /**
      * 地图容器
      */

@@ -12,13 +12,13 @@ function _getMouseTips (arg0?: FssgEsri | MouseTips) : MouseTips {
   let mouseTips: MouseTips
   if (!arg0) {
     const fssgEsri = injectFssgEsri()
-    mouseTips = fssgEsri.mouseTips
+    mouseTips = fssgEsri.getPlugin(MouseTips)
     if (!mouseTips) {
       warn(this, 'MouseTips实例未挂载到FssgMap实例')
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      mouseTips = arg0.mouseTips
+      mouseTips = arg0.getPlugin(MouseTips)
     } else {
       mouseTips = arg0
     }
@@ -53,7 +53,7 @@ export function useMouseTips () : UseMouseTips
 export function useMouseTips (fssgEsri: FssgEsri) : UseMouseTips
 export function useMouseTips (fssgEsri?: FssgEsri) : UseMouseTips
 export function useMouseTips (fssgEsri?: FssgEsri) : UseMouseTips {
-  const mouseTips = fssgEsri?.mouseTips ?? injectMouseTips()
+  const mouseTips = fssgEsri?.getPlugin(MouseTips) ?? injectMouseTips()
   return createIsomorphicDestructurable(
     { mouseTips } as const,
     [mouseTips] as const,

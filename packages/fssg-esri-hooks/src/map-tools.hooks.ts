@@ -13,13 +13,13 @@ function _getMapTools (arg0?: FssgEsri | MapTools) : MapTools {
   let mapTools: MapTools
   if (!arg0) {
     const fssgEsri = injectFssgEsri()
-    mapTools = fssgEsri.mapTools
+    mapTools = fssgEsri.getPlugin(MapTools)
     if (!mapTools) {
       warn(this, 'MapTools实例未挂载到FssgMap实例')
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      mapTools = arg0.mapTools
+      mapTools = arg0.getPlugin(MapTools)
     } else {
       mapTools = arg0
     }
@@ -85,7 +85,7 @@ export function useMapTools () : UseMapTools
 export function useMapTools (fssgEsri: FssgEsri) : UseMapTools
 export function useMapTools (fssgEsri?: FssgEsri) : UseMapTools
 export function useMapTools (fssgEsri?: FssgEsri) : UseMapTools {
-  const mapTools = fssgEsri?.mapTools ?? injectMapTools()
+  const mapTools = fssgEsri?.getPlugin(MapTools) ?? injectMapTools()
   const { activedKey } = useMapToolsActivedKey(fssgEsri)
   return createIsomorphicDestructurable(
     { mapTools, activedKey } as const,

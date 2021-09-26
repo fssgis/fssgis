@@ -14,7 +14,7 @@ import TileLayer from '@arcgis/core/layers/TileLayer';
 import MapImageLayer from '@arcgis/core/layers/MapImageLayer';
 import Graphic from '@arcgis/core/Graphic';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
-import { isNullOrUndefined, deepCopyJSON, $extend, whenRightReturn, throttle, listToTree, createGuid } from '@fssgis/utils';
+import { isNullOrUndefined, deepCopyJSON, $extend, throttle, createGuid, whenRightReturn, listToTree } from '@fssgis/utils';
 import Field from '@arcgis/core/layers/support/Field';
 import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer';
 import { load, project } from '@arcgis/core/geometry/projection';
@@ -999,30 +999,6 @@ class FssgEsri extends FssgMap {
       debugName: 'fssgEsri'
     });
 
-    _defineProperty(this, "basemap", void 0);
-
-    _defineProperty(this, "mapElement", void 0);
-
-    _defineProperty(this, "mapTools", void 0);
-
-    _defineProperty(this, "mapCursor", void 0);
-
-    _defineProperty(this, "mapLayers", void 0);
-
-    _defineProperty(this, "hawkeye", void 0);
-
-    _defineProperty(this, "layerTree", void 0);
-
-    _defineProperty(this, "mapModules", void 0);
-
-    _defineProperty(this, "mouseTips", void 0);
-
-    _defineProperty(this, "overlays", void 0);
-
-    _defineProperty(this, "viewCliper", void 0);
-
-    _defineProperty(this, "mapPopups", void 0);
-
     _defineProperty(this, "_map", void 0);
 
     _defineProperty(this, "_view", void 0);
@@ -1823,6 +1799,93 @@ class ZoomHomeTool extends FssgEsriBaseTool {
 
 }
 
+/**
+ * 地图鼠标控制插件
+ */
+
+class MapCursor extends FssgEsriPlugin {
+  /**
+   * 鼠标样式
+   */
+
+  /**
+   * 样式容器池
+   */
+
+  /**
+   * 鼠标样式
+   */
+  get cursorType() {
+    return this._cursorType;
+  }
+  /**
+   * 鼠标样式
+   */
+
+
+  set cursorType(t) {
+    this._setCursor(t);
+  }
+  /**
+   * 构造地图鼠标控制器
+   * @param options 配置项
+   */
+
+
+  constructor(options) {
+    super(options, {
+      items: {}
+    });
+
+    _defineProperty(this, "_cursorType", void 0);
+
+    _defineProperty(this, "_typePool", void 0);
+  }
+  /**
+   * 初始化
+   */
+
+
+  _init() {
+    this._typePool = new Map();
+    Object.entries(MAP_CURSOR_DIC).forEach(([cType, cData]) => this._typePool.set(cType, cData));
+    Object.entries(this.options_.items ?? {}).forEach(([cType, cData]) => this._typePool.set(cType, cData));
+
+    this._setCursor('default');
+
+    return this;
+  }
+  /**
+   * 设置鼠标样式
+   * @param cursorType 鼠标样式
+   */
+
+
+  _setCursor(cursorType) {
+    const cursor = this._typePool.get(cursorType);
+
+    if (!cursor) {
+      warn(this, `无鼠标样式项${cursorType}`);
+    } else {
+      this.fire('change', {
+        cursorType
+      });
+    }
+
+    this.view_.container.style.cursor = cursor ?? 'default';
+  }
+  /**
+   * 安装插件
+   */
+
+
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
+  }
+
+}
+
 class DrawTool extends FssgEsriBaseTool {
   //#region 私有属性
 
@@ -1962,12 +2025,11 @@ class DrawTool extends FssgEsriBaseTool {
   onToolActived_(e) {
     if (!super.onToolActived_(e)) {
       return false;
-    }
+    } // const { mapElement, mapCursor } = this.$
 
-    const {
-      mapElement,
-      mapCursor
-    } = this.$;
+
+    const mapElement = this.$.getPlugin(MapElement);
+    const mapCursor = this.$.getPlugin(MapCursor);
 
     if (!mapElement) {
       // TODO
@@ -1990,9 +2052,7 @@ class DrawTool extends FssgEsriBaseTool {
 
     this.action_.destroy();
     this.draw_.destroy();
-    const {
-      mapElement
-    } = this.map_.$owner;
+    const mapElement = this.$.getPlugin(MapElement);
 
     if (!mapElement) {
       return false;
@@ -2000,9 +2060,7 @@ class DrawTool extends FssgEsriBaseTool {
 
     this._tempGraphic && mapElement.remove(this._tempGraphic);
     this._tempGraphic = null;
-    const {
-      mapCursor
-    } = this.$;
+    const mapCursor = this.$.getPlugin(MapCursor);
     mapCursor.cursorType = 'default';
     return true;
   }
@@ -2036,9 +2094,7 @@ class DrawTool extends FssgEsriBaseTool {
       return false;
     }
 
-    const {
-      mapElement
-    } = this.map_.$owner;
+    const mapElement = this.$.getPlugin(MapElement);
 
     if (!mapElement) {
       return false;
@@ -2058,9 +2114,7 @@ class DrawTool extends FssgEsriBaseTool {
       return false;
     }
 
-    const {
-      mapElement
-    } = this.map_.$owner;
+    const mapElement = this.$.getPlugin(MapElement);
 
     if (!mapElement) {
       return false;
@@ -2091,9 +2145,7 @@ class DrawTool extends FssgEsriBaseTool {
 
 
   clearDrawed() {
-    const {
-      mapElement
-    } = this.map_.$owner;
+    const mapElement = this.$.getPlugin(MapElement);
 
     if (!mapElement) {
       return this;
@@ -2455,6 +2507,219 @@ class DrawRectangleTool extends DrawTool {
 
 }
 
+class MouseTips extends FssgEsriPlugin {
+  constructor(options) {
+    super(options, {});
+
+    _defineProperty(this, "_handlers", void 0);
+
+    _defineProperty(this, "_tipsDom", void 0);
+  }
+
+  _init() {
+    this._handlers = new Set();
+    return this;
+  }
+
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
+  }
+
+  showTips(tips) {
+    if (!this._tipsDom) {
+      this._tipsDom = document.createElement('div');
+
+      this._tipsDom.classList.add('fssg-mouse-tips');
+
+      this._tipsDom.style.position = 'absolute';
+      this._tipsDom.style.padding = '4px 8px';
+      this._tipsDom.style.backgroundColor = '#00000085';
+      this._tipsDom.style.color = '#fff';
+      this._tipsDom.style.boxShadow = '0 1px 4px rgb(0 0 0 / 80%)';
+      this.view_.container.append(this._tipsDom);
+    }
+
+    this._handlers.forEach(item => item.remove());
+
+    this._handlers.clear();
+
+    this._tipsDom.innerHTML = tips;
+    const pointerMouveHandler = this.view_.on('pointer-move', throttle(e => {
+      this._tipsDom.style.top = `${e.y + 16}px`;
+      this._tipsDom.style.left = `${e.x + 16}px`;
+    }, 100));
+
+    this._handlers.add(pointerMouveHandler);
+
+    const pointerLeaveHandler = this.view_.on('pointer-leave', () => {
+      this._tipsDom.style.display = 'none';
+    });
+
+    this._handlers.add(pointerLeaveHandler);
+
+    const pointerEnter = this.view_.on('pointer-enter', () => {
+      this._tipsDom.style.display = 'block';
+    });
+
+    this._handlers.add(pointerEnter);
+
+    return this;
+  }
+
+  cancelTips() {
+    var _this$_tipsDom, _this$_tipsDom$remove;
+
+    (_this$_tipsDom = this._tipsDom) === null || _this$_tipsDom === void 0 ? void 0 : (_this$_tipsDom$remove = _this$_tipsDom.remove) === null || _this$_tipsDom$remove === void 0 ? void 0 : _this$_tipsDom$remove.call(_this$_tipsDom); // eslint-disable-next-line
+    // @ts-ignore
+
+    this._tipsDom = null;
+
+    this._handlers.forEach(item => item.remove());
+
+    this._handlers.clear();
+
+    return this;
+  }
+
+}
+
+class Overlays extends FssgEsriPlugin {
+  constructor(options) {
+    super(options, {});
+
+    _defineProperty(this, "_overlayPool", void 0);
+
+    _defineProperty(this, "_overlayContainer", void 0);
+  }
+
+  _init() {
+    this._overlayContainer = document.createElement('div');
+
+    this._overlayContainer.classList.add('fssg-overlay-container');
+
+    this._overlayContainer.style.height = '100%';
+    this._overlayContainer.style.width = '100%';
+    this._overlayContainer.style.top = '0';
+    this._overlayContainer.style.left = '0';
+    this._overlayContainer.style.position = 'absolute';
+    this._overlayContainer.style.pointerEvents = 'none';
+    this._overlayContainer.style.overflow = 'hidden';
+    this.view_.container.append(this._overlayContainer);
+    this._overlayPool = new Map();
+    this.view_.when().then(() => {
+      this.view_.watch('extent', throttle(() => {
+        [...this._overlayPool.values()].forEach(item => {
+          const screenPt = this.view_.toScreen(item.mapXY);
+
+          if (item.screenX && item.screenY) {
+            screenPt.x = item.screenX;
+            screenPt.y = item.screenY;
+          }
+
+          item.container.style.top = `${screenPt.y + item.offsetY}px`;
+          item.container.style.left = `${screenPt.x + item.offsetX}px`;
+          const mapPt = this.view_.toMap({
+            x: screenPt.x + (item.offsetX ?? 0),
+            y: screenPt.y + (item.offsetY ?? 0)
+          });
+
+          if (item.bezierCurve) {
+            item.bezierCurve && this.view_.$owner.getPlugin(MapElement).remove(item.bezierCurve);
+            item.bezierCurve = this.view_.$owner.getPlugin(MapElement).add(createGeometryFactory(this.$).createBezierCurve(item.mapXY, mapPt), item.bezierCurveSymbol);
+          }
+        });
+      }, 200));
+    });
+    return this;
+  }
+
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
+  }
+
+  add(options) {
+    var _options$classNames;
+
+    const overlay = document.createElement('div');
+    overlay.classList.add('fssg-overlay');
+    (_options$classNames = options.classNames) === null || _options$classNames === void 0 ? void 0 : _options$classNames.forEach(name => overlay.classList.add(name));
+    overlay.style.position = 'absolute';
+    overlay.style.padding = '4px 8px';
+    overlay.style.backgroundColor = '#00000085';
+    overlay.style.color = '#fff';
+    overlay.style.boxShadow = '0 1px 4px rgb(0 0 0 / 80%)';
+    overlay.style.width = 'fit-content';
+    overlay.style.pointerEvents = 'all';
+    overlay.style.transition = 'all .1s ease-in-out';
+    typeof options.content === 'string' ? overlay.innerHTML = options.content : overlay.append(options.content);
+    const screenPt = this.view_.toScreen(options.point);
+
+    if (options.screenX && options.screenY) {
+      screenPt.x = options.screenX;
+      screenPt.y = options.screenY;
+    }
+
+    overlay.style.top = `${screenPt.y + (options.offsetY ?? 0)}px`;
+    overlay.style.left = `${screenPt.x + (options.offsetX ?? 0)}px`;
+    const mapPt = this.view_.toMap({
+      x: screenPt.x + (options.offsetX ?? 0),
+      y: screenPt.y + (options.offsetY ?? 0)
+    });
+    let bezierCurve = undefined;
+
+    if (options.showBezierCurve) {
+      bezierCurve = this.view_.$owner.getPlugin(MapElement).add(createGeometryFactory(this.$).createBezierCurve(options.point, mapPt), options.bezierCurveSymbol);
+    }
+
+    const id = options.id ?? `overlay-${createGuid()}`;
+    overlay.id = id;
+
+    this._overlayPool.set(id, {
+      id,
+      classNames: options.classNames,
+      container: overlay,
+      mapXY: options.point,
+      offsetX: options.offsetX ?? 0,
+      offsetY: options.offsetY ?? 0,
+      screenX: options.screenX,
+      screenY: options.screenY,
+      bezierCurve: bezierCurve,
+      bezierCurveSymbol: options.bezierCurveSymbol
+    });
+
+    this._overlayContainer.append(overlay);
+
+    return id;
+  }
+
+  removeById(id) {
+    const item = this._overlayPool.get(id);
+
+    if (item) {
+      item.container.remove();
+      item.bezierCurve && this.view_.$owner.getPlugin(MapElement).remove(item.bezierCurve);
+
+      this._overlayPool.delete(id);
+    }
+
+    return this;
+  }
+
+  clear() {
+    [...this._overlayPool.values()].forEach(item => {
+      item.container.remove();
+      item.bezierCurve && this.view_.$owner.getPlugin(MapElement).remove(item.bezierCurve);
+    });
+
+    this._overlayPool.clear();
+
+    return this;
+  }
+
+}
+
 class MeasureCoordinateTool extends DrawPointTool {
   constructor(map, view) {
     super(map, view);
@@ -2472,7 +2737,7 @@ class MeasureCoordinateTool extends DrawPointTool {
     }
 
     const point = graphic.geometry;
-    this.view_.$owner.mouseTips.showTips(`x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`);
+    this.view_.$owner.getPlugin(MouseTips).showTips(`x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`);
     return graphic;
   }
 
@@ -2481,7 +2746,7 @@ class MeasureCoordinateTool extends DrawPointTool {
       return false;
     }
 
-    this.view_.$owner.mouseTips.cancelTips();
+    this.view_.$owner.getPlugin(MouseTips).cancelTips();
     return true;
   }
 
@@ -2493,7 +2758,7 @@ class MeasureCoordinateTool extends DrawPointTool {
     }
 
     const point = graphic.geometry;
-    const id = this.view_.$owner.overlays.add({
+    const id = this.view_.$owner.getPlugin(Overlays).add({
       point,
       content: `x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`,
       offsetX: 0,
@@ -2508,7 +2773,7 @@ class MeasureCoordinateTool extends DrawPointTool {
 
   clearMeasure() {
     this._overlayIds.forEach(id => {
-      this.view_.$owner.overlays.removeById(id);
+      this.view_.$owner.getPlugin(Overlays).removeById(id);
     });
 
     return this.clearDrawed();
@@ -2549,7 +2814,7 @@ class MeasureLengthTool extends DrawPolylineTool {
 
     const line = graphic.geometry;
     planarLength(line, this.unit).then(length => {
-      this.view_.$owner.mouseTips.showTips(`长度：${length.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`);
+      this.view_.$owner.getPlugin(MouseTips).showTips(`长度：${length.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`);
     });
     return graphic;
   }
@@ -2559,7 +2824,7 @@ class MeasureLengthTool extends DrawPolylineTool {
       return false;
     }
 
-    this.view_.$owner.mouseTips.cancelTips();
+    this.view_.$owner.getPlugin(MouseTips).cancelTips();
     return true;
   }
 
@@ -2572,20 +2837,20 @@ class MeasureLengthTool extends DrawPolylineTool {
 
     const line = graphic.geometry;
     planarLength(line, this.unit).then(length => {
-      const id = this.view_.$owner.overlays.add({
+      const id = this.view_.$owner.getPlugin(Overlays).add({
         point: line.extent.center,
         content: `长度：${length.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`
       });
 
       this._overlayIds.add(id);
     });
-    this.view_.$owner.mouseTips.cancelTips();
+    this.view_.$owner.getPlugin(MouseTips).cancelTips();
     return graphic;
   }
 
   clearMeasure() {
     this._overlayIds.forEach(id => {
-      this.view_.$owner.overlays.removeById(id);
+      this.view_.$owner.getPlugin(Overlays).removeById(id);
     });
 
     return this.clearDrawed();
@@ -2629,7 +2894,7 @@ class MeasureAreaTool extends DrawPolygonTool {
     const polygon = graphic.geometry;
     planarArea(polygon, this.unit).then(area => {
       area = Math.abs(area);
-      this.view_.$owner.mouseTips.showTips(`面积：${area.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`);
+      this.view_.$owner.getPlugin(MouseTips).showTips(`面积：${area.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`);
     });
     return graphic;
   }
@@ -2639,7 +2904,7 @@ class MeasureAreaTool extends DrawPolygonTool {
       return false;
     }
 
-    this.view_.$owner.mouseTips.cancelTips();
+    this.view_.$owner.getPlugin(MouseTips).cancelTips();
     return true;
   }
 
@@ -2653,499 +2918,23 @@ class MeasureAreaTool extends DrawPolygonTool {
     const polygon = graphic.geometry;
     planarArea(polygon, this.unit).then(area => {
       area = Math.abs(area);
-      const id = this.view_.$owner.overlays.add({
+      const id = this.view_.$owner.getPlugin(Overlays).add({
         point: polygon.extent.center,
         content: `面积：${area.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`
       });
 
       this._overlayIds.add(id);
     });
-    this.view_.$owner.mouseTips.cancelTips();
+    this.view_.$owner.getPlugin(MouseTips).cancelTips();
     return graphic;
   }
 
   clearMeasure() {
     this._overlayIds.forEach(id => {
-      this.view_.$owner.overlays.removeById(id);
+      this.view_.$owner.getPlugin(Overlays).removeById(id);
     });
 
     return this.clearDrawed();
-  }
-
-}
-
-class HitTestTool extends DrawPointTool {
-  //#region 静态方法
-  static getAttributesFromGraphic(graphic) {
-    return Object.entries(graphic.attributes).map(([name, value]) => ({
-      name,
-      value
-    }));
-  }
-
-  static parseAttributesFromArcGISServer(attributes, graphic) {
-    let layer = graphic.layer ?? graphic.sourceLayer; // eslint-disable-line
-
-    const fieldsSelf = layer === null || layer === void 0 ? void 0 : layer.fields; // ArcGIS内置字段配置信息
-
-    if (fieldsSelf) {
-      fieldsSelf.forEach(field => {
-        const item = attributes.find(v => v.name === field.name);
-        item && (item.alias = field.alias);
-      });
-    }
-
-    return attributes;
-  }
-
-  static parseAttributesFromCustomConfig(attributes, graphic, attributesConfig) {
-    let layer = graphic.layer ?? graphic.sourceLayer; // eslint-disable-line
-
-    const name = layer.name ?? layer.layer.name; // eslint-disable-line
-
-    const attr = attributesConfig.find(item => item.layerName === name);
-
-    if (attr) {
-      var _attr$fields;
-
-      attr.exclude && (attributes = attributes.filter(item => {
-        var _attr$exclude;
-
-        return !((_attr$exclude = attr.exclude) !== null && _attr$exclude !== void 0 && _attr$exclude.includes(item.name));
-      }));
-      (_attr$fields = attr.fields) === null || _attr$fields === void 0 ? void 0 : _attr$fields.forEach(field => {
-        const item = attributes.find(v => v.name === field.name);
-
-        if (item) {
-          item.alias = field.alias;
-          item.type = field.type;
-        }
-      });
-    }
-
-    return attributes;
-  } //#endregion
-
-
-  constructor(map, view) {
-    super(map, view);
-    this.cursorType_ = 'help';
-    this.setDrawingStyle({
-      marker: {
-        size: 0
-      }
-    });
-  }
-
-  async _queryWithMapImageLayer(geometry) {
-    const fssgMap = this.$;
-    const ret = [];
-    await fssgMap.mapLayers.forEach(async ([layer, options]) => {
-      if (!['mapimagelayer', 'dynamiclayer'].includes(options.layerType)) {
-        return;
-      }
-
-      if (!options.isQuery) {
-        return;
-      }
-
-      if (!layer.visible) {
-        return;
-      }
-
-      const sublayer = layer.sublayers.getItemAt(0);
-      const screenPoint = this.view_.toScreen(geometry);
-      screenPoint.x += 10;
-      const point = this.view_.toMap(screenPoint);
-      const bufferDistance = Math.abs(geometry.x - point.x);
-      const polygon = await buffer(geometry, bufferDistance, 'meters');
-      const {
-        features
-      } = await sublayer.queryFeatures({
-        geometry: Array.isArray(polygon) ? polygon[0] : polygon,
-        returnGeometry: true,
-        // distance: 10000,
-        outFields: ['*']
-      });
-
-      if (features.length > 0) {
-        ret.push(...features);
-      }
-    });
-    return ret;
-  } //#region 保护方法
-
-
-  onDrawEnd_(e) {
-    const graphic = super.onDrawEnd_(e);
-
-    if (!graphic) {
-      return false;
-    }
-
-    this.clearDrawed();
-    const point = graphic.geometry;
-    const screen = this.view_.toScreen(point);
-    const {
-      mapElement,
-      mapLayers,
-      viewCliper
-    } = this.$;
-    Promise.all([this._queryWithMapImageLayer(point), this.view_.hitTest(screen, {
-      exclude: [mapElement === null || mapElement === void 0 ? void 0 : mapElement.graphicsLayer, mapElement === null || mapElement === void 0 ? void 0 : mapElement.highlightLayer, ...(mapLayers === null || mapLayers === void 0 ? void 0 : mapLayers.layersWhichCantQuery.map(([layer]) => layer)), viewCliper === null || viewCliper === void 0 ? void 0 : viewCliper.cliperLayer]
-    })]).then(([queryResult, hitTestResult]) => {
-      var _hitTestResult$result, _hitTestResult$result2;
-
-      const mapPoint = (_hitTestResult$result = hitTestResult.results) === null || _hitTestResult$result === void 0 ? void 0 : (_hitTestResult$result2 = _hitTestResult$result[0]) === null || _hitTestResult$result2 === void 0 ? void 0 : _hitTestResult$result2.mapPoint;
-      queryResult.forEach(graphic => {
-        hitTestResult.results.push({
-          graphic,
-          mapPoint
-        });
-      });
-      this.finsheHitTest_(hitTestResult);
-    });
-    return graphic;
-  }
-
-  finsheHitTest_(result) {
-    this.fire('finshed', {
-      results: result.results
-    });
-    return result.results;
-  }
-
-}
-
-class SelectByPolygonTool extends DrawPolygonTool {
-  constructor(map, view, options) {
-    super(map, view, options);
-    this.on('selected', e => this.onSelected_(e));
-  }
-
-  onSelected_(e) {
-    if (!this.actived) {
-      return false;
-    }
-
-    return e.features;
-  }
-
-  onDrawEnd_(e) {
-    const graphic = super.onDrawEnd_(e);
-
-    if (!graphic) {
-      return false;
-    }
-
-    const geometry = graphic.geometry;
-    Promise.all(this.options_.querylayers.map(layer => {
-      return layer.queryFeatures({
-        geometry,
-        returnGeometry: true,
-        outFields: ['*']
-      });
-    })).then(featureSets => {
-      const features = featureSets.reduce((ret, cur) => {
-        ret.push(...cur.features);
-        return ret;
-      }, []);
-      this.fire('selected', {
-        features
-      });
-    });
-    return graphic;
-  }
-
-  setQueryLayers(layers) {
-    this.options_.querylayers = layers;
-    return this;
-  }
-
-}
-
-class ClearTool extends FssgEsriBaseTool {
-  //#region 构造函数
-
-  /**
-   * 构造比例放大工具对象
-   * @param map 地图对象
-   * @param view 视图对象
-   */
-  constructor(map, view) {
-    super(map, view, {
-      isOnceTool: true
-    });
-  } //#endregion
-  //#region 保护方法
-
-
-  onToolActived_(e) {
-    if (!super.onToolActived_(e)) {
-      return false;
-    }
-
-    const {
-      mapElement,
-      overlays,
-      mouseTips
-    } = this.$;
-
-    if (mapElement) {
-      mapElement.clear(true);
-    }
-
-    if (overlays) {
-      overlays.clear();
-    }
-
-    if (mouseTips) {
-      mouseTips.cancelTips();
-    }
-
-    return true;
-  }
-
-}
-
-/**
- * 地图工具链
- */
-
-class MapTools extends FssgEsriPlugin {
-  /**
-   * 工具池
-   */
-
-  /**
-   * 当前激活工具的Key
-   */
-
-  /**
-   * 当前激活工具的Key
-   */
-  get activedKey() {
-    return this._activedKey;
-  }
-  /**
-   * 当前激活工具的Key
-   */
-
-
-  set activedKey(key) {
-    this._activeTool(key);
-  }
-  /**
-   * 构造地图工具链
-   * @param options 配置项
-   */
-
-
-  constructor(options) {
-    super(options, {});
-
-    _defineProperty(this, "_toolPool", new Map());
-
-    _defineProperty(this, "_activedKey", 'default');
-  }
-  /**
-   * 初始化
-   */
-
-
-  _init() {
-    this._toolPool.set('default', new FssgEsriBaseTool(this.map_, this.view_, {
-      isOnceTool: false
-    })).set('zoom-home', new ZoomHomeTool(this.map_, this.view_)).set('zoom-in-rect', new ZoomInRectTool(this.map_, this.view_)).set('zoom-out-rect', new ZoomOutRectTool(this.map_, this.view_)).set('clear', new ClearTool(this.map_, this.view_)).set('measure-coordinate', new MeasureCoordinateTool(this.map_, this.view_)).set('measure-length', new MeasureLengthTool(this.map_, this.view_)).set('measure-area', new MeasureAreaTool(this.map_, this.view_)).set('hit-test', new HitTestTool(this.map_, this.view_)).set('draw-rectangle', new DrawRectangleTool(this.map_, this.view_)).set('draw-point', new DrawPointTool(this.map_, this.view_)).set('draw-polyline', new DrawPolylineTool(this.map_, this.view_)).set('draw-polygon', new DrawPolygonTool(this.map_, this.view_)).set('draw-rectangle-faster', new DrawRectangleFasterTool(this.map_, this.view_));
-
-    return this;
-  }
-  /**
-   * 安装插件
-   */
-
-
-  installPlugin(fssgEsri) {
-    super.installPlugin(fssgEsri);
-    return this._init();
-  }
-  /**
-   * 设置工具
-   * @param toolKey 工具Key
-   */
-
-
-  _activeTool(toolKey) {
-    const tool = this._toolPool.get(toolKey);
-
-    if (!tool) {
-      warn(this, `无工具项${toolKey}`);
-      return this;
-    }
-
-    if (tool.isOnceTool) {
-      this.fire('change', {
-        previousKey: this._activedKey,
-        currentKey: this._activedKey,
-        executeKey: toolKey
-      });
-      tool.active();
-      return this;
-    }
-
-    [...this._toolPool.values()].map(t => {
-      if (t !== tool) {
-        t.deactive();
-      }
-    });
-    this.fire('change', {
-      previousKey: this._activedKey,
-      currentKey: toolKey,
-      executeKey: toolKey
-    });
-    this._activedKey = toolKey;
-    tool.active();
-    return this;
-  }
-  /**
-   * 创建自定义工具
-   * @param key 工具Key
-   * @param tool 工具对象
-   */
-
-
-  createTool(key, tool) {
-    if (this.hasTool(key)) {
-      warn(this, `工具项${key}已存在，将会被覆盖`);
-    }
-
-    this._toolPool.set(key, tool);
-
-    return this;
-  }
-  /**
-   * 检查是否存在工具
-   * @param key 工具Key
-   */
-
-
-  hasTool(key) {
-    return this._toolPool.has(key);
-  }
-  /**
-   * 移除工具
-   * @param key 工具Key
-   */
-
-
-  deleteTool(key) {
-    this._toolPool.has(key) && this._toolPool.delete(key);
-
-    if (this._activedKey === key) {
-      this._activeTool('default');
-    }
-
-    return this;
-  }
-  /**
-   * 获取工具
-   * @param key 工具Key
-   */
-
-
-  getTool(key) {
-    const tool = this._toolPool.get(key);
-
-    if (tool) {
-      return tool;
-    }
-  }
-
-}
-
-/**
- * 地图鼠标控制插件
- */
-
-class MapCursor extends FssgEsriPlugin {
-  /**
-   * 鼠标样式
-   */
-
-  /**
-   * 样式容器池
-   */
-
-  /**
-   * 鼠标样式
-   */
-  get cursorType() {
-    return this._cursorType;
-  }
-  /**
-   * 鼠标样式
-   */
-
-
-  set cursorType(t) {
-    this._setCursor(t);
-  }
-  /**
-   * 构造地图鼠标控制器
-   * @param options 配置项
-   */
-
-
-  constructor(options) {
-    super(options, {
-      items: {}
-    });
-
-    _defineProperty(this, "_cursorType", void 0);
-
-    _defineProperty(this, "_typePool", void 0);
-  }
-  /**
-   * 初始化
-   */
-
-
-  _init() {
-    this._typePool = new Map();
-    Object.entries(MAP_CURSOR_DIC).forEach(([cType, cData]) => this._typePool.set(cType, cData));
-    Object.entries(this.options_.items ?? {}).forEach(([cType, cData]) => this._typePool.set(cType, cData));
-
-    this._setCursor('default');
-
-    return this;
-  }
-  /**
-   * 设置鼠标样式
-   * @param cursorType 鼠标样式
-   */
-
-
-  _setCursor(cursorType) {
-    const cursor = this._typePool.get(cursorType);
-
-    if (!cursor) {
-      warn(this, `无鼠标样式项${cursorType}`);
-    } else {
-      this.fire('change', {
-        cursorType
-      });
-    }
-
-    this.view_.container.style.cursor = cursor ?? 'default';
-  }
-  /**
-   * 安装插件
-   */
-
-
-  installPlugin(fssgEsri) {
-    super.installPlugin(fssgEsri);
-    return this._init();
   }
 
 }
@@ -3363,6 +3152,446 @@ class MapLayers extends FssgEsriPlugin {
 
 }
 
+class ViewCliper extends FssgEsriPlugin {
+  constructor(options) {
+    super(options, {});
+
+    _defineProperty(this, "_cliperLayer", void 0);
+  }
+
+  get cliperLayer() {
+    return this._cliperLayer;
+  }
+
+  _init() {
+    this._cliperLayer = new GraphicsLayer({
+      blendMode: 'destination-in',
+      effect: 'bloom(200%)'
+    });
+    return this;
+  }
+
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
+  }
+
+  clip(arg0) {
+    if (!this.map_.findLayerById(this._cliperLayer.id)) {
+      this.map_.add(this._cliperLayer);
+    }
+
+    let graphic = arg0.clone();
+
+    if (graphic instanceof Geometry) {
+      graphic = new Graphic({
+        geometry: graphic
+      });
+    }
+
+    this._cliperLayer.graphics.removeAll();
+
+    this._cliperLayer.graphics.add(graphic);
+
+    return this;
+  }
+
+  restore() {
+    if (this.map_.findLayerById(this._cliperLayer.id)) {
+      this.map_.remove(this._cliperLayer);
+    }
+
+    return this;
+  }
+
+}
+
+class HitTestTool extends DrawPointTool {
+  //#region 静态方法
+  static getAttributesFromGraphic(graphic) {
+    return Object.entries(graphic.attributes).map(([name, value]) => ({
+      name,
+      value
+    }));
+  }
+
+  static parseAttributesFromArcGISServer(attributes, graphic) {
+    let layer = graphic.layer ?? graphic.sourceLayer; // eslint-disable-line
+
+    const fieldsSelf = layer === null || layer === void 0 ? void 0 : layer.fields; // ArcGIS内置字段配置信息
+
+    if (fieldsSelf) {
+      fieldsSelf.forEach(field => {
+        const item = attributes.find(v => v.name === field.name);
+        item && (item.alias = field.alias);
+      });
+    }
+
+    return attributes;
+  }
+
+  static parseAttributesFromCustomConfig(attributes, graphic, attributesConfig) {
+    let layer = graphic.layer ?? graphic.sourceLayer; // eslint-disable-line
+
+    const name = layer.name ?? layer.layer.name; // eslint-disable-line
+
+    const attr = attributesConfig.find(item => item.layerName === name);
+
+    if (attr) {
+      var _attr$fields;
+
+      attr.exclude && (attributes = attributes.filter(item => {
+        var _attr$exclude;
+
+        return !((_attr$exclude = attr.exclude) !== null && _attr$exclude !== void 0 && _attr$exclude.includes(item.name));
+      }));
+      (_attr$fields = attr.fields) === null || _attr$fields === void 0 ? void 0 : _attr$fields.forEach(field => {
+        const item = attributes.find(v => v.name === field.name);
+
+        if (item) {
+          item.alias = field.alias;
+          item.type = field.type;
+        }
+      });
+    }
+
+    return attributes;
+  } //#endregion
+
+
+  constructor(map, view) {
+    super(map, view);
+    this.cursorType_ = 'help';
+    this.setDrawingStyle({
+      marker: {
+        size: 0
+      }
+    });
+  }
+
+  async _queryWithMapImageLayer(geometry) {
+    const fssgMap = this.$;
+    const ret = [];
+    await fssgMap.getPlugin(MapLayers).forEach(async ([layer, options]) => {
+      if (!['mapimagelayer', 'dynamiclayer'].includes(options.layerType)) {
+        return;
+      }
+
+      if (!options.isQuery) {
+        return;
+      }
+
+      if (!layer.visible) {
+        return;
+      }
+
+      const sublayer = layer.sublayers.getItemAt(0);
+      const screenPoint = this.view_.toScreen(geometry);
+      screenPoint.x += 10;
+      const point = this.view_.toMap(screenPoint);
+      const bufferDistance = Math.abs(geometry.x - point.x);
+      const polygon = await buffer(geometry, bufferDistance, 'meters');
+      const {
+        features
+      } = await sublayer.queryFeatures({
+        geometry: Array.isArray(polygon) ? polygon[0] : polygon,
+        returnGeometry: true,
+        // distance: 10000,
+        outFields: ['*']
+      });
+
+      if (features.length > 0) {
+        ret.push(...features);
+      }
+    });
+    return ret;
+  } //#region 保护方法
+
+
+  onDrawEnd_(e) {
+    const graphic = super.onDrawEnd_(e);
+
+    if (!graphic) {
+      return false;
+    }
+
+    this.clearDrawed();
+    const point = graphic.geometry;
+    const screen = this.view_.toScreen(point); // const { mapElement, mapLayers, viewCliper } = this.$
+
+    const mapElement = this.$.getPlugin(MapElement);
+    const mapLayers = this.$.getPlugin(MapLayers);
+    const viewCliper = this.$.getPlugin(ViewCliper);
+    Promise.all([this._queryWithMapImageLayer(point), this.view_.hitTest(screen, {
+      exclude: [mapElement === null || mapElement === void 0 ? void 0 : mapElement.graphicsLayer, mapElement === null || mapElement === void 0 ? void 0 : mapElement.highlightLayer, ...(mapLayers === null || mapLayers === void 0 ? void 0 : mapLayers.layersWhichCantQuery.map(([layer]) => layer)), viewCliper === null || viewCliper === void 0 ? void 0 : viewCliper.cliperLayer]
+    })]).then(([queryResult, hitTestResult]) => {
+      var _hitTestResult$result, _hitTestResult$result2;
+
+      const mapPoint = (_hitTestResult$result = hitTestResult.results) === null || _hitTestResult$result === void 0 ? void 0 : (_hitTestResult$result2 = _hitTestResult$result[0]) === null || _hitTestResult$result2 === void 0 ? void 0 : _hitTestResult$result2.mapPoint;
+      queryResult.forEach(graphic => {
+        hitTestResult.results.push({
+          graphic,
+          mapPoint
+        });
+      });
+      this.finsheHitTest_(hitTestResult);
+    });
+    return graphic;
+  }
+
+  finsheHitTest_(result) {
+    this.fire('finshed', {
+      results: result.results
+    });
+    return result.results;
+  }
+
+}
+
+class SelectByPolygonTool extends DrawPolygonTool {
+  constructor(map, view, options) {
+    super(map, view, options);
+    this.on('selected', e => this.onSelected_(e));
+  }
+
+  onSelected_(e) {
+    if (!this.actived) {
+      return false;
+    }
+
+    return e.features;
+  }
+
+  onDrawEnd_(e) {
+    const graphic = super.onDrawEnd_(e);
+
+    if (!graphic) {
+      return false;
+    }
+
+    const geometry = graphic.geometry;
+    Promise.all(this.options_.querylayers.map(layer => {
+      return layer.queryFeatures({
+        geometry,
+        returnGeometry: true,
+        outFields: ['*']
+      });
+    })).then(featureSets => {
+      const features = featureSets.reduce((ret, cur) => {
+        ret.push(...cur.features);
+        return ret;
+      }, []);
+      this.fire('selected', {
+        features
+      });
+    });
+    return graphic;
+  }
+
+  setQueryLayers(layers) {
+    this.options_.querylayers = layers;
+    return this;
+  }
+
+}
+
+class ClearTool extends FssgEsriBaseTool {
+  //#region 构造函数
+
+  /**
+   * 构造比例放大工具对象
+   * @param map 地图对象
+   * @param view 视图对象
+   */
+  constructor(map, view) {
+    super(map, view, {
+      isOnceTool: true
+    });
+  } //#endregion
+  //#region 保护方法
+
+
+  onToolActived_(e) {
+    if (!super.onToolActived_(e)) {
+      return false;
+    }
+
+    const mapElement = this.$.getPlugin(MapElement);
+    const overlays = this.$.getPlugin(Overlays);
+    const mouseTips = this.$.getPlugin(MouseTips);
+
+    if (mapElement) {
+      mapElement.clear(true);
+    }
+
+    if (overlays) {
+      overlays.clear();
+    }
+
+    if (mouseTips) {
+      mouseTips.cancelTips();
+    }
+
+    return true;
+  }
+
+}
+
+/**
+ * 地图工具链
+ */
+
+class MapTools extends FssgEsriPlugin {
+  /**
+   * 工具池
+   */
+
+  /**
+   * 当前激活工具的Key
+   */
+
+  /**
+   * 当前激活工具的Key
+   */
+  get activedKey() {
+    return this._activedKey;
+  }
+  /**
+   * 当前激活工具的Key
+   */
+
+
+  set activedKey(key) {
+    this._activeTool(key);
+  }
+  /**
+   * 构造地图工具链
+   * @param options 配置项
+   */
+
+
+  constructor(options) {
+    super(options, {});
+
+    _defineProperty(this, "_toolPool", new Map());
+
+    _defineProperty(this, "_activedKey", 'default');
+  }
+  /**
+   * 初始化
+   */
+
+
+  _init() {
+    this._toolPool.set('default', new FssgEsriBaseTool(this.map_, this.view_, {
+      isOnceTool: false
+    })).set('zoom-home', new ZoomHomeTool(this.map_, this.view_)).set('zoom-in-rect', new ZoomInRectTool(this.map_, this.view_)).set('zoom-out-rect', new ZoomOutRectTool(this.map_, this.view_)).set('clear', new ClearTool(this.map_, this.view_)).set('measure-coordinate', new MeasureCoordinateTool(this.map_, this.view_)).set('measure-length', new MeasureLengthTool(this.map_, this.view_)).set('measure-area', new MeasureAreaTool(this.map_, this.view_)).set('hit-test', new HitTestTool(this.map_, this.view_)).set('draw-rectangle', new DrawRectangleTool(this.map_, this.view_)).set('draw-point', new DrawPointTool(this.map_, this.view_)).set('draw-polyline', new DrawPolylineTool(this.map_, this.view_)).set('draw-polygon', new DrawPolygonTool(this.map_, this.view_)).set('draw-rectangle-faster', new DrawRectangleFasterTool(this.map_, this.view_));
+
+    return this;
+  }
+  /**
+   * 安装插件
+   */
+
+
+  installPlugin(fssgEsri) {
+    super.installPlugin(fssgEsri);
+    return this._init();
+  }
+  /**
+   * 设置工具
+   * @param toolKey 工具Key
+   */
+
+
+  _activeTool(toolKey) {
+    const tool = this._toolPool.get(toolKey);
+
+    if (!tool) {
+      warn(this, `无工具项${toolKey}`);
+      return this;
+    }
+
+    if (tool.isOnceTool) {
+      this.fire('change', {
+        previousKey: this._activedKey,
+        currentKey: this._activedKey,
+        executeKey: toolKey
+      });
+      tool.active();
+      return this;
+    }
+
+    [...this._toolPool.values()].map(t => {
+      if (t !== tool) {
+        t.deactive();
+      }
+    });
+    this.fire('change', {
+      previousKey: this._activedKey,
+      currentKey: toolKey,
+      executeKey: toolKey
+    });
+    this._activedKey = toolKey;
+    tool.active();
+    return this;
+  }
+  /**
+   * 创建自定义工具
+   * @param key 工具Key
+   * @param tool 工具对象
+   */
+
+
+  createTool(key, tool) {
+    if (this.hasTool(key)) {
+      warn(this, `工具项${key}已存在，将会被覆盖`);
+    }
+
+    this._toolPool.set(key, tool);
+
+    return this;
+  }
+  /**
+   * 检查是否存在工具
+   * @param key 工具Key
+   */
+
+
+  hasTool(key) {
+    return this._toolPool.has(key);
+  }
+  /**
+   * 移除工具
+   * @param key 工具Key
+   */
+
+
+  deleteTool(key) {
+    this._toolPool.has(key) && this._toolPool.delete(key);
+
+    if (this._activedKey === key) {
+      this._activeTool('default');
+    }
+
+    return this;
+  }
+  /**
+   * 获取工具
+   * @param key 工具Key
+   */
+
+
+  getTool(key) {
+    const tool = this._toolPool.get(key);
+
+    if (tool) {
+      return tool;
+    }
+  }
+
+}
+
 /**
  * 鹰眼插件
  */
@@ -3418,7 +3647,7 @@ class Hawkeye extends FssgEsriPlugin {
     const sourceView = this.$.view;
     const hawkeyeView = this._fssgEsri.view;
     Promise.all([sourceView.when, hawkeyeView.when]).then(() => {
-      this._fssgEsri.mapElement.set(sourceView.extent); //禁止移动地图
+      this._fssgEsri.getPlugin(MapElement).set(sourceView.extent); //禁止移动地图
 
 
       hawkeyeView.on('drag', event => {
@@ -3429,7 +3658,7 @@ class Hawkeye extends FssgEsriPlugin {
       }); // 动态主图绘制范围
 
       sourceView.watch(['zoom', 'center'], throttle(() => {
-        this._fssgEsri.mapElement.set(sourceView.extent);
+        this._fssgEsri.getPlugin(MapElement).set(sourceView.extent);
 
         this._fssgEsri.goto({
           zoom: sourceView.zoom - 4,
@@ -3531,10 +3760,10 @@ class LayerTree extends FssgEsriPlugin {
       return this;
     }
 
-    const layer = this.$.mapLayers.findLayer(node.layerId);
+    const layer = this.$.getPlugin(MapLayers).findLayer(node.layerId);
     layer && (layer.visible = checked);
     (_node$associatedLayer = node.associatedLayerIds) === null || _node$associatedLayer === void 0 ? void 0 : _node$associatedLayer.forEach(id => {
-      const layer = this.$.mapLayers.findLayer(id);
+      const layer = this.$.getPlugin(MapLayers).findLayer(id);
       layer && (layer.visible = checked);
     });
 
@@ -3555,7 +3784,7 @@ class LayerTree extends FssgEsriPlugin {
 
 
   _init() {
-    this.$.mapLayers.when().then(() => {
+    this.$.getPlugin(MapLayers).when().then(() => {
       this._list.forEach(item => {
         this._setNodeChecked(item, item.defaultChecked);
 
@@ -3577,7 +3806,7 @@ class LayerTree extends FssgEsriPlugin {
 
   installPlugin(fssgEsri) {
     super.installPlugin(fssgEsri);
-    return this.$.mapLayers.when().then(() => this._init());
+    return this.$.getPlugin(MapLayers).when().then(() => this._init());
   }
   /**
    * 通过树节点Id查找图层
@@ -3592,7 +3821,7 @@ class LayerTree extends FssgEsriPlugin {
     const layerId = (_this$_list$find = this._list.find(item => item.id === nodeId)) === null || _this$_list$find === void 0 ? void 0 : _this$_list$find.layerId;
 
     if (layerId) {
-      return this.$.mapLayers.findLayer(layerId);
+      return this.$.getPlugin(MapLayers).findLayer(layerId);
     }
   }
   /**
@@ -3718,7 +3947,7 @@ class MapModules extends FssgEsriPlugin {
 
   installPlugin(fssgEsri) {
     super.installPlugin(fssgEsri);
-    return this.$.layerTree.when().then(() => this);
+    return this.$.getPlugin(LayerTree).when().then(() => this);
   }
   /**
   * 选择地图模块
@@ -3736,11 +3965,11 @@ class MapModules extends FssgEsriPlugin {
         this._selectedTitle = module.title;
         item = module;
         module.treeNodeIds.forEach(nodeId => {
-          this.$.layerTree.setNodeCheckById(nodeId, true);
+          this.$.getPlugin(LayerTree).setNodeCheckById(nodeId, true);
         });
       } else {
         module.treeNodeIds.forEach(nodeId => {
-          this.$.layerTree.setNodeCheckById(nodeId, false);
+          this.$.getPlugin(LayerTree).setNodeCheckById(nodeId, false);
         });
       }
     });
@@ -3766,11 +3995,11 @@ class MapModules extends FssgEsriPlugin {
         this._selectedTitle = module.title;
         item = module;
         module.treeNodeIds.forEach(nodeId => {
-          this.$.layerTree.setNodeCheckById(nodeId, true);
+          this.$.getPlugin(LayerTree).setNodeCheckById(nodeId, true);
         });
       } else {
         module.treeNodeIds.forEach(nodeId => {
-          this.$.layerTree.setNodeCheckById(nodeId, false);
+          this.$.getPlugin(LayerTree).setNodeCheckById(nodeId, false);
         });
       }
     });
@@ -3778,273 +4007,6 @@ class MapModules extends FssgEsriPlugin {
     this.fire('change:selected', {
       item
     });
-    return this;
-  }
-
-}
-
-class MouseTips extends FssgEsriPlugin {
-  constructor(options) {
-    super(options, {});
-
-    _defineProperty(this, "_handlers", void 0);
-
-    _defineProperty(this, "_tipsDom", void 0);
-  }
-
-  _init() {
-    this._handlers = new Set();
-    return this;
-  }
-
-  installPlugin(fssgEsri) {
-    super.installPlugin(fssgEsri);
-    return this._init();
-  }
-
-  showTips(tips) {
-    if (!this._tipsDom) {
-      this._tipsDom = document.createElement('div');
-
-      this._tipsDom.classList.add('fssg-mouse-tips');
-
-      this._tipsDom.style.position = 'absolute';
-      this._tipsDom.style.padding = '4px 8px';
-      this._tipsDom.style.backgroundColor = '#00000085';
-      this._tipsDom.style.color = '#fff';
-      this._tipsDom.style.boxShadow = '0 1px 4px rgb(0 0 0 / 80%)';
-      this.view_.container.append(this._tipsDom);
-    }
-
-    this._handlers.forEach(item => item.remove());
-
-    this._handlers.clear();
-
-    this._tipsDom.innerHTML = tips;
-    const pointerMouveHandler = this.view_.on('pointer-move', throttle(e => {
-      this._tipsDom.style.top = `${e.y + 16}px`;
-      this._tipsDom.style.left = `${e.x + 16}px`;
-    }, 100));
-
-    this._handlers.add(pointerMouveHandler);
-
-    const pointerLeaveHandler = this.view_.on('pointer-leave', () => {
-      this._tipsDom.style.display = 'none';
-    });
-
-    this._handlers.add(pointerLeaveHandler);
-
-    const pointerEnter = this.view_.on('pointer-enter', () => {
-      this._tipsDom.style.display = 'block';
-    });
-
-    this._handlers.add(pointerEnter);
-
-    return this;
-  }
-
-  cancelTips() {
-    var _this$_tipsDom, _this$_tipsDom$remove;
-
-    (_this$_tipsDom = this._tipsDom) === null || _this$_tipsDom === void 0 ? void 0 : (_this$_tipsDom$remove = _this$_tipsDom.remove) === null || _this$_tipsDom$remove === void 0 ? void 0 : _this$_tipsDom$remove.call(_this$_tipsDom); // eslint-disable-next-line
-    // @ts-ignore
-
-    this._tipsDom = null;
-
-    this._handlers.forEach(item => item.remove());
-
-    this._handlers.clear();
-
-    return this;
-  }
-
-}
-
-class Overlays extends FssgEsriPlugin {
-  constructor(options) {
-    super(options, {});
-
-    _defineProperty(this, "_overlayPool", void 0);
-
-    _defineProperty(this, "_overlayContainer", void 0);
-  }
-
-  _init() {
-    this._overlayContainer = document.createElement('div');
-
-    this._overlayContainer.classList.add('fssg-overlay-container');
-
-    this._overlayContainer.style.height = '100%';
-    this._overlayContainer.style.width = '100%';
-    this._overlayContainer.style.top = '0';
-    this._overlayContainer.style.left = '0';
-    this._overlayContainer.style.position = 'absolute';
-    this._overlayContainer.style.pointerEvents = 'none';
-    this._overlayContainer.style.overflow = 'hidden';
-    this.view_.container.append(this._overlayContainer);
-    this._overlayPool = new Map();
-    this.view_.when().then(() => {
-      this.view_.watch('extent', throttle(() => {
-        [...this._overlayPool.values()].forEach(item => {
-          const screenPt = this.view_.toScreen(item.mapXY);
-
-          if (item.screenX && item.screenY) {
-            screenPt.x = item.screenX;
-            screenPt.y = item.screenY;
-          }
-
-          item.container.style.top = `${screenPt.y + item.offsetY}px`;
-          item.container.style.left = `${screenPt.x + item.offsetX}px`;
-          const mapPt = this.view_.toMap({
-            x: screenPt.x + (item.offsetX ?? 0),
-            y: screenPt.y + (item.offsetY ?? 0)
-          });
-
-          if (item.bezierCurve) {
-            item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve);
-            item.bezierCurve = this.view_.$owner.mapElement.add(createGeometryFactory(this.$).createBezierCurve(item.mapXY, mapPt), item.bezierCurveSymbol);
-          }
-        });
-      }, 200));
-    });
-    return this;
-  }
-
-  installPlugin(fssgEsri) {
-    super.installPlugin(fssgEsri);
-    return this._init();
-  }
-
-  add(options) {
-    var _options$classNames;
-
-    const overlay = document.createElement('div');
-    overlay.classList.add('fssg-overlay');
-    (_options$classNames = options.classNames) === null || _options$classNames === void 0 ? void 0 : _options$classNames.forEach(name => overlay.classList.add(name));
-    overlay.style.position = 'absolute';
-    overlay.style.padding = '4px 8px';
-    overlay.style.backgroundColor = '#00000085';
-    overlay.style.color = '#fff';
-    overlay.style.boxShadow = '0 1px 4px rgb(0 0 0 / 80%)';
-    overlay.style.width = 'fit-content';
-    overlay.style.pointerEvents = 'all';
-    overlay.style.transition = 'all .1s ease-in-out';
-    typeof options.content === 'string' ? overlay.innerHTML = options.content : overlay.append(options.content);
-    const screenPt = this.view_.toScreen(options.point);
-
-    if (options.screenX && options.screenY) {
-      screenPt.x = options.screenX;
-      screenPt.y = options.screenY;
-    }
-
-    overlay.style.top = `${screenPt.y + (options.offsetY ?? 0)}px`;
-    overlay.style.left = `${screenPt.x + (options.offsetX ?? 0)}px`;
-    const mapPt = this.view_.toMap({
-      x: screenPt.x + (options.offsetX ?? 0),
-      y: screenPt.y + (options.offsetY ?? 0)
-    });
-    let bezierCurve = undefined;
-
-    if (options.showBezierCurve) {
-      bezierCurve = this.view_.$owner.mapElement.add(createGeometryFactory(this.$).createBezierCurve(options.point, mapPt), options.bezierCurveSymbol);
-    }
-
-    const id = options.id ?? `overlay-${createGuid()}`;
-    overlay.id = id;
-
-    this._overlayPool.set(id, {
-      id,
-      classNames: options.classNames,
-      container: overlay,
-      mapXY: options.point,
-      offsetX: options.offsetX ?? 0,
-      offsetY: options.offsetY ?? 0,
-      screenX: options.screenX,
-      screenY: options.screenY,
-      bezierCurve: bezierCurve,
-      bezierCurveSymbol: options.bezierCurveSymbol
-    });
-
-    this._overlayContainer.append(overlay);
-
-    return id;
-  }
-
-  removeById(id) {
-    const item = this._overlayPool.get(id);
-
-    if (item) {
-      item.container.remove();
-      item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve);
-
-      this._overlayPool.delete(id);
-    }
-
-    return this;
-  }
-
-  clear() {
-    [...this._overlayPool.values()].forEach(item => {
-      item.container.remove();
-      item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve);
-    });
-
-    this._overlayPool.clear();
-
-    return this;
-  }
-
-}
-
-class ViewCliper extends FssgEsriPlugin {
-  constructor(options) {
-    super(options, {});
-
-    _defineProperty(this, "_cliperLayer", void 0);
-  }
-
-  get cliperLayer() {
-    return this._cliperLayer;
-  }
-
-  _init() {
-    this._cliperLayer = new GraphicsLayer({
-      blendMode: 'destination-in',
-      effect: 'bloom(200%)'
-    });
-    return this;
-  }
-
-  installPlugin(fssgEsri) {
-    super.installPlugin(fssgEsri);
-    return this._init();
-  }
-
-  clip(arg0) {
-    if (!this.map_.findLayerById(this._cliperLayer.id)) {
-      this.map_.add(this._cliperLayer);
-    }
-
-    let graphic = arg0.clone();
-
-    if (graphic instanceof Geometry) {
-      graphic = new Graphic({
-        geometry: graphic
-      });
-    }
-
-    this._cliperLayer.graphics.removeAll();
-
-    this._cliperLayer.graphics.add(graphic);
-
-    return this;
-  }
-
-  restore() {
-    if (this.map_.findLayerById(this._cliperLayer.id)) {
-      this.map_.remove(this._cliperLayer);
-    }
-
     return this;
   }
 

@@ -1,6 +1,9 @@
 import { OnToolActivedParams, OnToolActivedReture } from '@fssgis/fssg-map'
 import { IMap, IView } from '../../../../fssg-esri'
 import FssgEsriBaseTool from '../../base-tool'
+import { Overlays } from '../../../overlays'
+import { MapElement } from '../../../map-element'
+import { MouseTips } from '../../../mouse-tips'
 
 export class ClearTool extends FssgEsriBaseTool {
 
@@ -23,7 +26,9 @@ export class ClearTool extends FssgEsriBaseTool {
     if (!super.onToolActived_(e)) {
       return false
     }
-    const { mapElement, overlays, mouseTips } = this.$
+    const mapElement = this.$.getPlugin(MapElement)
+    const overlays = this.$.getPlugin(Overlays)
+    const mouseTips = this.$.getPlugin(MouseTips)
     if (mapElement) {
       mapElement.clear(true)
     }

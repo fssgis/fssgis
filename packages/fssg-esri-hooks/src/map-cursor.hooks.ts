@@ -13,13 +13,13 @@ function _getMapCursor (arg0?: FssgEsri | MapCursor) : MapCursor {
   let mapCursor: MapCursor
   if (!arg0) {
     const fssgEsri = injectFssgEsri()
-    mapCursor = fssgEsri.mapCursor
+    mapCursor = fssgEsri.getPlugin(MapCursor)
     if (!mapCursor) {
       warn(this, 'MapCursor实例未挂载到FssgMap实例')
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      mapCursor = arg0.mapCursor
+      mapCursor = arg0.getPlugin(MapCursor)
     } else {
       mapCursor = arg0
     }
@@ -85,7 +85,7 @@ export function useMapCursor () : UseMapCursor
 export function useMapCursor (fssgEsri: FssgEsri) : UseMapCursor
 export function useMapCursor (fssgEsri?: FssgEsri) : UseMapCursor
 export function useMapCursor (fssgEsri?: FssgEsri) : UseMapCursor {
-  const mapCursor = fssgEsri?.mapCursor ?? injectMapCursor()
+  const mapCursor = fssgEsri?.getPlugin(MapCursor) ?? injectMapCursor()
   const { cursorType } = useMapCursorType()
   return createIsomorphicDestructurable(
     { mapCursor, cursorType } as const,

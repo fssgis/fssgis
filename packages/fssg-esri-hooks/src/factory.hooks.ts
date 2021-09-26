@@ -1,13 +1,13 @@
 import { FssgEsri, GeometryFacory, createGeometryFactory, ILayerFactory, createLayerFactory } from '@fssgis/fssg-esri'
 import { App, inject, InjectionKey, provide } from 'vue'
-import { useFssgEsri } from './fssg-esri.hooks'
+import { injectFssgEsri } from './fssg-esri.hooks'
 import { createIsomorphicDestructurable } from '@fssgis/utils'
 
 const SYMBOL_GEO_FACTORY : InjectionKey<GeometryFacory> = Symbol('FssgEsri.GeoFactory')
 const SYMBOL_LYR_FACTORY : InjectionKey<ILayerFactory> = Symbol('FssgEsri.LyrFactory')
 
 export function createGeoFactory (fssgEsri?: FssgEsri, app?: App) : GeometryFacory {
-  fssgEsri = fssgEsri || useFssgEsri().fssgEsri
+  fssgEsri = fssgEsri || injectFssgEsri()
   const factory = createGeometryFactory(fssgEsri)
   if (app) {
     app.provide(SYMBOL_GEO_FACTORY, factory)

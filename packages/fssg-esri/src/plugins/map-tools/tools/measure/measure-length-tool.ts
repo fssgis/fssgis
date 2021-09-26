@@ -3,6 +3,8 @@ import { IMap, IView } from '../../../../fssg-esri'
 import DrawPolylineTool, { IDrawPolylineToolEvents, IDrawPolylineToolOptions } from '../draw/draw-polyline-tool'
 import { OnDrawEndParams, OnDrawEndReture, OnDrawMoveParams, OnDrawMoveReture } from '../draw/draw-tool'
 import { planarLength } from '@arcgis/core/geometry/geometryEngineAsync'
+import { MouseTips } from '../../../mouse-tips'
+import { Overlays } from '../../../overlays'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IMeasureLengthToolOptions extends IDrawPolylineToolOptions {
@@ -47,7 +49,7 @@ export class MeasureLengthTool<
     }
     const line = graphic.geometry as __esri.Polyline
     planarLength(line, this.unit).then(length => {
-      this.view_.$owner.mouseTips.showTips(`长度：${length.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`)
+      this.view_.$owner.getPlugin(MouseTips).showTips(`长度：${length.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`)
     })
     return graphic
   }
@@ -56,7 +58,7 @@ export class MeasureLengthTool<
     if (!super.onToolDeactived_(e)) {
       return false
     }
-    this.view_.$owner.mouseTips.cancelTips()
+    this.view_.$owner.getPlugin(MouseTips).cancelTips()
     return true
   }
 
@@ -67,19 +69,19 @@ export class MeasureLengthTool<
     }
     const line = graphic.geometry as __esri.Polyline
     planarLength(line, this.unit).then(length => {
-      const id = this.view_.$owner.overlays.add({
+      const id = this.view_.$owner.getPlugin(Overlays).add({
         point: line.extent.center,
         content: `长度：${length.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`,
       })
       this._overlayIds.add(id)
     })
-    this.view_.$owner.mouseTips.cancelTips()
+    this.view_.$owner.getPlugin(MouseTips).cancelTips()
     return graphic
   }
 
   public clearMeasure () : this {
     this._overlayIds.forEach(id => {
-      this.view_.$owner.overlays.removeById(id)
+      this.view_.$owner.getPlugin(Overlays).removeById(id)
     })
     return this.clearDrawed()
   }

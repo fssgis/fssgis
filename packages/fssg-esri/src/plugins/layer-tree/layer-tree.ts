@@ -2,6 +2,7 @@ import { listToTree } from '@fssgis/utils'
 import { ext } from '@fssgis/ext'
 import FssgEsri from '../../fssg-esri'
 import FssgEsriPlugin, { IFssgEsriPluginEvents, IFssgEsriPluginOptions } from '../../fssg-esri-plugin'
+import { MapLayers } from '../map-layers'
 
 /**
  * 树节点
@@ -103,10 +104,10 @@ export class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEvent
     if (!node.layerId) {
       return this
     }
-    const layer = this.$.mapLayers.findLayer(node.layerId)
+    const layer = this.$.getPlugin(MapLayers).findLayer(node.layerId)
     layer && (layer.visible = checked)
     node.associatedLayerIds?.forEach(id => {
-      const layer = this.$.mapLayers.findLayer(id)
+      const layer = this.$.getPlugin(MapLayers).findLayer(id)
       layer && (layer.visible = checked)
     })
     if (checked) {
@@ -121,7 +122,7 @@ export class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEvent
    * 初始化
    */
   private _init () : this {
-    this.$.mapLayers.when().then(() => {
+    this.$.getPlugin(MapLayers).when().then(() => {
       this._list.forEach(item => {
         this._setNodeChecked(item, item.defaultChecked)
         item.defaultChecked && this._checkedIds.add(item.id)
@@ -144,7 +145,7 @@ export class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEvent
    */
   public override installPlugin (fssgEsri: FssgEsri) : this | Promise<this> {
     super.installPlugin(fssgEsri)
-    return this.$.mapLayers.when().then(() => this._init())
+    return this.$.getPlugin(MapLayers).when().then(() => this._init())
   }
 
   /**
@@ -155,7 +156,7 @@ export class LayerTree extends FssgEsriPlugin<ILayerTreeOptions, ILayerTreeEvent
   public findLayerFromNodeId (nodeId: string) : __esri.Layer | undefined {
     const layerId = this._list.find(item => item.id === nodeId)?.layerId
     if (layerId) {
-      return this.$.mapLayers.findLayer(layerId)
+      return this.$.getPlugin(MapLayers).findLayer(layerId)
     }
   }
 

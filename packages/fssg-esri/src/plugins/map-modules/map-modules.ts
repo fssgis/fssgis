@@ -1,3 +1,4 @@
+import { LayerTree } from '../layer-tree'
 import FssgEsri from '../../fssg-esri'
 import FssgEsriPlugin, { IFssgEsriPluginEvents, IFssgEsriPluginOptions } from '../../fssg-esri-plugin'
 
@@ -86,7 +87,7 @@ export class MapModules extends FssgEsriPlugin<IMapModulesOptions, IMapModulesEv
    */
    public override installPlugin (fssgEsri: FssgEsri) : this | Promise<this> {
     super.installPlugin(fssgEsri)
-    return this.$.layerTree.when().then(() => this)
+    return this.$.getPlugin(LayerTree).when().then(() => this)
   }
 
   /**
@@ -102,11 +103,11 @@ export class MapModules extends FssgEsriPlugin<IMapModulesOptions, IMapModulesEv
         this._selectedTitle = module.title
         item = module
         module.treeNodeIds.forEach(nodeId => {
-          this.$.layerTree.setNodeCheckById(nodeId, true)
+          this.$.getPlugin(LayerTree).setNodeCheckById(nodeId, true)
         })
       } else {
         module.treeNodeIds.forEach(nodeId => {
-          this.$.layerTree.setNodeCheckById(nodeId, false)
+          this.$.getPlugin(LayerTree).setNodeCheckById(nodeId, false)
         })
       }
     })
@@ -127,11 +128,11 @@ export class MapModules extends FssgEsriPlugin<IMapModulesOptions, IMapModulesEv
         this._selectedTitle = module.title
         item = module
         module.treeNodeIds.forEach(nodeId => {
-          this.$.layerTree.setNodeCheckById(nodeId, true)
+          this.$.getPlugin(LayerTree).setNodeCheckById(nodeId, true)
         })
       } else {
         module.treeNodeIds.forEach(nodeId => {
-          this.$.layerTree.setNodeCheckById(nodeId, false)
+          this.$.getPlugin(LayerTree).setNodeCheckById(nodeId, false)
         })
       }
     })

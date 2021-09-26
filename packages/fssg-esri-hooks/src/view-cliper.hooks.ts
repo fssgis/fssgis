@@ -12,13 +12,13 @@ function _getViewCliper (arg0?: FssgEsri | ViewCliper) : ViewCliper {
   let viewCliper: ViewCliper
   if (!arg0) {
     const fssgEsri = injectFssgEsri()
-    viewCliper = fssgEsri.viewCliper
+    viewCliper = fssgEsri.getPlugin(ViewCliper)
     if (!viewCliper) {
       warn(this, 'ViewCliper实例未挂载到FssgMap实例')
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      viewCliper = arg0.viewCliper
+      viewCliper = arg0.getPlugin(ViewCliper)
     } else {
       viewCliper = arg0
     }
@@ -53,7 +53,7 @@ export function useViewCliper () : UseViewCliper
 export function useViewCliper (fssgEsri: FssgEsri) : UseViewCliper
 export function useViewCliper (fssgEsri?: FssgEsri) : UseViewCliper
 export function useViewCliper (fssgEsri?: FssgEsri) : UseViewCliper {
-  const viewCliper = fssgEsri?.viewCliper ?? injectViewCliper()
+  const viewCliper = fssgEsri?.getPlugin(ViewCliper) ?? injectViewCliper()
   return createIsomorphicDestructurable(
     { viewCliper } as const,
     [viewCliper] as const,

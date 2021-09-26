@@ -2,7 +2,6 @@ import { FssgMap, IFssgMapEvents, IFssgMapOptions } from '@fssgis/fssg-map'
 import ArcGISMap from '@arcgis/core/Map'
 import MapView from '@arcgis/core/views/MapView'
 import esriConfig from '@arcgis/core/config'
-import { Basemap, Hawkeye, LayerTree, MapCursor, MapElement, MapLayers, MapModules, MapTools, MouseTips, Overlays, ViewCliper, MapPopups } from '../plugins'
 import { error } from '@fssgis/fssg-map'
 import { createGeometryFactory, LonLat, XY, getLonfromLonLat, getLatfromLonLat, getXfromXY, getYfromXY } from '../factories'
 import FssgEsriPlugin from '../fssg-esri-plugin'
@@ -43,19 +42,6 @@ export type IView = __esri.MapView & IOwner
  * 地图应用
  */
 export class FssgEsri extends FssgMap<IFssgEsriOptions, IFssgEsriEvents> {
-
-  public basemap: Basemap
-  public mapElement: MapElement
-  public mapTools: MapTools
-  public mapCursor: MapCursor
-  public mapLayers: MapLayers
-  public hawkeye: Hawkeye
-  public layerTree: LayerTree
-  public mapModules: MapModules
-  public mouseTips: MouseTips
-  public overlays: Overlays
-  public viewCliper: ViewCliper
-  public mapPopups: MapPopups
 
   //#region 私有属性
 

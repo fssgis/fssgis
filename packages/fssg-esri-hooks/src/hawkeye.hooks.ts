@@ -12,13 +12,13 @@ function _getHawkeye (arg0?: FssgEsri | Hawkeye) : Hawkeye {
   let hawkeye: Hawkeye
   if (!arg0) {
     const fssgEsri = injectFssgEsri()
-    hawkeye = fssgEsri.hawkeye
+    hawkeye = fssgEsri.getPlugin(Hawkeye)
     if (!hawkeye) {
       warn(this, 'Hawkeye实例未挂载到FssgMap实例')
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      hawkeye = arg0.hawkeye
+      hawkeye = arg0.getPlugin(Hawkeye)
     } else {
       hawkeye = arg0
     }
@@ -53,7 +53,7 @@ export function useHawkeye () : UseHawkeye
 export function useHawkeye (fssgEsri: FssgEsri) : UseHawkeye
 export function useHawkeye (fssgEsri?: FssgEsri) : UseHawkeye
 export function useHawkeye (fssgEsri?: FssgEsri) : UseHawkeye {
-  const hawkeye = fssgEsri?.hawkeye ?? injectHawkeye()
+  const hawkeye = fssgEsri?.getPlugin(Hawkeye) ?? injectHawkeye()
   return createIsomorphicDestructurable(
     { hawkeye } as const,
     [hawkeye] as const,

@@ -2,6 +2,7 @@ import { createGuid, throttle } from '@fssgis/utils'
 import { createGeometryFactory } from '../../factories'
 import FssgEsri from '../../fssg-esri'
 import FssgEsriPlugin, { IFssgEsriPluginEvents, IFssgEsriPluginOptions } from '../../fssg-esri-plugin'
+import { MapElement } from '../map-element'
 
 export interface IOverlaysOptions extends IFssgEsriPluginOptions { // eslint-disable-line
 
@@ -78,8 +79,8 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
           })
 
           if (item.bezierCurve) {
-            item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve)
-            item.bezierCurve = this.view_.$owner.mapElement.add(
+            item.bezierCurve && this.view_.$owner.getPlugin(MapElement).remove(item.bezierCurve)
+            item.bezierCurve = this.view_.$owner.getPlugin(MapElement).add(
               createGeometryFactory(this.$).createBezierCurve(item.mapXY, mapPt),
               item.bezierCurveSymbol,
             )
@@ -126,7 +127,7 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
     let bezierCurve: __esri.Graphic | undefined = undefined
 
     if (options.showBezierCurve) {
-      bezierCurve = this.view_.$owner.mapElement.add(
+      bezierCurve = this.view_.$owner.getPlugin(MapElement).add(
         createGeometryFactory(this.$).createBezierCurve(options.point, mapPt),
         options.bezierCurveSymbol
       )
@@ -155,7 +156,7 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
     const item = this._overlayPool.get(id)
     if (item) {
       item.container.remove()
-      item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve)
+      item.bezierCurve && this.view_.$owner.getPlugin(MapElement).remove(item.bezierCurve)
       this._overlayPool.delete(id)
     }
     return this
@@ -164,7 +165,7 @@ export class Overlays extends FssgEsriPlugin<IOverlaysOptions, IOverlaysEvents> 
   public clear () : this {
     [...this._overlayPool.values()].forEach(item => {
       item.container.remove()
-      item.bezierCurve && this.view_.$owner.mapElement.remove(item.bezierCurve)
+      item.bezierCurve && this.view_.$owner.getPlugin(MapElement).remove(item.bezierCurve)
     })
     this._overlayPool.clear()
     return this

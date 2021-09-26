@@ -13,10 +13,10 @@ function _getMapModules (arg0?: FssgEsri | MapModules) : MapModules {
   let mapModules: MapModules
   if (!arg0) {
     const fssgEsri = injectFssgEsri()
-    mapModules = fssgEsri.mapModules
+    mapModules = fssgEsri.getPlugin(MapModules)
   } else {
     if (arg0 instanceof FssgEsri) {
-      mapModules = arg0.mapModules
+      mapModules = arg0.getPlugin(MapModules)
     } else {
       mapModules = arg0
     }
@@ -114,7 +114,7 @@ export function useMapModules () : UseMapModules
 export function useMapModules (fssgEsri: FssgEsri) : UseMapModules
 export function useMapModules (fssgEsri?: FssgEsri) : UseMapModules
 export function useMapModules (fssgEsri?: FssgEsri) : UseMapModules {
-  const mapModules = fssgEsri?.mapModules ?? injectMapModules()
+  const mapModules = fssgEsri?.getPlugin(MapModules) ?? injectMapModules()
   const { selectedId } = toRefs(inject(SYMBOL_MAPMODULES_STATE) as IMapModulesState)
   const { selectedTitle } = useMapModulesSelectedTitle(mapModules)
   return createIsomorphicDestructurable(

@@ -1,4 +1,4 @@
-import { LayerTree, FssgEsri, ILayerTreeOptions, ITreeNode } from '@fssgis/fssg-esri'
+import { LayerTree, FssgEsri, ILayerTreeOptions, ITreeNode, MapLayers } from '@fssgis/fssg-esri'
 import { warn } from '@fssgis/fssg-map'
 import { App, inject, InjectionKey, provide, reactive, toRefs, watch, ToRefs } from 'vue'
 import { injectFssgEsri } from './fssg-esri.hooks'
@@ -12,13 +12,13 @@ function _getLayerTree (arg0?: FssgEsri | LayerTree) : LayerTree {
   let layerTree: LayerTree
   if (!arg0) {
     const fssgEsri = injectFssgEsri()
-    layerTree = fssgEsri.layerTree
+    layerTree = fssgEsri.getPlugin(LayerTree)
     if (!layerTree) {
       warn(this, 'LayerTree实例未挂载到FssgMap实例')
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      layerTree = arg0.layerTree
+      layerTree = arg0.getPlugin(LayerTree)
     } else {
       layerTree = arg0
     }
@@ -57,7 +57,7 @@ export function createLayerTree (options: ILayerTreeOptions, fssgEsri?: FssgEsri
           if (!item.layerId) {
             return
           }
-          const layer = (fssgEsri as FssgEsri).mapLayers.findLayer(item.layerId)
+          const layer = (fssgEsri as FssgEsri).getPlugin(MapLayers).findLayer(item.layerId)
           if (!layer) {
             return
           }
@@ -74,7 +74,7 @@ export function createLayerTree (options: ILayerTreeOptions, fssgEsri?: FssgEsri
         layerTree.setNodeCheckById(nodeId, false)
       })
     }, { immediate: true, deep: true })
-    ;(fssgEsri as FssgEsri).mapLayers.on('change:visible', e => {
+    ;(fssgEsri as FssgEsri).getPlugin(MapLayers).on('change:visible', e => {
       const node = layerTree.findNodeFromLayerId(e.options.id)
       if (!node) {
         return
@@ -113,7 +113,7 @@ export function useLayerTree () : IUseLayerTree
 export function useLayerTree (fssgEsri: FssgEsri) : IUseLayerTree
 export function useLayerTree (fssgEsri?: FssgEsri) : IUseLayerTree
 export function useLayerTree (fssgEsri?: FssgEsri) : IUseLayerTree {
-  const layerTree = fssgEsri?.layerTree ?? injectLayerTree()
+  const layerTree = fssgEsri?.getPlugin(LayerTree) ?? injectLayerTree()
   return {
     layerTree,
     ...toRefs(inject(SYMBOL_LAYERTREE_STATE) as ILayerTreeState),

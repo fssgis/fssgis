@@ -75,7 +75,7 @@ export class Hawkeye extends FssgEsriPlugin<IHawkeyeOptions, IHawkeyeEvents> {
     const sourceView = this.$.view
     const hawkeyeView = this._fssgEsri.view
     Promise.all([sourceView.when, hawkeyeView.when]).then(() => {
-      this._fssgEsri.mapElement
+      this._fssgEsri.getPlugin(MapElement)
         .set(sourceView.extent)
       //禁止移动地图
       hawkeyeView.on('drag', event => {
@@ -86,7 +86,7 @@ export class Hawkeye extends FssgEsriPlugin<IHawkeyeOptions, IHawkeyeEvents> {
       })
       // 动态主图绘制范围
       sourceView.watch(['zoom', 'center'], throttle(() => {
-        this._fssgEsri.mapElement
+        this._fssgEsri.getPlugin(MapElement)
           .set(sourceView.extent)
           this._fssgEsri.goto({
           zoom: sourceView.zoom - 4,

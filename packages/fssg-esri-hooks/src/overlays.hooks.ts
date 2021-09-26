@@ -13,13 +13,13 @@ function _getOverlays (arg0?: FssgEsri | Overlays) : Overlays {
   let overlays: Overlays
   if (!arg0) {
     const fssgEsri = injectFssgEsri()
-    overlays = fssgEsri.overlays
+    overlays = fssgEsri.getPlugin(Overlays)
     if (!overlays) {
       warn(this, 'Overlays实例未挂载到FssgMap实例')
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      overlays = arg0.overlays
+      overlays = arg0.getPlugin(Overlays)
     } else {
       overlays = arg0
     }
@@ -90,7 +90,7 @@ export function useOverlays () : IUseOverlays
 export function useOverlays (fssgEsri: FssgEsri) : IUseOverlays
 export function useOverlays (fssgEsri?: FssgEsri) : IUseOverlays
 export function useOverlays (fssgEsri?: FssgEsri) : IUseOverlays {
-  const overlays = fssgEsri?.overlays ?? injectOverlays()
+  const overlays = fssgEsri?.getPlugin(Overlays) ?? injectOverlays()
   return {
     overlays,
     ...useSetOverlays(overlays),

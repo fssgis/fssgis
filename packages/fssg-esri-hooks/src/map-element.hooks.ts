@@ -12,13 +12,13 @@ function _getMapElement (arg0?: FssgEsri | MapElement) : MapElement {
   let mapElement: MapElement
   if (!arg0) {
     const fssgEsri = injectFssgEsri()
-    mapElement = fssgEsri.mapElement
+    mapElement = fssgEsri.getPlugin(MapElement)
     if (!mapElement) {
       warn(this, 'MapElement实例未挂载到FssgMap实例')
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      mapElement = arg0.mapElement
+      mapElement = arg0.getPlugin(MapElement)
     } else {
       mapElement = arg0
     }
@@ -53,7 +53,7 @@ export function useMapElement () : UseMapElement
 export function useMapElement (fssgEsri: FssgEsri) : UseMapElement
 export function useMapElement (fssgEsri?: FssgEsri) : UseMapElement
 export function useMapElement (fssgEsri?: FssgEsri) : UseMapElement {
-  const mapElement = fssgEsri?.mapElement ?? injectMapElement()
+  const mapElement = fssgEsri?.getPlugin(MapElement) ?? injectMapElement()
   return createIsomorphicDestructurable(
     { mapElement } as const,
     [mapElement] as const,

@@ -3,6 +3,9 @@ import { IMap, IView } from '../../../fssg-esri'
 import DrawPointTool, { IDrawPointToolEvents, IDrawPointToolOptions } from './draw/draw-point-tool'
 import { OnDrawEndParams, OnDrawEndReture } from './draw/draw-tool'
 import { buffer } from '@arcgis/core/geometry/geometryEngineAsync'
+import { MapLayers } from '../../map-layers'
+import { MapElement } from '../../map-element'
+import { ViewCliper } from '../../view-cliper'
 
 export interface IAttributesConfigItem {
     layerName: string;
@@ -83,7 +86,7 @@ export class HitTestTool<
   private async _queryWithMapImageLayer (geometry: __esri.Point) : Promise<__esri.Graphic[]> {
     const fssgMap = this.$
     const ret : __esri.Graphic[] = []
-    await fssgMap.mapLayers.forEach(async ([layer, options]) => {
+    await fssgMap.getPlugin(MapLayers).forEach(async ([layer, options]) => {
       if (!['mapimagelayer', 'dynamiclayer'].includes(options.layerType)) {
         return
       }
@@ -121,7 +124,10 @@ export class HitTestTool<
     this.clearDrawed()
     const point = graphic.geometry as Point
     const screen = this.view_.toScreen(point)
-    const { mapElement, mapLayers, viewCliper } = this.$
+    // const { mapElement, mapLayers, viewCliper } = this.$
+    const mapElement = this.$.getPlugin(MapElement)
+    const mapLayers = this.$.getPlugin(MapLayers)
+    const viewCliper = this.$.getPlugin(ViewCliper)
     Promise.all([
       this._queryWithMapImageLayer(point),
       this.view_.hitTest(screen, {

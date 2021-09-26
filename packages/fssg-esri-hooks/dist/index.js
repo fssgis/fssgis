@@ -274,14 +274,14 @@ function _getBasemap(arg0) {
 
   if (!arg0) {
     const fssgEsri = injectFssgEsri();
-    basemap = fssgEsri.basemap;
+    basemap = fssgEsri.getPlugin(Basemap);
 
     if (!basemap) {
       warn(this, 'Basemap实例未挂载到FssgMap实例');
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      basemap = arg0.basemap;
+      basemap = arg0.getPlugin(Basemap);
     } else {
       basemap = arg0;
     }
@@ -344,7 +344,7 @@ function useBasemapVisible(arg0) {
   }, [visible]);
 }
 function useBasemap(fssgEsri) {
-  const basemap = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.basemap) ?? injectBasemap();
+  const basemap = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.getPlugin(Basemap)) ?? injectBasemap();
   const {
     selectedKey
   } = useBasemapSelectedKey(basemap);
@@ -361,7 +361,7 @@ function useBasemap(fssgEsri) {
 const SYMBOL_GEO_FACTORY = Symbol('FssgEsri.GeoFactory');
 const SYMBOL_LYR_FACTORY = Symbol('FssgEsri.LyrFactory');
 function createGeoFactory(fssgEsri, app) {
-  fssgEsri = fssgEsri || useFssgEsri().fssgEsri;
+  fssgEsri = fssgEsri || injectFssgEsri();
   const factory = createGeometryFactory(fssgEsri);
 
   if (app) {
@@ -401,14 +401,14 @@ function _getMapCursor(arg0) {
 
   if (!arg0) {
     const fssgEsri = injectFssgEsri();
-    mapCursor = fssgEsri.mapCursor;
+    mapCursor = fssgEsri.getPlugin(MapCursor);
 
     if (!mapCursor) {
       warn(this, 'MapCursor实例未挂载到FssgMap实例');
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      mapCursor = arg0.mapCursor;
+      mapCursor = arg0.getPlugin(MapCursor);
     } else {
       mapCursor = arg0;
     }
@@ -453,7 +453,7 @@ function injectMapCursor() {
   return inject(SYMBOL_MAPCURSOR);
 }
 function useMapCursor(fssgEsri) {
-  const mapCursor = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapCursor) ?? injectMapCursor();
+  const mapCursor = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.getPlugin(MapCursor)) ?? injectMapCursor();
   const {
     cursorType
   } = useMapCursorType();
@@ -481,7 +481,7 @@ function injectMapLayers() {
   return inject(SYMBOL_MAPLAYERS);
 }
 function useMapLayers(fssgEsri) {
-  const mapLayers = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapLayers) ?? injectMapLayers();
+  const mapLayers = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.getPlugin(MapLayers)) ?? injectMapLayers();
   return createIsomorphicDestructurable({
     mapLayers
   }, [mapLayers]);
@@ -505,7 +505,7 @@ function injectMapElement() {
   return inject(SYMBOL_MAPELEMENT);
 }
 function useMapElement(fssgEsri) {
-  const mapElement = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapElement) ?? injectMapElement();
+  const mapElement = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.getPlugin(MapElement)) ?? injectMapElement();
   return createIsomorphicDestructurable({
     mapElement
   }, [mapElement]);
@@ -516,14 +516,14 @@ function _getMapTools(arg0) {
 
   if (!arg0) {
     const fssgEsri = injectFssgEsri();
-    mapTools = fssgEsri.mapTools;
+    mapTools = fssgEsri.getPlugin(MapTools);
 
     if (!mapTools) {
       warn(this, 'MapTools实例未挂载到FssgMap实例');
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      mapTools = arg0.mapTools;
+      mapTools = arg0.getPlugin(MapTools);
     } else {
       mapTools = arg0;
     }
@@ -568,7 +568,7 @@ function injectMapTools() {
   return inject(SYMBOL_MAPTOOLS);
 }
 function useMapTools(fssgEsri) {
-  const mapTools = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapTools) ?? injectMapTools();
+  const mapTools = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.getPlugin(MapTools)) ?? injectMapTools();
   const {
     activedKey
   } = useMapToolsActivedKey(fssgEsri);
@@ -596,7 +596,7 @@ function injectHawkeye() {
   return inject(SYMBOL_HAWKEYE);
 }
 function useHawkeye(fssgEsri) {
-  const hawkeye = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.hawkeye) ?? injectHawkeye();
+  const hawkeye = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.getPlugin(Hawkeye)) ?? injectHawkeye();
   return createIsomorphicDestructurable({
     hawkeye
   }, [hawkeye]);
@@ -627,7 +627,7 @@ function createLayerTree(options, fssgEsri, app) {
             return;
           }
 
-          const layer = fssgEsri.mapLayers.findLayer(item.layerId);
+          const layer = fssgEsri.getPlugin(MapLayers).findLayer(item.layerId);
 
           if (!layer) {
             return;
@@ -650,7 +650,7 @@ function createLayerTree(options, fssgEsri, app) {
       immediate: true,
       deep: true
     });
-    fssgEsri.mapLayers.on('change:visible', e => {
+    fssgEsri.getPlugin(MapLayers).on('change:visible', e => {
       const node = layerTree.findNodeFromLayerId(e.options.id);
 
       if (!node) {
@@ -685,7 +685,7 @@ function injectLayerTree() {
   return inject(SYMBOL_LAYERTREE);
 }
 function useLayerTree(fssgEsri) {
-  const layerTree = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.layerTree) ?? injectLayerTree();
+  const layerTree = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.getPlugin(LayerTree)) ?? injectLayerTree();
   return {
     layerTree,
     ...toRefs(inject(SYMBOL_LAYERTREE_STATE))
@@ -697,10 +697,10 @@ function _getMapModules(arg0) {
 
   if (!arg0) {
     const fssgEsri = injectFssgEsri();
-    mapModules = fssgEsri.mapModules;
+    mapModules = fssgEsri.getPlugin(MapModules);
   } else {
     if (arg0 instanceof FssgEsri) {
-      mapModules = arg0.mapModules;
+      mapModules = arg0.getPlugin(MapModules);
     } else {
       mapModules = arg0;
     }
@@ -780,7 +780,7 @@ function injectMapModules() {
   return inject(SYMBOL_MAPMODULES);
 }
 function useMapModules(fssgEsri) {
-  const mapModules = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapModules) ?? injectMapModules();
+  const mapModules = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.getPlugin(MapModules)) ?? injectMapModules();
   const {
     selectedId
   } = toRefs(inject(SYMBOL_MAPMODULES_STATE));
@@ -812,7 +812,7 @@ function injectMouseTips() {
   return inject(SYMBOL_MOUSETIPS);
 }
 function useMouseTips(fssgEsri) {
-  const mouseTips = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mouseTips) ?? injectMouseTips();
+  const mouseTips = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.getPlugin(MouseTips)) ?? injectMouseTips();
   return createIsomorphicDestructurable({
     mouseTips
   }, [mouseTips]);
@@ -823,14 +823,14 @@ function _getOverlays(arg0) {
 
   if (!arg0) {
     const fssgEsri = injectFssgEsri();
-    overlays = fssgEsri.overlays;
+    overlays = fssgEsri.getPlugin(Overlays);
 
     if (!overlays) {
       warn(this, 'Overlays实例未挂载到FssgMap实例');
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      overlays = arg0.overlays;
+      overlays = arg0.getPlugin(Overlays);
     } else {
       overlays = arg0;
     }
@@ -888,7 +888,7 @@ function injectOverlays() {
   return inject(SYMBOL_OVERLAYS);
 }
 function useOverlays(fssgEsri) {
-  const overlays = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.overlays) ?? injectOverlays();
+  const overlays = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.getPlugin(Overlays)) ?? injectOverlays();
   return {
     overlays,
     ...useSetOverlays(overlays)
@@ -913,7 +913,7 @@ function injectViewCliper() {
   return inject(SYMBOL_VIEWCLIPER$1);
 }
 function useViewCliper(fssgEsri) {
-  const viewCliper = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.viewCliper) ?? injectViewCliper();
+  const viewCliper = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.getPlugin(ViewCliper)) ?? injectViewCliper();
   return createIsomorphicDestructurable({
     viewCliper
   }, [viewCliper]);
@@ -965,14 +965,14 @@ function _getMapPopups(arg0) {
 
   if (!arg0) {
     const fssgEsri = injectFssgEsri();
-    mapPopups = fssgEsri.mapPopups;
+    mapPopups = fssgEsri.getPlugin(MapPopups);
 
     if (!mapPopups) {
       warn(this, 'MapPopups实例未挂载到FssgMap实例');
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      mapPopups = arg0.mapPopups;
+      mapPopups = arg0.getPlugin(MapPopups);
     } else {
       mapPopups = arg0;
     }
@@ -999,7 +999,7 @@ function injectMapPopups() {
   return inject(SYMBOL_VIEWCLIPER);
 }
 function useMapPopups(fssgEsri) {
-  const mapPopups = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.mapPopups) ?? injectMapPopups();
+  const mapPopups = (fssgEsri === null || fssgEsri === void 0 ? void 0 : fssgEsri.getPlugin(MapPopups)) ?? injectMapPopups();
   return createIsomorphicDestructurable({
     mapPopups
   }, [mapPopups]);

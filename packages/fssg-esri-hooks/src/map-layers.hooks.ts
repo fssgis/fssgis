@@ -12,13 +12,13 @@ function _getMapLayers (arg0?: FssgEsri | MapLayers) : MapLayers {
   let mapLayers: MapLayers
   if (!arg0) {
     const fssgEsri = injectFssgEsri()
-    mapLayers = fssgEsri.mapLayers
+    mapLayers = fssgEsri.getPlugin(MapLayers)
     if (!mapLayers) {
       warn(this, 'MapLayers实例未挂载到FssgMap实例')
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      mapLayers = arg0.mapLayers
+      mapLayers = arg0.getPlugin(MapLayers)
     } else {
       mapLayers = arg0
     }
@@ -53,7 +53,7 @@ export function useMapLayers () : UseMapLayers
 export function useMapLayers (fssgEsri: FssgEsri) : UseMapLayers
 export function useMapLayers (fssgEsri?: FssgEsri) : UseMapLayers
 export function useMapLayers (fssgEsri?: FssgEsri) : UseMapLayers {
-  const mapLayers = fssgEsri?.mapLayers ?? injectMapLayers()
+  const mapLayers = fssgEsri?.getPlugin(MapLayers) ?? injectMapLayers()
   return createIsomorphicDestructurable(
     { mapLayers } as const,
     [mapLayers] as const,

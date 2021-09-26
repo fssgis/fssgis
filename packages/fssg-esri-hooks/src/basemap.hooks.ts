@@ -13,13 +13,13 @@ function _getBasemap (arg0?: FssgEsri | Basemap) : Basemap {
   let basemap: Basemap
   if (!arg0) {
     const fssgEsri = injectFssgEsri()
-    basemap = fssgEsri.basemap
+    basemap = fssgEsri.getPlugin(Basemap)
     if (!basemap) {
       warn(this, 'Basemap实例未挂载到FssgMap实例')
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      basemap = arg0.basemap
+      basemap = arg0.getPlugin(Basemap)
     } else {
       basemap = arg0
     }
@@ -117,7 +117,7 @@ export function useBasemap () : UseBasemap
 export function useBasemap (fssgEsri: FssgEsri) : UseBasemap
 export function useBasemap (fssgEsri?: FssgEsri) : UseBasemap
 export function useBasemap (fssgEsri?: FssgEsri) : UseBasemap {
-  const basemap = fssgEsri?.basemap ?? injectBasemap()
+  const basemap = fssgEsri?.getPlugin(Basemap) ?? injectBasemap()
   const { selectedKey } = useBasemapSelectedKey(basemap)
   const { visible } = useBasemapVisible(basemap)
   return createIsomorphicDestructurable(

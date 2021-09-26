@@ -3,6 +3,8 @@ import { IMap, IView } from '../../../../fssg-esri'
 import { OnDrawEndParams, OnDrawEndReture, OnDrawMoveParams, OnDrawMoveReture } from '../draw/draw-tool'
 import { planarArea } from '@arcgis/core/geometry/geometryEngineAsync'
 import DrawPolygonTool, { IDrawPolygonToolEvents, IDrawPolygonToolOptions } from '../draw/draw-polygon-tool'
+import { MouseTips } from '../../../mouse-tips'
+import { Overlays } from '../../../overlays'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IMeasureAreaToolOptions extends IDrawPolygonToolOptions {
@@ -50,7 +52,7 @@ export class MeasureAreaTool<
     const polygon = graphic.geometry as __esri.Polygon
     planarArea(polygon, this.unit).then(area => {
       area = Math.abs(area)
-      this.view_.$owner.mouseTips.showTips(`面积：${area.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`)
+      this.view_.$owner.getPlugin(MouseTips).showTips(`面积：${area.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`)
     })
     return graphic
   }
@@ -59,7 +61,7 @@ export class MeasureAreaTool<
     if (!super.onToolDeactived_(e)) {
       return false
     }
-    this.view_.$owner.mouseTips.cancelTips()
+    this.view_.$owner.getPlugin(MouseTips).cancelTips()
     return true
   }
 
@@ -71,19 +73,19 @@ export class MeasureAreaTool<
     const polygon = graphic.geometry as __esri.Polygon
     planarArea(polygon, this.unit).then(area => {
       area = Math.abs(area)
-      const id = this.view_.$owner.overlays.add({
+      const id = this.view_.$owner.getPlugin(Overlays).add({
         point: polygon.extent.center,
         content: `面积：${area.toFixed(this.fixedCount)}${this._unitStrDic[this.unit]}`,
       })
       this._overlayIds.add(id)
     })
-    this.view_.$owner.mouseTips.cancelTips()
+    this.view_.$owner.getPlugin(MouseTips).cancelTips()
     return graphic
   }
 
   public clearMeasure () : this {
     this._overlayIds.forEach(id => {
-      this.view_.$owner.overlays.removeById(id)
+      this.view_.$owner.getPlugin(Overlays).removeById(id)
     })
     return this.clearDrawed()
   }

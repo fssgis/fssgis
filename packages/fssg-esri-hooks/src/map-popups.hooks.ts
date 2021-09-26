@@ -60,13 +60,13 @@ function _getMapPopups (arg0?: FssgEsri | MapPopups) : MapPopups {
   let mapPopups: MapPopups
   if (!arg0) {
     const fssgEsri = injectFssgEsri()
-    mapPopups = fssgEsri.mapPopups
+    mapPopups = fssgEsri.getPlugin(MapPopups)
     if (!mapPopups) {
       warn(this, 'MapPopups实例未挂载到FssgMap实例')
     }
   } else {
     if (arg0 instanceof FssgEsri) {
-      mapPopups = arg0.mapPopups
+      mapPopups = arg0.getPlugin(MapPopups)
     } else {
       mapPopups = arg0
     }
@@ -101,7 +101,7 @@ export function useMapPopups () : UseMapPopups
 export function useMapPopups (fssgEsri: FssgEsri) : UseMapPopups
 export function useMapPopups (fssgEsri?: FssgEsri) : UseMapPopups
 export function useMapPopups (fssgEsri?: FssgEsri) : UseMapPopups {
-  const mapPopups = fssgEsri?.mapPopups ?? injectMapPopups()
+  const mapPopups = fssgEsri?.getPlugin(MapPopups) ?? injectMapPopups()
   return createIsomorphicDestructurable(
     { mapPopups } as const,
     [mapPopups] as const,

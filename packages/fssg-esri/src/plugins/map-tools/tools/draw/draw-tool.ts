@@ -9,6 +9,8 @@ import { ICallbackParams } from '@fssgis/observable'
 import Point from '@arcgis/core/geometry/Point'
 import { IMap, IView } from '../../../../fssg-esri'
 import { OnToolActivedParams, OnToolActivedReture, OnToolDeactivedParams, OnToolDeactivedReture } from '@fssgis/fssg-map'
+import { MapCursor } from '../../../map-cursor'
+import { MapElement } from '../../../map-element'
 
 type Concrete<Type> = {
   [Property in keyof Type]-?: Type[Property];
@@ -166,7 +168,9 @@ export abstract class DrawTool<
     if (!super.onToolActived_(e)) {
       return false
     }
-    const { mapElement, mapCursor } = this.$
+    // const { mapElement, mapCursor } = this.$
+    const mapElement = this.$.getPlugin(MapElement)
+    const mapCursor = this.$.getPlugin(MapCursor)
     if (!mapElement) {
       // TODO
       return false
@@ -185,13 +189,13 @@ export abstract class DrawTool<
     }
     this.action_.destroy()
     this.draw_.destroy()
-    const { mapElement } = this.map_.$owner
+    const mapElement = this.$.getPlugin(MapElement)
     if (!mapElement) {
       return false
     }
     this._tempGraphic && mapElement.remove(this._tempGraphic)
     this._tempGraphic = null
-    const { mapCursor } = this.$
+    const mapCursor = this.$.getPlugin(MapCursor)
     mapCursor.cursorType = 'default'
     return true
   }
@@ -214,7 +218,7 @@ export abstract class DrawTool<
     if (!this.actived) {
       return false
     }
-    const { mapElement } = this.map_.$owner
+    const mapElement = this.$.getPlugin(MapElement)
     if (!mapElement) {
       return false
     }
@@ -230,7 +234,7 @@ export abstract class DrawTool<
     if (!this.actived) {
       return false
     }
-    const { mapElement } = this.map_.$owner
+    const mapElement = this.$.getPlugin(MapElement)
     if (!mapElement) {
       return false
     }
@@ -256,7 +260,7 @@ export abstract class DrawTool<
    *清理绘制过的图元
    */
   public clearDrawed () : this {
-    const { mapElement } = this.map_.$owner
+    const mapElement = this.$.getPlugin(MapElement)
     if (!mapElement) {
       return this
     }

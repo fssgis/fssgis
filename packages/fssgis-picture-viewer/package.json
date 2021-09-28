@@ -1,0 +1,20 @@
+{
+  "name": "@fssgis/picture-viewer",
+  "version": "0.0.0",
+  "description": "🎉使用Leaflet地图框架实现的图片查看器",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "keywords": [
+    "javascript",
+    "typescript",
+    "picture",
+    "viewer",
+    "leaflet"
+  ],
+  "dependencies": {
+    "@fssgis/ext": "^1.1.3",
+    "@fssgis/observable": "^1.1.2",
+    "@fssgis/utils": "^1.1.2",
+    "leaflet": "^1.7.1"
+  }
+}

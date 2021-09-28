@@ -55,9 +55,9 @@ module.exports = {
           ],
         },
         {
-          text: '@fssgis/esri',
+          text: '@fssgis/fssg-esri',
           children: [
-            { text: 'use to @fssgis/esri', link: '/guide/fssgis-esri/index' },
+            { text: 'use to @fssgis/fssg-esri', link: '/guide/fssgis-esri/index' },
           ],
         },
         {
@@ -68,7 +68,13 @@ module.exports = {
             { text: 'FssgGrid Grid布局组件', link: '/guide/fssgis-ui/fssg-grid' },
             { text: 'FssgBox 指标可视化组件', link: '/guide/fssgis-ui/fssg-box' },
           ]
-        }
+        },
+        {
+          text: '@fssgis/picture-viewer',
+          children: [
+            { text: 'use to @fssgis/picture-viewer', link: '/guide/fssgis-picture-viewer/index' },
+          ],
+        },
       ],
     },
   },

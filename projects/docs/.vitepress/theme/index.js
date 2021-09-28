@@ -20,6 +20,7 @@ import {
   FssgBoxV6,
 } from '@fssgis/ui'
 import ExampleFssgBox from '../../components/fssgis-ui/Example.FssgBox.vue'
+import ExamplePictureViewer from '../../components/fssgis-picture-viewer/ExamplePictureViewer.vue'
 
 export default {
   ...DefaultTheme,
@@ -41,5 +42,6 @@ export default {
     app.component('FssgBoxV5', FssgBoxV5)
     app.component('FssgBoxV6', FssgBoxV6)
     app.component('ExampleFssgBox', ExampleFssgBox)
+    app.component('ExamplePictureViewer', ExamplePictureViewer)
   }
 }

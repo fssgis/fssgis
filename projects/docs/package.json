@@ -11,6 +11,7 @@
     "@fssgis/fssg-leaflet": "^1.1.4",
     "@fssgis/grid": "^1.0.10-alpha.0",
     "@fssgis/icon": "^1.0.3",
+    "@fssgis/picture-viewer": "^0.0.0",
     "@fssgis/utils": "^1.1.2",
     "@fssgis/ui": "^1.1.3",
     "leaflet": "^1.7.1",

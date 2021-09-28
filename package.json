@@ -39,7 +39,8 @@
     "test:vite": "vite --config ./packages/test-vite/vite.config.js",
     "dev:map-configuration": "vite --config ./projects/map-configuration/vite.config.js",
     "build:map-configuration": "vite build --config ./projects/map-configuration/vite.config.js",
-    "build:picture-viewer": "npx rollup --config ./build/build.fssgis-picture-viewer.js -w"
+    "build:picture-viewer": "npx rollup --config ./build/build.fssgis-picture-viewer.js -w",
+    "build:pg": "npx rollup --config ./build/build.fssgis-pg.js -w"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
@@ -52,6 +53,7 @@
     "@types/arcgis-js-api": "^4.20.1",
     "@types/jest": "^26.0.24",
     "@types/leaflet": "^1.7.4",
+    "@types/pg": "^8.6.1",
     "@types/proj4leaflet": "^1.0.6",
     "@typescript-eslint/eslint-plugin": "^4.28.4",
     "@typescript-eslint/parser": "^4.28.4",

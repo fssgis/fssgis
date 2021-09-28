@@ -1,0 +1,16 @@
+{
+  "name": "@fssgis/pg",
+  "version": "0.0.0",
+  "description": "🎉postgresql数据库操作库",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "keywords": [
+    "javascript",
+    "typescript",
+    "postgresql",
+    "db"
+  ],
+  "dependencies": {
+    "pg": "^8.7.1"
+  }
+}

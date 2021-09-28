@@ -105,9 +105,9 @@ export class Basemap extends FssgLeafletPlugin<IBasemapOptions, IBasemapEvents> 
    * @param fssgLeaflet 地图应用
    * @returns this
    */
-  public override installPlugin (fssgLeaflet: FssgLeaflet) : this {
-    return super.installPlugin(fssgLeaflet)
-      ._init()
+  public override installPlugin (fssgLeaflet: FssgLeaflet) : this | Promise<this> {
+    super.installPlugin(fssgLeaflet)
+    return this._init()
   }
 
 }

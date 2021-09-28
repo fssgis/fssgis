@@ -40,7 +40,7 @@ export class FssgLeafletPlugin<
    * @param fssgLeaflet 地图应用实例
    * @returns this
    */
-  public installPlugin (fssgLeaflet: FssgLeaflet) : this {
+  public installPlugin (fssgLeaflet: FssgLeaflet) : this | Promise<this> {
     this.map_ = fssgLeaflet.map
     return this
   }

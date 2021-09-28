@@ -53,9 +53,6 @@ export interface ILocateOptions extends ZoomPanOptions {
  */
 export class FssgLeaflet extends FssgMap<IFssgLeafletOptions, IFssgLeafletEvents> {
 
-  public basemap: Basemap
-  public mapElement: MapElement
-
   /**
    * leaflet地图实例
    */

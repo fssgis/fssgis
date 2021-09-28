@@ -59,10 +59,6 @@ class FssgLeaflet extends FssgMap {
       }
     });
 
-    _defineProperty(this, "basemap", void 0);
-
-    _defineProperty(this, "mapElement", void 0);
-
     _defineProperty(this, "_map", void 0);
   }
   /**
@@ -493,7 +489,8 @@ class Basemap extends FssgLeafletPlugin {
 
 
   installPlugin(fssgLeaflet) {
-    return super.installPlugin(fssgLeaflet)._init();
+    super.installPlugin(fssgLeaflet);
+    return this._init();
   }
 
 }

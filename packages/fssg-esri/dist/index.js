@@ -2720,13 +2720,32 @@ class Overlays extends FssgEsriPlugin {
 
 }
 
+load();
 class MeasureCoordinateTool extends DrawPointTool {
   constructor(map, view) {
     super(map, view);
 
+    _defineProperty(this, "showLonlat", void 0);
+
     _defineProperty(this, "_overlayIds", void 0);
 
     this._overlayIds = new Set();
+    this.showLonlat = true;
+  }
+
+  _createContent(point) {
+    let content = '';
+
+    if (this.showLonlat) {
+      const pt = project(point, new SpatialReference({
+        wkid: 4326
+      }));
+      content = `经度: ${pt.x.toFixed(6)}<br>纬度: ${pt.y.toFixed(6)}`;
+    } else {
+      content = `x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`;
+    }
+
+    return content;
   }
 
   onDrawMove_(e) {
@@ -2737,7 +2756,10 @@ class MeasureCoordinateTool extends DrawPointTool {
     }
 
     const point = graphic.geometry;
-    this.view_.$owner.getPlugin(MouseTips).showTips(`x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`);
+
+    const content = this._createContent(point);
+
+    this.view_.$owner.getPlugin(MouseTips).showTips(content);
     return graphic;
   }
 
@@ -2758,9 +2780,12 @@ class MeasureCoordinateTool extends DrawPointTool {
     }
 
     const point = graphic.geometry;
+
+    const content = this._createContent(point);
+
     const id = this.view_.$owner.getPlugin(Overlays).add({
       point,
-      content: `x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`,
+      content,
       offsetX: 0,
       offsetY: 0,
       showBezierCurve: true

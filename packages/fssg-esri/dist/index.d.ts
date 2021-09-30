@@ -1071,8 +1071,10 @@ interface IMeasureCoordinateToolOptions extends IDrawPointToolOptions {
 interface IMeasureCoordinateToolEvents extends IDrawPointToolEvents {
 }
 declare class MeasureCoordinateTool<T_OPTIONS extends IMeasureCoordinateToolOptions = IMeasureCoordinateToolOptions, T_EVENTS extends IMeasureCoordinateToolEvents = IMeasureCoordinateToolEvents> extends DrawPointTool<T_OPTIONS, T_EVENTS> {
+    showLonlat: boolean;
     private _overlayIds;
     constructor(map: IMap, view: IView);
+    private _createContent;
     protected onDrawMove_(e: OnDrawMoveParams<this>): OnDrawMoveReture;
     protected onToolDeactived_(e: OnToolDeactivedParams<this>): OnToolDeactivedReture;
     protected onDrawEnd_(e: OnDrawEndParams<this>): OnDrawEndReture;

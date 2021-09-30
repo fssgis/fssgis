@@ -4,6 +4,9 @@ import DrawPointTool, { IDrawPointToolEvents, IDrawPointToolOptions } from '../d
 import { OnDrawEndParams, OnDrawEndReture, OnDrawMoveParams, OnDrawMoveReture } from '../draw/draw-tool'
 import { MouseTips } from '../../../mouse-tips'
 import { Overlays } from '../../../overlays'
+import { load, project } from '@arcgis/core/geometry/projection'
+import SpatialReference from '@arcgis/core/geometry/SpatialReference'
+load()
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IMeasureCoordinateToolOptions extends IDrawPointToolOptions {
@@ -18,11 +21,25 @@ export class MeasureCoordinateTool<
   T_EVENTS extends IMeasureCoordinateToolEvents = IMeasureCoordinateToolEvents,
 > extends DrawPointTool<T_OPTIONS, T_EVENTS> {
 
+  public showLonlat: boolean
+
   private _overlayIds: Set<string>
 
   constructor (map: IMap, view: IView) {
     super(map, view)
     this._overlayIds = new Set()
+    this.showLonlat = true
+  }
+
+  private _createContent (point: __esri.Point) : string {
+    let content = ''
+    if (this.showLonlat) {
+      const pt = project(point, new SpatialReference({ wkid: 4326 })) as __esri.Point
+      content = `经度: ${pt.x.toFixed(6)}<br>纬度: ${pt.y.toFixed(6)}`
+    } else {
+      content = `x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`
+    }
+    return content
   }
 
   protected override onDrawMove_ (e: OnDrawMoveParams<this>) : OnDrawMoveReture {
@@ -31,7 +48,8 @@ export class MeasureCoordinateTool<
       return false
     }
     const point = graphic.geometry as __esri.Point
-    this.view_.$owner.getPlugin(MouseTips).showTips(`x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`)
+    const content = this._createContent(point)
+    this.view_.$owner.getPlugin(MouseTips).showTips(content)
     return graphic
   }
 
@@ -49,9 +67,10 @@ export class MeasureCoordinateTool<
       return false
     }
     const point = graphic.geometry as __esri.Point
+    const content = this._createContent(point)
     const id = this.view_.$owner.getPlugin(Overlays).add({
       point,
-      content: `x: ${point.x.toFixed(3)}<br>y: ${point.y.toFixed(3)}`,
+      content,
       offsetX: 0,
       offsetY: 0,
       showBezierCurve: true,

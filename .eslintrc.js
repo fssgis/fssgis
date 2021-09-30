@@ -24,7 +24,10 @@ module.exports = {
     'vue'
   ],
   'globals': {
-    '__esri': true
+    '__esri': true,
+    'defineProps': true,
+    'defineEmits': true,
+    'defineExpose': true,
   },
   'rules': {
 

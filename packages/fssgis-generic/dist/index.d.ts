@@ -47,5 +47,9 @@ let t4 : ReturnPromiseType<typeof test2> // number
  */
 declare type ReturnPromiseType<Type extends (...args: any[]) => any> = Type extends (...args: any[]) => Promise<infer Return> ? Return : ReturnType<Type>;
 declare type IsomorphicDestructurable<T extends Record<string, unknown>, A extends readonly any[]> = T & A;
+/**
+ * 非数组类型
+ */
+declare type NonArray<T> = T extends Array<unknown> ? T[0] : T;
 
-export { Concrete, IsomorphicDestructurable, Optional, ReturnPromiseType };
+export { Concrete, IsomorphicDestructurable, NonArray, Optional, ReturnPromiseType };

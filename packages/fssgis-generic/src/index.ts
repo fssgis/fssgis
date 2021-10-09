@@ -59,3 +59,8 @@ export type IsomorphicDestructurable<
   T extends Record<string, unknown>,
   A extends readonly any[] // eslint-disable-line
 > = T & A
+
+/**
+ * 非数组类型
+ */
+export type NonArray<T> = T extends Array<unknown> ? T[0] : T

@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/ban-types */
 
 /**
  * 成员具体化
- * @example
- * @deprecated please use Required<>
+ * @example\
 Concrete<{       // => {
   a?: number     // =>   a: number
   b?: string     // =>   b: string
@@ -13,14 +13,15 @@ Concrete<{       // => {
 }>               // => }
  */
 export type Concrete<Type> = {
-  [Property in keyof Type]-?: Concrete<Type[Property]>
+  [Property in keyof Type]-?: Type[Property] extends object
+    ? Concrete<Type[Property]>
+    : Type[Property]
 }
 
 
 /**
  * 成员可选化
  * @example
- * @deprecated please use Partial<>
 Concrete<{       // => {
   a: number      // =>   a?: number
   b: string      // =>   b?: string
@@ -31,7 +32,9 @@ Concrete<{       // => {
 }>               // => }
  */
 export type Optional<Type> = {
-  [Property in keyof Type]?: Optional<Type[Property]>;
+  [Property in keyof Type]?: Type[Property] extends object
+    ? Optional<Type[Property]>
+    : Type[Property]
 }
 
 /**
